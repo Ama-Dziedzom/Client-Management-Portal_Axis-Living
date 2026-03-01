@@ -1,4 +1,5 @@
 @import url('https://fonts.cdnfonts.com/css/quinsi');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -11,12 +12,26 @@
 
   --font-heading: "Quinsi", serif;
   --font-body: var(--font-manrope), sans-serif;
+  --font-playfair: "Playfair Display", serif;
 }
 
 :root {
   --background: #C6B9AA;
   --foreground: #2F402C;
   --accent: #2F402C;
+}
+
+.font-playfair {
+  font-family: var(--font-playfair);
+}
+
+.drop-cap::first-letter {
+  float: left;
+  font-size: 5.5rem;
+  line-height: 0.8;
+  padding-right: 0.8rem;
+  font-family: var(--font-playfair);
+  color: var(--foreground);
 }
 
 html {

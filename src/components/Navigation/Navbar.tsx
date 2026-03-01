@@ -30,6 +30,7 @@ const Navbar = () => {
         { name: "Portfolio", href: "/portfolio" },
         { name: "Pricing", href: "/pricing" },
         { name: "About", href: "/about" },
+        { name: "Journal", href: "/journal" },
     ];
 
     const isProjectDetail = pathname.startsWith("/portfolio/") && pathname !== "/portfolio";

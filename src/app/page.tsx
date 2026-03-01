@@ -5,7 +5,9 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { ArrowRight, Quote } from "lucide-react";
 import { getFeaturedProjects } from "../data/projects";
+import { getFeaturedPosts } from "../data/journal";
 import { Project } from "../types/project";
+import { Post } from "../types/journal";
 import { useRef, useState, useEffect } from "react";
 import LookbookSection from "../components/EmailCapture/LookbookSection";
 
@@ -82,6 +84,7 @@ export default function Home() {
     };
 
     const featuredProjects = getFeaturedProjects();
+    const featuredPosts = getFeaturedPosts();
     const [heroElement, setHeroElement] = useState<HTMLElement | null>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -332,6 +335,70 @@ export default function Home() {
             </section>
 
             <LookbookSection />
+
+            {/* Journal Preview Section */}
+            <section className="py-24 px-6 lg:px-24 bg-white border-t border-foreground/5 overflow-hidden">
+                <div className="max-w-7xl mx-auto">
+                    <header className="mb-20 flex flex-col md:flex-row justify-between items-end gap-8">
+                        <motion.div
+                            variants={fadeInUp}
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                        >
+                            <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">From the Studio</span>
+                            <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2]">Thoughts on design, process, <br /><span className="italic font-light">and living well</span></h2>
+                        </motion.div>
+                        <motion.div
+                            variants={fadeInUp}
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                        >
+                            <Link href="/journal" className="bg-accent text-white px-8 py-3 rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-lg flex items-center gap-2">
+                                Read All Articles <ArrowRight size={14} />
+                            </Link>
+                        </motion.div>
+                    </header>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {featuredPosts.slice(0, 2).map((post: Post) => (
+                            <motion.div
+                                key={post.id}
+                                variants={fadeInUp}
+                                initial="initial"
+                                whileInView="animate"
+                                viewport={{ once: true }}
+                                className="group bg-background overflow-hidden shadow-2xl flex flex-col md:flex-row border border-foreground/5 hover:border-accent/10 transition-all duration-500"
+                            >
+                                <div className="relative aspect-[16/10] md:aspect-square md:w-[45%] overflow-hidden">
+                                    <Image
+                                        src={post.coverImage}
+                                        alt={post.title}
+                                        fill
+                                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                    />
+                                    <div className="absolute top-4 left-4">
+                                        <span className="bg-white/90 backdrop-blur-md text-accent text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                                            {post.category}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-8 md:p-10 md:w-[55%] flex flex-col justify-center">
+                                    <p className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mb-4">{post.readTime} · {new Date(post.publishedAt).toLocaleDateString('en-ZM', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                    <h3 className="text-2xl md:text-3xl font-heading mb-6 group-hover:text-accent transition-colors leading-tight">{post.title}</h3>
+                                    <p className="text-foreground/50 text-sm line-clamp-3 mb-8 leading-relaxed font-light">{post.excerpt}</p>
+                                    <div className="pt-2">
+                                        <Link href={`/journal/${post.slug}`} className="text-[10px] font-bold uppercase tracking-widest text-accent hover:gap-4 transition-all flex items-center gap-2 group-hover:gap-4">
+                                            Read Entry <ArrowRight size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
             {/* Final CTA Hero */}
             <section className="relative h-[80vh] min-h-[500px] overflow-hidden flex items-center justify-center">
