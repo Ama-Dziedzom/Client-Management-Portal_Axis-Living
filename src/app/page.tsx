@@ -61,7 +61,7 @@ export default function Home() {
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="bg-background">
             {/* Hero Section */}
             <section ref={setHeroElement} className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
                 <motion.div style={{ y }} className="absolute inset-0 z-0">

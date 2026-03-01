@@ -30,9 +30,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={`${manrope.variable} scroll-smooth`}>
-            <body className="bg-background text-foreground antialiased min-h-screen flex flex-col">
+            <body className="bg-background text-foreground antialiased min-h-screen">
                 <Navbar />
-                <main className="flex-grow">
+                <main>
                     {children}
                 </main>
                 <Footer />

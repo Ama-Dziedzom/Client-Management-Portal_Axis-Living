@@ -68,11 +68,12 @@ const AboutClient = () => {
                         priority
                     />
                 </motion.div>
-                <div className="relative z-10 text-center text-white px-6">
+                <div className="absolute inset-0 bg-black/40 z-10" />
+                <div className="relative z-20 text-center text-white px-6">
                     <motion.p
                         initial={{ opacity: 0, letterSpacing: "0.2em" }}
                         animate={{ opacity: 1, letterSpacing: "0.5em" }}
-                        className="text-accent text-xs font-bold uppercase mb-4"
+                        className="text-white text-xs font-bold uppercase mb-4 opacity-90"
                     >
                         The Studio
                     </motion.p>
@@ -83,7 +84,7 @@ const AboutClient = () => {
                     >
                         Our Philosophy
                     </motion.h1>
-                    <p className="max-w-2xl mx-auto text-white/50 text-sm tracking-widest uppercase font-medium">
+                    <p className="max-w-2xl mx-auto text-white/90 text-sm tracking-[0.5em] uppercase font-bold">
                         Good design isn&apos;t decorating. It&apos;s problem-solving with beauty.
                     </p>
                 </div>
@@ -159,7 +160,7 @@ const AboutClient = () => {
                         viewport={{ once: true, margin: "-100px" }}
                         className="mb-24 text-center"
                     >
-                        <span className="text-white/50 text-xs font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
+                        <span className="text-white/70 text-xs font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
                         <h2 className="text-white text-5xl md:text-8xl font-heading mb-12 font-light leading-[1.2] tracking-wide">My Process</h2>
                     </motion.header>
 
@@ -178,7 +179,7 @@ const AboutClient = () => {
                             >
                                 <span className="text-white/30 text-4xl font-heading mb-8 italic group-hover:text-white/70 transition-all">{proc.step}</span>
                                 <h3 className="text-white text-2xl font-heading mb-6 group-hover:text-white/60 transition-colors">{proc.title}</h3>
-                                <p className="text-sm font-body leading-relaxed text-white/50">
+                                <p className="text-sm font-body leading-relaxed text-white/70">
                                     {proc.description}
                                 </p>
                             </motion.div>

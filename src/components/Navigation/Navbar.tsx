@@ -29,14 +29,16 @@ const Navbar = () => {
 
     const isProjectDetail = pathname.startsWith("/portfolio/") && pathname !== "/portfolio";
     const isDarkHero = pathname === "/" || pathname === "/about" || isProjectDetail;
-    const navTextColor = scrolled ? "text-foreground" : (isDarkHero ? "text-white" : "text-foreground");
+    const navTextColor = (scrolled && !isDarkHero) || (window.scrollY > 300)
+        ? "text-foreground"
+        : (isDarkHero ? "text-white" : "text-foreground");
 
     return (
         <nav
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-6 lg:px-12 py-6 flex items-center justify-between",
                 scrolled
-                    ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-foreground/5 py-4"
+                    ? "bg-background/80 backdrop-blur-lg shadow-lg border-b border-foreground/5 py-4"
                     : "bg-transparent",
                 navTextColor
             )}
@@ -54,18 +56,29 @@ const Navbar = () => {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-10 text-sm font-medium tracking-wide uppercase">
-                {navLinks.map((link) => (
-                    <Link
-                        key={link.href}
-                        href={link.href}
-                        className={cn(
-                            "hover:text-accent transition-colors",
-                            pathname === link.href ? "text-accent" : navTextColor
-                        )}
-                    >
-                        {link.name}
-                    </Link>
-                ))}
+                {navLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className={cn(
+                                "transition-all duration-300 relative py-1",
+                                // Base Color
+                                navTextColor,
+                                // Hover State
+                                scrolled ? "hover:text-accent" : (isDarkHero ? "hover:text-white/60" : "hover:text-accent"),
+                                // Active State
+                                isActive && cn(
+                                    "font-bold after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px",
+                                    scrolled || !isDarkHero ? "text-accent after:bg-accent" : "text-white after:bg-white"
+                                )
+                            )}
+                        >
+                            {link.name}
+                        </Link>
+                    );
+                })}
                 <Link
                     href="/booking"
                     className="bg-accent text-white px-6 py-2 rounded-full hover:bg-accent/90 transition-all shadow-md hover:scale-105 active:scale-95"

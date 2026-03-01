@@ -32,7 +32,7 @@ const PricingPage = () => {
                     >
                         Free <span className="italic font-light">Consultation</span>
                     </motion.h1>
-                    <p className="text-foreground/50 text-lg uppercase tracking-widest max-w-2xl mx-auto font-medium">
+                    <p className="text-foreground/80 text-lg uppercase tracking-widest max-w-2xl mx-auto font-bold">
                         Every great space starts with a conversation. Book a complimentary discovery call and let&rsquo;s explore what&rsquo;s possible.
                     </p>
                 </header>
@@ -44,7 +44,7 @@ const PricingPage = () => {
                         viewport={{ once: true }}
                         className="relative bg-white p-12 lg:p-16 border-4 border-accent rounded-sm shadow-2xl overflow-hidden"
                     >
-                        <div className="absolute top-0 right-0 bg-accent text-white px-8 py-2 text-[10px] font-bold tracking-widest uppercase rotate-45 translate-x-[25%] translate-y-[50%]">
+                        <div className="absolute top-10 -right-16 bg-accent text-white py-1.5 w-64 text-[9px] font-bold tracking-widest uppercase rotate-45 flex items-center justify-center shadow-lg">
                             Complimentary
                         </div>
 
@@ -82,12 +82,12 @@ const PricingPage = () => {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    className="mt-24 text-center max-w-2xl mx-auto py-12 border-t border-foreground/5"
+                    className="mt-24 text-center max-w-3xl mx-auto py-16 border-t border-foreground/10"
                 >
-                    <p className="text-foreground/60 text-lg italic font-heading mb-8">
+                    <p className="text-foreground/80 text-xl md:text-2xl italic font-heading mb-10 leading-relaxed">
                         After your discovery call, we&rsquo;ll prepare a custom proposal with transparent pricing tailored to your project scope, location, and material selections. No surprises.
                     </p>
-                    <p className="text-[10px] uppercase tracking-[0.3em] font-bold">
+                    <p className="text-[11px] uppercase tracking-[0.4em] font-bold text-accent">
                         Your bespoke journey starts with a single conversation
                     </p>
                 </motion.div>

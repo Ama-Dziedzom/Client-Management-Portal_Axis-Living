@@ -738,7 +738,7 @@ const BookingPage = () => {
                 {/* Email fallback */}
                 <div className="mt-24 text-center opacity-40 hover:opacity-100 transition-opacity">
                     <p className="text-xs font-bold uppercase tracking-widest flex items-center gap-3 justify-center mb-6">
-                        <Mail size={16} /> or reach out directly: hello@axisliving.co.zm
+                        <Mail size={16} /> or reach out directly: <a href="mailto:hello@axisliving.co.zm" className="text-accent hover:underline">hello@axisliving.co.zm</a>
                     </p>
                 </div>
             </div>
