@@ -27,7 +27,8 @@ const Navbar = () => {
         { name: "About", href: "/about" },
     ];
 
-    const isDarkHero = pathname === "/" || pathname === "/about";
+    const isProjectDetail = pathname.startsWith("/portfolio/") && pathname !== "/portfolio";
+    const isDarkHero = pathname === "/" || pathname === "/about" || isProjectDetail;
     const navTextColor = scrolled ? "text-foreground" : (isDarkHero ? "text-white" : "text-foreground");
 
     return (
@@ -75,7 +76,7 @@ const Navbar = () => {
 
             {/* Mobile Toggle */}
             <button
-                className="md:hidden text-foreground"
+                className={cn("md:hidden", navTextColor)}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Toggle menu"
             >

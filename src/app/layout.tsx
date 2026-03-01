@@ -12,7 +12,7 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
     title: "Axis Living | Bespoke Interiors, Lusaka, Zambia",
-    description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful — tailored to your life, not a trend. Lusaka-based interior design studio.",
+    description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful, tailored to your life, not a trend. Lusaka-based interior design studio.",
     keywords: ["interior design", "Lusaka", "Zambia", "bespoke design", "residential design", "commercial interiors", "Axis Living"],
     openGraph: {
         title: "Axis Living | Bespoke Interiors, Lusaka",

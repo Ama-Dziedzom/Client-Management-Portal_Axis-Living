@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowLeft, MapPin, Tag, ChevronDown, Quote } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowLeft, ArrowRight, MapPin, Tag, ChevronDown, Quote } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import LinkNext from "next/link";
 import { Project } from "../../../types/project";
 import { useRef, useState } from "react";
@@ -27,6 +27,9 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
     });
 
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
+    const [currentSpread, setCurrentSpread] = useState(0);
+    const totalSpreads = Math.min(3, Math.ceil(project.gallery.length / 3));
 
     return (
         <div className="bg-background min-h-screen">
@@ -146,32 +149,152 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                 </div>
             </section>
 
-            {/* Large Spread Gallery */}
+            {/* Magazine Gallery */}
             <section className="bg-foreground py-32 overflow-hidden">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-24">
-                    <span className="text-accent/50 text-xs font-bold uppercase tracking-widest mb-16 block text-center">Gallery Spread</span>
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                        <div className="md:col-span-7 h-[600px] relative shadow-2xl">
-                            <Image src={project.gallery[0] || ""} alt="Gallery Item 1" fill className="object-cover" />
-                        </div>
-                        <div className="md:col-span-5 flex flex-col gap-8 h-full justify-center">
-                            <div className="h-[280px] relative grayscale shadow-xl">
-                                <Image src={project.gallery[1] || ""} alt="Gallery Item 2" fill className="object-cover" />
+                    <div className="flex items-center justify-between mb-16">
+                        <span className="text-white/30 text-xs font-bold uppercase tracking-widest">Gallery Spread</span>
+                        <span className="text-white/20 text-[10px] uppercase tracking-widest">
+                            {currentSpread + 1} / {totalSpreads}
+                        </span>
+                    </div>
+
+                    {/* Magazine Viewer */}
+                    <div className="relative">
+                        <AnimatePresence mode="wait">
+                            {currentSpread === 0 && (
+                                <motion.div
+                                    key="spread-0"
+                                    initial={{ opacity: 0, x: 60 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -60 }}
+                                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                                    className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6"
+                                >
+                                    <div className="md:col-span-7 h-[500px] md:h-[700px] relative overflow-hidden group">
+                                        <Image src={project.gallery[0] || ""} alt="Gallery 1" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-8">
+                                            <p className="text-white/60 text-[10px] uppercase tracking-widest font-bold">{project.category}</p>
+                                            <p className="text-white text-lg font-heading mt-1">{project.title}</p>
+                                        </div>
+                                    </div>
+                                    <div className="md:col-span-5 flex flex-col gap-4 md:gap-6">
+                                        <div className="h-[240px] md:h-[340px] relative overflow-hidden group">
+                                            <Image src={project.gallery[1] || ""} alt="Gallery 2" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                        </div>
+                                        <div className="h-[240px] md:h-[340px] relative overflow-hidden group">
+                                            <Image src={project.gallery[2] || ""} alt="Gallery 3" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {currentSpread === 1 && project.gallery.length > 3 && (
+                                <motion.div
+                                    key="spread-1"
+                                    initial={{ opacity: 0, x: 60 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -60 }}
+                                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                                    className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
+                                >
+                                    <div className="flex flex-col gap-4 md:gap-6">
+                                        <div className="h-[300px] md:h-[420px] relative overflow-hidden group">
+                                            <Image src={project.gallery[3] || ""} alt="Gallery 4" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                        </div>
+                                        <div className="bg-white/5 p-8 md:p-12 flex flex-col justify-center">
+                                            <p className="text-white/30 text-[10px] uppercase tracking-widest font-bold mb-4">The Details</p>
+                                            <p className="text-white/80 text-xl md:text-2xl font-heading italic leading-relaxed">
+                                                Every surface, every texture, every angle was considered. Nothing is accidental.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="h-[500px] md:h-full relative overflow-hidden group">
+                                        <Image src={project.gallery[4] || project.gallery[3] || ""} alt="Gallery 5" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                        <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full">
+                                            <p className="text-white text-[10px] uppercase tracking-widest font-bold">{project.style}</p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {currentSpread === 2 && project.gallery.length > 5 && (
+                                <motion.div
+                                    key="spread-2"
+                                    initial={{ opacity: 0, x: 60 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -60 }}
+                                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                                    className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6"
+                                >
+                                    <div className="md:col-span-5 h-[500px] md:h-[700px] relative overflow-hidden group">
+                                        <Image src={project.gallery[5] || ""} alt="Gallery 6" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                    </div>
+                                    <div className="md:col-span-7 flex flex-col justify-center p-8 md:p-16">
+                                        <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold mb-8">The Space</p>
+                                        <p className="text-white text-3xl md:text-5xl font-heading leading-[1.3] mb-8">
+                                            {project.location}
+                                        </p>
+                                        <p className="text-white/50 text-sm leading-relaxed max-w-md">
+                                            {project.result.body}
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Navigation Arrows */}
+                        <div className="flex items-center justify-center gap-6 mt-12">
+                            <button
+                                onClick={() => setCurrentSpread(s => Math.max(0, s - 1))}
+                                disabled={currentSpread === 0}
+                                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                                aria-label="Previous spread"
+                            >
+                                <ArrowLeft size={18} />
+                            </button>
+
+                            {/* Page Dots */}
+                            <div className="flex items-center gap-3">
+                                {Array.from({ length: totalSpreads }).map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setCurrentSpread(i)}
+                                        className={`transition-all duration-300 rounded-full ${currentSpread === i
+                                            ? "w-8 h-2 bg-white"
+                                            : "w-2 h-2 bg-white/20 hover:bg-white/40"
+                                            }`}
+                                        aria-label={`Go to spread ${i + 1}`}
+                                    />
+                                ))}
                             </div>
-                            <div className="h-[280px] relative shadow-xl">
-                                <Image src={project.gallery[2] || ""} alt="Gallery Item 3" fill className="object-cover" />
-                            </div>
+
+                            <button
+                                onClick={() => setCurrentSpread(s => Math.min(totalSpreads - 1, s + 1))}
+                                disabled={currentSpread === totalSpreads - 1}
+                                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                                aria-label="Next spread"
+                            >
+                                <ArrowRight size={18} />
+                            </button>
                         </div>
                     </div>
-                    {project.gallery.length > 3 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-                            {project.gallery.slice(3).map((img, idx) => (
-                                <div key={idx} className={`h-[350px] relative shadow-xl ${idx === 1 ? 'grayscale hover:grayscale-0 transition-all duration-700' : ''}`}>
-                                    <Image src={img} alt={`Gallery Item ${idx + 4}`} fill className="object-cover" />
-                                </div>
-                            ))}
-                        </div>
-                    )}
+
+                    {/* Thumbnail Strip */}
+                    <div className="mt-16 flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+                        {project.gallery.map((img, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setCurrentSpread(Math.min(Math.floor(idx / 3), totalSpreads - 1))}
+                                className={`flex-shrink-0 w-20 h-14 relative overflow-hidden rounded-sm transition-all duration-300 ${Math.floor(idx / 3) === currentSpread
+                                    ? "ring-2 ring-white opacity-100"
+                                    : "opacity-30 hover:opacity-60"
+                                    }`}
+                            >
+                                <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </section>
 

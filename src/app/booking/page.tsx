@@ -190,7 +190,7 @@ const BookingPage = () => {
                     <p className="max-w-xl mx-auto text-foreground/60 text-lg leading-relaxed font-body mb-8">
                         Book a free 30-minute discovery call. We&apos;ll talk about your project,
                         your vision, and whether we&apos;re the right fit for each other. No
-                        pressure, no pitch &mdash; just a conversation.
+                        pressure, no pitch. Just a conversation.
                     </p>
                 </header>
 
@@ -207,30 +207,30 @@ const BookingPage = () => {
 
                 {/* Feature cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 w-full border-y border-foreground/5 py-12">
-                    <div className="flex flex-col items-center text-center p-6 bg-white shadow-xl rounded-sm">
-                        <Clock className="text-accent mb-4" size={32} />
+                    <div className="flex flex-col items-center text-center p-6 bg-accent text-white shadow-xl rounded-sm">
+                        <Clock className="text-white/70 mb-4" size={32} />
                         <p className="text-[10px] uppercase font-bold tracking-widest mb-2 font-heading">
                             30-Minute Call
                         </p>
-                        <p className="text-xs opacity-60">
+                        <p className="text-xs opacity-70">
                             Efficient exploration of your project goals.
                         </p>
                     </div>
-                    <div className="flex flex-col items-center text-center p-6 bg-white shadow-xl rounded-sm">
-                        <Calendar className="text-accent mb-4" size={32} />
+                    <div className="flex flex-col items-center text-center p-6 bg-accent text-white shadow-xl rounded-sm">
+                        <Calendar className="text-white/70 mb-4" size={32} />
                         <p className="text-[10px] uppercase font-bold tracking-widest mb-2 font-heading">
                             Self-Scheduling
                         </p>
-                        <p className="text-xs opacity-60">
+                        <p className="text-xs opacity-70">
                             Choose a time that fits your own busy calendar.
                         </p>
                     </div>
-                    <div className="flex flex-col items-center text-center p-6 bg-white shadow-xl rounded-sm">
-                        <ShieldCheck className="text-accent mb-4" size={32} />
+                    <div className="flex flex-col items-center text-center p-6 bg-accent text-white shadow-xl rounded-sm">
+                        <ShieldCheck className="text-white/70 mb-4" size={32} />
                         <p className="text-[10px] uppercase font-bold tracking-widest mb-2 font-heading">
                             No Obligation
                         </p>
-                        <p className="text-xs opacity-60">
+                        <p className="text-xs opacity-70">
                             A discovery phase before any formal commitment.
                         </p>
                     </div>
@@ -239,13 +239,13 @@ const BookingPage = () => {
                 {/* ───── Booking Widget ───── */}
                 <div className="w-full bg-white shadow-2xl rounded-sm overflow-hidden border border-foreground/5">
                     {/* Widget header with progress */}
-                    <div className="p-6 border-b border-foreground/5 bg-background">
+                    <div className="p-6 border-b border-white/10 bg-accent">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-foreground/40 text-[10px] uppercase tracking-[0.3em] font-bold">
+                            <span className="text-white text-[10px] uppercase tracking-[0.3em] font-bold">
                                 Secure Booking Portal
                             </span>
                             {step !== "confirmed" && (
-                                <span className="text-foreground/30 text-[10px] uppercase tracking-[0.2em]">
+                                <span className="text-white/70 text-[10px] uppercase tracking-[0.2em]">
                                     Step{" "}
                                     {step === "date" ? "1" : step === "time" ? "2" : "3"} of 3
                                 </span>
@@ -253,9 +253,9 @@ const BookingPage = () => {
                         </div>
                         {/* Progress bar */}
                         {step !== "confirmed" && (
-                            <div className="w-full h-[2px] bg-foreground/5 rounded-full overflow-hidden">
+                            <div className="w-full h-[2px] bg-white/20 rounded-full overflow-hidden">
                                 <motion.div
-                                    className="h-full bg-accent rounded-full"
+                                    className="h-full bg-white rounded-full"
                                     initial={{ width: "0%" }}
                                     animate={{
                                         width:
@@ -439,7 +439,7 @@ const BookingPage = () => {
                                         })}
                                     </div>
 
-                                    <p className="text-center text-foreground/30 text-[10px] mt-6 italic">
+                                    <p className="text-center text-foreground/60 text-[10px] mt-6 italic">
                                         All times are in Central Africa Time (CAT)
                                     </p>
                                 </motion.div>
@@ -499,7 +499,7 @@ const BookingPage = () => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, name: e.target.value })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-background border border-foreground/10 rounded-sm text-sm font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
                                             />
                                         </div>
 
@@ -517,7 +517,7 @@ const BookingPage = () => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, email: e.target.value })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-background border border-foreground/10 rounded-sm text-sm font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
                                             />
                                         </div>
 
@@ -534,7 +534,7 @@ const BookingPage = () => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, phone: e.target.value })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-background border border-foreground/10 rounded-sm text-sm font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
                                             />
                                         </div>
 
@@ -553,7 +553,7 @@ const BookingPage = () => {
                                                         projectType: e.target.value,
                                                     })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-background border border-foreground/10 rounded-sm text-sm font-body text-foreground/60 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all appearance-none cursor-pointer"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm font-body text-neutral-800 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all appearance-none cursor-pointer"
                                             >
                                                 <option value="" disabled>
                                                     Project Type
@@ -590,7 +590,7 @@ const BookingPage = () => {
                                                         message: e.target.value,
                                                     })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-background border border-foreground/10 rounded-sm text-sm font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all resize-none"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all resize-none"
                                             />
                                         </div>
 
@@ -625,7 +625,7 @@ const BookingPage = () => {
                                             )}
                                         </motion.button>
 
-                                        <p className="text-center text-foreground/25 text-[10px] mt-2">
+                                        <p className="text-center text-foreground/60 text-[10px] mt-2">
                                             By booking, you agree to a free, no-obligation discovery
                                             call.
                                         </p>
@@ -727,7 +727,7 @@ const BookingPage = () => {
                                 What&apos;s Next?
                             </p>
                             <p className="max-w-md mx-auto italic text-lg opacity-90 leading-relaxed font-heading">
-                                &ldquo;You&apos;re booked! Check your inbox &mdash; you&apos;ll
+                                &ldquo;You&apos;re booked! Check your inbox, you&apos;ll
                                 find a calendar invite with your meeting link. We&apos;re looking
                                 forward to hearing about your space.&rdquo;
                             </p>

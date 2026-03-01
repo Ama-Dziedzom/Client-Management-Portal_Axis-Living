@@ -9,15 +9,15 @@ const Footer = () => {
                 <div className="col-span-1 md:col-span-1">
                     <Link href="/" className="relative block">
                         <Image
-                            src="/logo.jpg"
+                            src="/logo-light.jpeg"
                             alt="Axis Living - Bespoke Interiors"
                             width={160}
                             height={70}
-                            className="h-12 w-auto object-contain"
+                            className="h-14 w-auto object-contain"
                         />
                     </Link>
                     <p className="mt-6 text-sm leading-relaxed max-w-sm">
-                        Designing spaces that feel inevitable. We create interiors that are as intentional as they are beautiful &mdash; tailored to your life, not a trend.
+                        Designing spaces that feel inevitable. We create interiors that are as intentional as they are beautiful, tailored to your life, not a trend.
                     </p>
                     <div className="flex space-x-5 mt-8">
                         <Link href="https://instagram.com" target="_blank" className="hover:text-accent transition-colors">
@@ -49,17 +49,6 @@ const Footer = () => {
                     </ul>
                 </div>
 
-                <div className="col-span-1 flex flex-col items-center md:items-end justify-center bg-white/10 p-8 rounded-lg border border-white/20">
-                    <p className="text-white text-center md:text-right font-heading text-xl mb-6 leading-relaxed italic">
-                        Ready to transform your space into something inevitable?
-                    </p>
-                    <Link
-                        href="/booking"
-                        className="w-full text-center bg-accent text-white px-8 py-4 rounded-full hover:bg-white hover:text-accent transition-all font-bold tracking-widest uppercase text-xs"
-                    >
-                        Book a Free Consultation
-                    </Link>
-                </div>
             </div>
 
             <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-widest uppercase font-medium opacity-50">

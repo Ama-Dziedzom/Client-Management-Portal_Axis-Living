@@ -126,16 +126,16 @@ const AboutClient = () => {
                             </h2>
                             <div className="space-y-8 text-foreground/70 text-lg leading-relaxed font-body">
                                 <p>
-                                    I&apos;m the principal designer and founder of Axis Living. For over 5 years, I&apos;ve been transforming residential and commercial spaces across Lusaka and beyond &mdash; from intimate apartment refreshes to full-scale builds for clients who refuse to compromise on beauty.
+                                    I&apos;m the principal designer and founder of Axis Living. For over 5 years, I&apos;ve been transforming residential and commercial spaces across Lusaka and beyond. From intimate apartment refreshes to full-scale builds for clients who refuse to compromise on beauty.
                                 </p>
                                 <p>
-                                    My approach sits at the intersection of function and feeling. Every room I design begins with a deep understanding of the person who will live or work in it &mdash; their rhythms, their aesthetics, their aspirations. The result is always spaces that feel inevitable, like they couldn&apos;t have been any other way.
+                                    My approach sits at the intersection of function and feeling. Every room I design begins with a deep understanding of the person who will live or work in it, their rhythms, their aesthetics, their aspirations. The result is always spaces that feel inevitable, like they couldn&apos;t have been any other way.
                                 </p>
                                 <p>
                                     I&apos;ve worked with clients across Lusaka, and I collaborate with a trusted network of craftspeople, suppliers, and architects to deliver work that lasts.
                                 </p>
-                                <p className="font-heading italic text-foreground text-2xl py-6 border-y border-foreground/5">
-                                    &ldquo;Good design isn&apos;t decorating. It&apos;s problem-solving with beauty. I believe every space has a best version of itself &mdash; my job is to find it, and then build it.&rdquo;
+                                <p className="font-heading italic text-foreground text-2xl py-8 border-y border-foreground/5 leading-relaxed">
+                                    &ldquo;Good design isn&apos;t decorating. It&apos;s problem-solving with beauty. I believe every space has a best version of itself. My job is to find it, and then build it.&rdquo;
                                 </p>
                                 <Link
                                     href="/booking"
@@ -159,7 +159,7 @@ const AboutClient = () => {
                         viewport={{ once: true, margin: "-100px" }}
                         className="mb-24 text-center"
                     >
-                        <span className="text-accent text-xs font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
+                        <span className="text-white/50 text-xs font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
                         <h2 className="text-white text-5xl md:text-8xl font-heading mb-12 font-light leading-[1.2] tracking-wide">My Process</h2>
                     </motion.header>
 
@@ -176,9 +176,9 @@ const AboutClient = () => {
                                 variants={fadeInUp}
                                 className="flex flex-col border-t border-white/10 pt-8 group"
                             >
-                                <span className="text-accent text-4xl font-heading mb-8 opacity-40 italic group-hover:opacity-100 transition-opacity">{proc.step}</span>
-                                <h3 className="text-white text-2xl font-heading mb-6 group-hover:text-accent transition-colors">{proc.title}</h3>
-                                <p className="text-sm font-body leading-relaxed opacity-60">
+                                <span className="text-white/30 text-4xl font-heading mb-8 italic group-hover:text-white/70 transition-all">{proc.step}</span>
+                                <h3 className="text-white text-2xl font-heading mb-6 group-hover:text-white/60 transition-colors">{proc.title}</h3>
+                                <p className="text-sm font-body leading-relaxed text-white/50">
                                     {proc.description}
                                 </p>
                             </motion.div>

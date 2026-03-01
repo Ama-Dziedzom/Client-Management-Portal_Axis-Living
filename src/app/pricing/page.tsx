@@ -11,7 +11,7 @@ const PricingPage = () => {
         "Initial space assessment & recommendations",
         "Overview of our design process & timelines",
         "Custom proposal tailored to your project scope",
-        "No obligation — just a conversation about your space",
+        "No obligation, just a conversation about your space",
     ];
 
     return (
@@ -51,7 +51,7 @@ const PricingPage = () => {
                         <div className="mb-12 text-center">
                             <h3 className="text-4xl md:text-5xl font-heading mb-4 leading-tight">Discovery Call</h3>
                             <p className="text-foreground/60 text-sm italic font-body mb-8 max-w-md mx-auto">
-                                A no-obligation conversation to understand your space, your style, and your vision &mdash; before any commitment.
+                                A no-obligation conversation to understand your space, your style, and your vision, before any commitment.
                             </p>
                             <div className="flex items-center justify-center gap-3 text-foreground">
                                 <span className="text-6xl md:text-7xl font-heading font-light">Free</span>
@@ -85,7 +85,7 @@ const PricingPage = () => {
                     className="mt-24 text-center max-w-2xl mx-auto py-12 border-t border-foreground/5"
                 >
                     <p className="text-foreground/60 text-lg italic font-heading mb-8">
-                        After your discovery call, we&rsquo;ll prepare a custom proposal with transparent pricing tailored to your project scope, location, and material selections &mdash; no surprises.
+                        After your discovery call, we&rsquo;ll prepare a custom proposal with transparent pricing tailored to your project scope, location, and material selections. No surprises.
                     </p>
                     <p className="text-[10px] uppercase tracking-[0.3em] font-bold">
                         Your bespoke journey starts with a single conversation

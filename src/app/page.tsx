@@ -231,60 +231,88 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Testimonials */}
-            <section className="py-24 px-6 lg:px-24 bg-background text-foreground">
-                <div className="max-w-5xl mx-auto text-center">
+            {/* Testimonials Ticker */}
+            <section className="py-24 bg-foreground text-white overflow-hidden">
+                <div className="max-w-7xl mx-auto px-6 lg:px-24 mb-16">
                     <motion.div
                         variants={fadeInUp}
                         initial="initial"
                         whileInView="animate"
                         viewport={{ once: true }}
+                        className="text-center"
                     >
-                        <Quote className="mx-auto text-accent mb-8 opacity-20" size={60} />
-                        <h2 className="text-3xl md:text-5xl font-heading mb-16 font-light">
+                        <Quote className="mx-auto text-white/15 mb-8" size={48} />
+                        <span className="text-white/30 text-[10px] uppercase tracking-[0.4em] font-bold mb-6 block">Client Stories</span>
+                        <h2 className="text-3xl md:text-5xl font-heading font-light text-white leading-[1.3]">
                             &ldquo;Working with Axis Living was the best decision we made for our new home.&rdquo;
                         </h2>
                     </motion.div>
+                </div>
 
-                    <motion.div
-                        variants={staggerContainer}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left"
-                    >
+                {/* Marquee Container */}
+                <div className="relative">
+                    {/* Gradient masks */}
+                    <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-foreground to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-foreground to-transparent z-10 pointer-events-none" />
+
+                    {/* Ticker row 1 */}
+                    <div className="flex animate-marquee hover:[animation-play-state:paused] mb-6">
                         {[
                             { name: "Thandiwe M.", role: "Kabulonga", content: "Working with Axis Living was the best decision we made for our new home. She understood our brief immediately and delivered something beyond what we imagined." },
-                            { name: "Mulenga C.", role: "Woodlands", content: "The professionalism, the communication, the final result — everything was five stars. Our office has never felt more like us." },
-                            { name: "Chilufya B.", role: "Roma", content: "I've worked with designers before but never one who truly listened. The space feels like me, not a showroom." }
-                        ].map((t, idx) => (
-                            <motion.div
-                                key={idx}
-                                variants={fadeInUp}
-                                className="p-8 border-l border-foreground/10"
+                            { name: "Mulenga C.", role: "Woodlands", content: "The professionalism, the communication, the final result, everything was five stars. Our office has never felt more like us." },
+                            { name: "Chilufya B.", role: "Roma", content: "I've worked with designers before but never one who truly listened. The space feels like me, not a showroom." },
+                            { name: "David K.", role: "Longacres", content: "The penthouse transformation was beyond anything I imagined. Every guest asks who designed it. Bold, refined, and completely unique." },
+                            { name: "Grace M.", role: "Ibex Hill", content: "From the first call to the final reveal, the process was seamless. They made something deeply personal out of a blank canvas." },
+                        ].flatMap((t, idx) => [t, t].map((item, dupIdx) => (
+                            <div
+                                key={`${idx}-${dupIdx}`}
+                                className="flex-shrink-0 w-[350px] md:w-[420px] mx-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-sm p-8 group hover:bg-white/10 transition-colors duration-500"
                             >
-                                <p className="text-foreground/70 text-sm leading-relaxed mb-6 italic">"{t.content}"</p>
-                                <p className="font-bold text-xs uppercase tracking-widest">{t.name}</p>
-                                <p className="text-accent text-[10px] uppercase font-medium">{t.role}</p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                                <Quote size={20} className="text-white/15 mb-4" />
+                                <p className="text-white/70 text-sm leading-relaxed mb-6 italic font-body">
+                                    &ldquo;{item.content}&rdquo;
+                                </p>
+                                <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/60">
+                                        {item.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-xs uppercase tracking-widest text-white/90">{item.name}</p>
+                                        <p className="text-white/40 text-[10px] uppercase tracking-wider">{item.role}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )))}
+                    </div>
                 </div>
             </section>
 
-            {/* Final CTA */}
-            <section className="py-12 border-t border-foreground/5 text-foreground">
+            {/* Final CTA Hero */}
+            <section className="relative h-[80vh] min-h-[500px] overflow-hidden flex items-center justify-center">
+                <Image
+                    src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1800&q=80&auto=format&fit=crop"
+                    alt="Beautifully designed interior space"
+                    fill
+                    className="object-cover brightness-[0.3]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
                 <motion.div
                     variants={fadeInUp}
                     initial="initial"
                     whileInView="animate"
                     viewport={{ once: true }}
-                    className="max-w-7xl mx-auto flex flex-col items-center py-24 text-center"
+                    className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl"
                 >
-                    <h2 className="text-4xl md:text-7xl font-heading mb-12 leading-[1.2] tracking-wide">Let&apos;s Talk About <br /> <span className="italic">Your Space</span>.</h2>
+                    <span className="text-white/40 text-[10px] uppercase tracking-[0.5em] font-bold mb-8 block">Start Your Journey</span>
+                    <h2 className="text-5xl md:text-8xl font-heading text-white mb-8 leading-[1.15] tracking-wide">
+                        Let&apos;s Talk About <br /> <span className="italic">Your Space</span>.
+                    </h2>
+                    <p className="text-white/50 text-sm md:text-base max-w-lg mb-12 leading-relaxed font-body">
+                        Every great space begins with a conversation. Book your free discovery call and let&apos;s explore what&apos;s possible.
+                    </p>
                     <Link
                         href="/booking"
-                        className="bg-accent text-white px-16 py-6 rounded-full text-base font-bold tracking-[0.3em] uppercase hover:bg-foreground transition-all shadow-2xl hover:scale-105 active:scale-95"
+                        className="bg-white text-foreground px-16 py-6 rounded-full text-sm font-bold tracking-[0.3em] uppercase hover:bg-accent hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95"
                     >
                         Book a Free Consultation
                     </Link>
