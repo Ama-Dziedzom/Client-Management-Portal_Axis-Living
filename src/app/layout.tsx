@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import "../styles/globals.css";
 import Navbar from "../components/Navigation/Navbar";
 import Footer from "../components/Navigation/Footer";
+import LookbookPopup from "../components/EmailCapture/LookbookPopup";
 
 const manrope = Manrope({
     subsets: ["latin"],
@@ -62,6 +63,7 @@ export default function RootLayout({
                     {children}
                 </main>
                 <Footer />
+                <LookbookPopup />
             </body>
         </html>
     );

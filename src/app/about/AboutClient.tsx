@@ -55,6 +55,21 @@ const AboutClient = () => {
         },
     ];
 
+    const press = [
+        "Design Digest Africa",
+        "Vanguard Style",
+        "The Guardian Life",
+        "Bella Naija Living",
+        "Dezeen*"
+    ];
+
+    const studioImages = [
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", // working
+        "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop", // fabric swatches
+        "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop", // meeting
+        "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=800&auto=format&fit=crop", // tools/samples
+    ];
+
     return (
         <div className="bg-background min-h-screen">
             {/* Hero Header */}
@@ -185,6 +200,75 @@ const AboutClient = () => {
                             </motion.div>
                         ))}
                     </motion.div>
+                </div>
+            </section>
+
+            {/* Press Section */}
+            <section className="py-24 px-6 lg:px-24 bg-white">
+                <div className="max-w-7xl mx-auto text-center">
+                    <motion.div
+                        variants={fadeInUp}
+                        initial="initial"
+                        whileInView="animate"
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-4xl font-heading mb-12 tracking-wide text-foreground">Press & Recognition</h2>
+                        <div className="flex flex-wrap justify-center gap-4 mb-8">
+                            {press.map((item) => (
+                                <span
+                                    key={item}
+                                    className="px-6 py-3 border border-[#C9A84C] text-[#C9A84C] rounded-full text-[10px] font-bold uppercase tracking-widest"
+                                >
+                                    {item}
+                                </span>
+                            ))}
+                        </div>
+                        <p className="text-[10px] text-foreground/40 italic font-body">
+                            *Press logos update as features are published
+                        </p>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Behind the Studio Section */}
+            <section className="py-32 px-6 lg:px-24 bg-background">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            className="grid grid-cols-2 gap-4"
+                        >
+                            {studioImages.map((src, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    variants={fadeInUp}
+                                    className="relative aspect-square overflow-hidden"
+                                >
+                                    <Image
+                                        src={src}
+                                        alt="Behind the scenes at Axis Living"
+                                        fill
+                                        className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                                    />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+
+                        <motion.div
+                            variants={fadeInUp}
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                        >
+                            <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-tight tracking-wide">Behind the Studio</h2>
+                            <p className="text-foreground/70 text-lg leading-relaxed font-body">
+                                Most of what we do happens before anything is bought or built. Site visits, material sourcing trips, vendor negotiations, late-night layout revisions. This is the work behind the work — and it&apos;s what separates a space that looks good in photos from one that feels right to live in.
+                            </p>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
         </div>

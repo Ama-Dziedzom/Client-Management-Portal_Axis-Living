@@ -7,6 +7,7 @@ import { ArrowRight, Quote } from "lucide-react";
 import { getFeaturedProjects } from "../data/projects";
 import { Project } from "../types/project";
 import { useRef, useState, useEffect } from "react";
+import LookbookSection from "../components/EmailCapture/LookbookSection";
 
 const staggerContainer: Variants = {
     initial: {},
@@ -329,6 +330,8 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            <LookbookSection />
 
             {/* Final CTA Hero */}
             <section className="relative h-[80vh] min-h-[500px] overflow-hidden flex items-center justify-center">

@@ -112,6 +112,14 @@ const BookingPage = () => {
         [selectedDate]
     );
 
+    // Build calendar grid
+    const calendarCells = useMemo(() => {
+        const cells: (number | null)[] = [];
+        for (let i = 0; i < firstDay; i++) cells.push(null);
+        for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+        return cells;
+    }, [firstDay, daysInMonth]);
+
     if (!mounted) {
         return <div className="min-h-screen bg-background pt-32 px-4 md:px-6 lg:px-24" />;
     }
@@ -163,14 +171,6 @@ const BookingPage = () => {
         setStep("date");
         setFormData({ name: "", email: "", phone: "", projectType: "", message: "" });
     };
-
-    // Build calendar grid
-    const calendarCells = useMemo(() => {
-        const cells: (number | null)[] = [];
-        for (let i = 0; i < firstDay; i++) cells.push(null);
-        for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-        return cells;
-    }, [firstDay, daysInMonth]);
 
     const formatSelectedDate = () => {
         if (!selectedDate) return "";
