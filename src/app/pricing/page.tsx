@@ -28,7 +28,7 @@ const PricingPage = () => {
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-8xl font-heading mb-10 leading-[1.1]"
+                        className="text-4xl md:text-8xl font-heading mb-10 leading-[1.1]"
                     >
                         Free <span className="italic font-light">Consultation</span>
                     </motion.h1>
@@ -71,9 +71,11 @@ const PricingPage = () => {
 
                         <Link
                             href="/booking"
-                            className="w-full py-5 rounded-full text-center text-xs font-bold tracking-[0.2em] uppercase transition-all shadow-xl flex items-center justify-center gap-3 bg-accent text-white hover:bg-foreground border border-accent hover:border-foreground"
+                            className="w-full py-5 px-8 rounded-full text-center text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase transition-all shadow-xl flex items-center justify-center gap-3 bg-accent text-white hover:bg-foreground border border-accent hover:border-foreground"
                         >
-                            Book Your Free Consultation <ArrowRight size={16} />
+                            <span className="hidden md:inline">Book Your Free Consultation</span>
+                            <span className="md:hidden">Free Consultation</span>
+                            <ArrowRight size={16} className="shrink-0" />
                         </Link>
                     </motion.div>
                 </div>

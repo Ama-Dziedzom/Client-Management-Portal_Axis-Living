@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { projects } from "../../data/projects";
 import { cn } from "../../lib/utils";
 import { Project } from "../../types/project";
@@ -41,7 +42,7 @@ const PortfolioClient = () => {
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-8xl font-heading mb-12"
+                        className="text-4xl md:text-8xl font-heading mb-12"
                     >
                         Portfolio <span className="italic font-light text-foreground/20">Catalog</span>
                     </motion.h1>
@@ -68,7 +69,7 @@ const PortfolioClient = () => {
                 {/* Project Grid */}
                 <motion.div
                     layout
-                    className="grid grid-cols-1 md:grid-cols-2 gap-16"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16"
                 >
                     <AnimatePresence mode="popLayout">
                         {filteredProjects.map((project: Project) => (
@@ -104,7 +105,7 @@ const PortfolioClient = () => {
                                         <motion.div
                                             className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all"
                                         >
-                                            <span className="text-accent group-hover:text-white transition-colors">↗</span>
+                                            <ArrowUpRight size={20} className="text-accent group-hover:text-white transition-colors" />
                                         </motion.div>
                                     </div>
                                 </Link>

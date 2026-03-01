@@ -87,7 +87,7 @@ export default function Home() {
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                        className="text-white text-5xl md:text-8xl font-heading mb-10 leading-[1.25] tracking-wide"
+                        className="text-white text-4xl md:text-8xl font-heading mb-10 leading-[1.2] md:leading-[1.25] tracking-wide"
                     >
                         Spaces Designed for <br />
                         <span className="italic font-light text-white/90">the Way You Live</span>
@@ -178,13 +178,13 @@ export default function Home() {
                         initial="initial"
                         whileInView="animate"
                         viewport={{ once: true, margin: "-50px" }}
-                        className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4"
+                        className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8 text-center md:text-left"
                     >
                         <div>
                             <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">Selected Works</span>
                             <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2]">The Portfolio</h2>
                         </div>
-                        <Link href="/portfolio" className="bg-foreground text-white px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-accent transition-colors">
+                        <Link href="/portfolio" className="bg-accent text-white px-10 py-4 rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-xl">
                             Explore All Projects
                         </Link>
                     </motion.div>
@@ -304,7 +304,7 @@ export default function Home() {
                     className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl"
                 >
                     <span className="text-white/40 text-[10px] uppercase tracking-[0.5em] font-bold mb-8 block">Start Your Journey</span>
-                    <h2 className="text-5xl md:text-8xl font-heading text-white mb-8 leading-[1.15] tracking-wide">
+                    <h2 className="text-4xl md:text-8xl font-heading text-white mb-8 leading-[1.15] tracking-wide">
                         Let&apos;s Talk About <br /> <span className="italic">Your Space</span>.
                     </h2>
                     <p className="text-white/50 text-sm md:text-base max-w-lg mb-12 leading-relaxed font-body">
@@ -312,7 +312,7 @@ export default function Home() {
                     </p>
                     <Link
                         href="/booking"
-                        className="bg-white text-foreground px-16 py-6 rounded-full text-sm font-bold tracking-[0.3em] uppercase hover:bg-accent hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95"
+                        className="bg-white text-foreground px-8 md:px-16 py-5 md:py-6 rounded-full text-[10px] md:text-sm font-bold tracking-[0.3em] uppercase hover:bg-accent hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95"
                     >
                         Book a Free Consultation
                     </Link>

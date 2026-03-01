@@ -11,13 +11,18 @@ import { cn } from "../../lib/utils";
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [scrollAmount, setScrollAmount] = useState(0);
     const pathname = usePathname();
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
+            setScrollAmount(window.scrollY);
         };
         window.addEventListener("scroll", handleScroll);
+        // Set initial state
+        setScrolled(window.scrollY > 20);
+        setScrollAmount(window.scrollY);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
@@ -29,18 +34,18 @@ const Navbar = () => {
 
     const isProjectDetail = pathname.startsWith("/portfolio/") && pathname !== "/portfolio";
     const isDarkHero = pathname === "/" || pathname === "/about" || isProjectDetail;
-    const navTextColor = (scrolled && !isDarkHero) || (window.scrollY > 300)
+    const navTextColor = (scrolled && !isDarkHero) || (scrollAmount > 300)
         ? "text-foreground"
         : (isDarkHero ? "text-white" : "text-foreground");
 
     return (
         <nav
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-6 lg:px-12 py-6 flex items-center justify-between",
-                scrolled
-                    ? "bg-background/80 backdrop-blur-lg shadow-lg border-b border-foreground/5 py-4"
+                "fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-6 md:py-8 flex items-center justify-between transition-[padding,background-color] duration-500",
+                (scrolled && !isOpen)
+                    ? "bg-background/30 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-white/10 py-4 md:py-4"
                     : "bg-transparent",
-                navTextColor
+                isOpen ? "text-foreground transition-none" : navTextColor
             )}
         >
             <Link href="/" className="relative block">
@@ -49,7 +54,7 @@ const Navbar = () => {
                     alt="Axis Living - Bespoke Interiors"
                     width={180}
                     height={80}
-                    className="h-16 w-auto object-contain"
+                    className="h-12 md:h-16 w-auto object-contain"
                     priority
                 />
             </Link>
@@ -89,7 +94,7 @@ const Navbar = () => {
 
             {/* Mobile Toggle */}
             <button
-                className={cn("md:hidden", navTextColor)}
+                className={cn("md:hidden z-[110] transition-colors duration-300", isOpen ? "text-foreground" : navTextColor)}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Toggle menu"
             >
@@ -100,29 +105,68 @@ const Navbar = () => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, x: "100%" }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: "100%" }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed inset-0 bg-background z-40 flex flex-col items-center justify-center space-y-8 md:hidden p-6"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 bg-background z-[100] flex flex-col items-center justify-center p-6 md:hidden"
                     >
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className="text-4xl font-heading hover:text-accent transition-colors"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
-                        <Link
-                            href="/booking"
-                            className="mt-4 px-10 py-5 bg-accent text-white text-xl rounded-full font-heading"
-                            onClick={() => setIsOpen(false)}
+                        <motion.div
+                            className="flex flex-col items-center space-y-12"
+                            variants={{
+                                open: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+                                closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+                            }}
+                            initial="closed"
+                            animate="open"
                         >
-                            Book a Free Consultation
-                        </Link>
+                            <motion.div
+                                variants={{
+                                    open: { opacity: 1, y: 0 },
+                                    closed: { opacity: 0, y: 20 }
+                                }}
+                            >
+                                <Link
+                                    href="/"
+                                    className="text-4xl font-heading text-foreground hover:text-accent transition-colors tracking-widest uppercase"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Home
+                                </Link>
+                            </motion.div>
+                            {navLinks.map((link) => (
+                                <motion.div
+                                    key={link.href}
+                                    variants={{
+                                        open: { opacity: 1, y: 0 },
+                                        closed: { opacity: 0, y: 20 }
+                                    }}
+                                >
+                                    <Link
+                                        href={link.href}
+                                        className="text-4xl font-heading text-foreground hover:text-accent transition-colors tracking-widest uppercase"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                </motion.div>
+                            ))}
+                            <motion.div
+                                variants={{
+                                    open: { opacity: 1, y: 0 },
+                                    closed: { opacity: 0, y: 20 }
+                                }}
+                                className="pt-6"
+                            >
+                                <Link
+                                    href="/booking"
+                                    className="px-8 py-4 bg-accent text-white text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase rounded-full shadow-2xl"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Free Consultation
+                                </Link>
+                            </motion.div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

@@ -80,7 +80,7 @@ const AboutClient = () => {
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-6xl md:text-9xl font-heading mb-10 font-light leading-[1.2] tracking-wide"
+                        className="text-4xl md:text-9xl font-heading mb-10 font-light leading-[1.2] tracking-wide"
                     >
                         Our Philosophy
                     </motion.h1>

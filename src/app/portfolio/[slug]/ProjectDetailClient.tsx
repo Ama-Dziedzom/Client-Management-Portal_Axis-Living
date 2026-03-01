@@ -54,7 +54,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                         <LinkNext href="/portfolio" className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-md px-6 py-2 rounded-full text-xs uppercase tracking-widest inline-flex items-center mb-8 gap-3 border border-white/20 group">
                             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Portfolio
                         </LinkNext>
-                        <h1 className="text-6xl md:text-9xl font-heading text-white leading-[1.15] mb-10 tracking-wide">{project.title}</h1>
+                        <h1 className="text-4xl md:text-9xl font-heading text-white leading-[1.15] mb-10 tracking-wide">{project.title}</h1>
                         <div className="flex flex-wrap items-center gap-12 text-white/70 uppercase tracking-[0.2em] text-[10px] md:text-xs">
                             <div className="flex items-center gap-3"><MapPin size={18} className="text-accent" /> {project.location}</div>
                             <div className="flex items-center gap-3"><Tag size={18} className="text-accent" /> {project.style} · {project.category}</div>
@@ -169,20 +169,20 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -60 }}
                                     transition={{ duration: 0.6, ease: "easeInOut" }}
-                                    className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6"
+                                    className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6"
                                 >
-                                    <div className="md:col-span-7 h-[500px] md:h-[700px] relative overflow-hidden group">
+                                    <div className="md:col-span-7 h-[400px] md:h-[700px] relative overflow-hidden group">
                                         <Image src={project.gallery[0] || ""} alt="Gallery 1" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-8">
-                                            <p className="text-white/60 text-[10px] uppercase tracking-widest font-bold">{project.category}</p>
-                                            <p className="text-white text-lg font-heading mt-1">{project.title}</p>
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 md:p-8">
+                                            <p className="text-white/60 text-[8px] md:text-[10px] uppercase tracking-widest font-bold">{project.category}</p>
+                                            <p className="text-white text-base md:text-lg font-heading mt-1">{project.title}</p>
                                         </div>
                                     </div>
                                     <div className="md:col-span-5 flex flex-col gap-4 md:gap-6">
-                                        <div className="h-[240px] md:h-[340px] relative overflow-hidden group">
+                                        <div className="h-[300px] md:h-[340px] relative overflow-hidden group">
                                             <Image src={project.gallery[1] || ""} alt="Gallery 2" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                                         </div>
-                                        <div className="h-[240px] md:h-[340px] relative overflow-hidden group">
+                                        <div className="h-[300px] md:h-[340px] relative overflow-hidden group">
                                             <Image src={project.gallery[2] || ""} alt="Gallery 3" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
                                         </div>
                                     </div>
@@ -196,20 +196,20 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -60 }}
                                     transition={{ duration: 0.6, ease: "easeInOut" }}
-                                    className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
+                                    className="flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-6"
                                 >
                                     <div className="flex flex-col gap-4 md:gap-6">
                                         <div className="h-[300px] md:h-[420px] relative overflow-hidden group">
                                             <Image src={project.gallery[3] || ""} alt="Gallery 4" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
                                         </div>
-                                        <div className="bg-white/5 p-8 md:p-12 flex flex-col justify-center">
+                                        <div className="bg-white/5 p-6 md:p-12 flex flex-col justify-center">
                                             <p className="text-white/30 text-[10px] uppercase tracking-widest font-bold mb-4">The Details</p>
-                                            <p className="text-white/80 text-xl md:text-2xl font-heading italic leading-relaxed">
+                                            <p className="text-white/80 text-lg md:text-2xl font-heading italic leading-relaxed">
                                                 Every surface, every texture, every angle was considered. Nothing is accidental.
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="h-[500px] md:h-full relative overflow-hidden group">
+                                    <div className="h-[400px] md:h-full relative overflow-hidden group">
                                         <Image src={project.gallery[4] || project.gallery[3] || ""} alt="Gallery 5" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
                                         <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full">
                                             <p className="text-white text-[10px] uppercase tracking-widest font-bold">{project.style}</p>
@@ -225,17 +225,17 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -60 }}
                                     transition={{ duration: 0.6, ease: "easeInOut" }}
-                                    className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6"
+                                    className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6"
                                 >
-                                    <div className="md:col-span-5 h-[500px] md:h-[700px] relative overflow-hidden group">
+                                    <div className="md:col-span-5 h-[400px] md:h-[700px] relative overflow-hidden group">
                                         <Image src={project.gallery[5] || ""} alt="Gallery 6" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                                     </div>
-                                    <div className="md:col-span-7 flex flex-col justify-center p-8 md:p-16">
-                                        <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold mb-8">The Space</p>
-                                        <p className="text-white text-3xl md:text-5xl font-heading leading-[1.3] mb-8">
+                                    <div className="md:col-span-7 flex flex-col justify-center p-6 md:p-16">
+                                        <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold mb-6 md:mb-8">The Space</p>
+                                        <p className="text-white text-2xl md:text-5xl font-heading leading-[1.3] mb-8">
                                             {project.location}
                                         </p>
-                                        <p className="text-white/50 text-sm leading-relaxed max-w-md">
+                                        <p className="text-white/50 text-xs md:text-sm leading-relaxed max-w-md">
                                             {project.result.body}
                                         </p>
                                     </div>
@@ -319,15 +319,6 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                 </div>
             </section>
 
-            {/* Bottom CTA for Mobile */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 p-6 z-40 bg-background/80 backdrop-blur-lg border-t border-foreground/5">
-                <LinkNext
-                    href="/booking"
-                    className="w-full bg-accent text-white py-5 rounded-full text-center flex items-center justify-center font-bold tracking-[0.2em] uppercase text-xs"
-                >
-                    Book a Consultation
-                </LinkNext>
-            </div>
         </div>
     );
 };

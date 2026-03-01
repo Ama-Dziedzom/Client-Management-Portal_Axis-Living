@@ -9,6 +9,7 @@ import {
     ShieldCheck,
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
     User,
     Phone,
     MessageSquare,
@@ -169,7 +170,7 @@ const BookingPage = () => {
 
     // ───── Render ─────
     return (
-        <div className="bg-background min-h-screen pt-32 pb-24 px-6 lg:px-24">
+        <div className="bg-background min-h-screen pt-32 pb-24 px-4 md:px-6 lg:px-24">
             <div className="max-w-5xl mx-auto flex flex-col items-center">
                 {/* Header */}
                 <header className="text-center mb-16">
@@ -183,7 +184,7 @@ const BookingPage = () => {
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-8xl font-heading mb-10 leading-[1.1]"
+                        className="text-4xl md:text-8xl font-heading mb-10 leading-[1.1]"
                     >
                         Book a <span className="italic font-light">Consultation</span>
                     </motion.h1>
@@ -735,6 +736,37 @@ const BookingPage = () => {
                     )}
                 </div>
 
+                {/* FAQ Section */}
+                <section className="w-full mt-32 max-w-4xl mx-auto px-4 md:px-0">
+                    <header className="text-center mb-16">
+                        <span className="text-accent text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Common Queries</span>
+                        <h2 className="text-3xl md:text-5xl font-heading tracking-wide">Frequently Asked <span className="italic font-light">Questions</span></h2>
+                    </header>
+
+                    <div className="space-y-4">
+                        {[
+                            {
+                                q: "What happens after I book?",
+                                a: "You'll receive an instant confirmation email with a calendar invite and a meeting link. I'll personally review your project notes before our call so we can jump straight into the details and make the most of our time together."
+                            },
+                            {
+                                q: "How long is the consultation?",
+                                a: "Discovery calls are 30 minutes. It's the perfect amount of time to understand your needs, discuss your vision, and see if our creative philosophies align—all without any pressure or commitment."
+                            },
+                            {
+                                q: "Do you work with clients outside your city?",
+                                a: "Yes, absolutely. While I am based in Lusaka, I work with clients across Zambia and internationally through our remote design packages and virtual consultations. Distance is never a barrier to good design."
+                            },
+                            {
+                                q: "What should I prepare before the call?",
+                                a: "You don't need a formal presentation. Just have a rough idea of your goals, any inspiration photos (Pinterest boards are great!), and a general sense of your timeline. This helps us have a productive and focused conversation."
+                            }
+                        ].map((faq, index) => (
+                            <FAQItem key={index} question={faq.q} answer={faq.a} />
+                        ))}
+                    </div>
+                </section>
+
                 {/* Email fallback */}
                 <div className="mt-24 text-center opacity-40 hover:opacity-100 transition-opacity">
                     <p className="text-xs font-bold uppercase tracking-widest flex items-center gap-3 justify-center mb-6">
@@ -743,6 +775,49 @@ const BookingPage = () => {
                 </div>
             </div>
         </div>
+    );
+};
+
+const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="border-b border-foreground/5 overflow-hidden"
+        >
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full py-8 flex items-center justify-between text-left group"
+            >
+                <h4 className={`text-lg md:text-xl font-heading transition-colors duration-300 ${isOpen ? 'text-accent' : 'text-foreground/80 group-hover:text-foreground'}`}>
+                    {question}
+                </h4>
+                <motion.div
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex-shrink-0 ml-4"
+                >
+                    <ChevronDown size={20} className={isOpen ? 'text-accent' : 'text-foreground/30'} />
+                </motion.div>
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                        <div className="pb-10 text-foreground/60 leading-relaxed font-body max-w-2xl">
+                            {answer}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 

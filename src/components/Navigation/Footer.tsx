@@ -8,7 +8,7 @@ const Footer = () => {
             {/* Brand Statement */}
             <div className="flex-1 flex flex-col items-center justify-center py-16 text-center">
                 <span className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-bold mb-6 block">Bespoke Interiors, Lusaka</span>
-                <h3 className="text-6xl md:text-9xl font-heading text-white/[0.15] tracking-wide leading-tight select-none">
+                <h3 className="text-4xl md:text-9xl font-heading text-white/[0.15] tracking-wide leading-tight select-none">
                     Axis Living
                 </h3>
             </div>
