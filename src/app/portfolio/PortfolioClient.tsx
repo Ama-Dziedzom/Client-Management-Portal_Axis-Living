@@ -86,7 +86,7 @@ const PortfolioClient = () => {
                                     <div className="relative aspect-[16/9] w-full overflow-hidden mb-8 shadow-2xl">
                                         <Image
                                             src={project.coverImage}
-                                            alt={project.title}
+                                            alt={`${project.title} - ${project.category} Interior Design in ${project.location}`}
                                             fill
                                             className="object-cover transition-transform duration-1000 group-hover:scale-110"
                                         />

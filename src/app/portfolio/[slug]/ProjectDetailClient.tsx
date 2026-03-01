@@ -38,9 +38,9 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                 <motion.div style={{ y }} className="absolute inset-0">
                     <Image
                         src={project.coverImage}
-                        alt={project.title}
+                        alt={`${project.title} Interior Design - Final Result Showcase`}
                         fill
-                        className="object-cover brightness-75 scale-105"
+                        className="object-cover brightness-[0.4]"
                         priority
                     />
                 </motion.div>
@@ -103,7 +103,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                 >
                                     <Image
                                         src={project.gallery[1]}
-                                        alt="Process and Texture"
+                                        alt={`${project.title} - Close up of textures, materials, and process`}
                                         fill
                                         className="object-cover"
                                     />
@@ -121,7 +121,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                 <div className="h-[700px] relative mt-16 group overflow-hidden">
                                     <Image
                                         src={project.gallery[2]}
-                                        alt="Final Result Preview"
+                                        alt={`${project.title} - Final design result preview`}
                                         fill
                                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
                                     />

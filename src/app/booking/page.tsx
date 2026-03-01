@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Calendar,
@@ -98,6 +98,11 @@ const BookingPage = () => {
         message: "",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Calendar data
     const daysInMonth = useMemo(() => getDaysInMonth(currentYear, currentMonth), [currentYear, currentMonth]);
@@ -106,6 +111,10 @@ const BookingPage = () => {
         () => (selectedDate ? getBookedSlots(selectedDate) : []),
         [selectedDate]
     );
+
+    if (!mounted) {
+        return <div className="min-h-screen bg-background pt-32 px-4 md:px-6 lg:px-24" />;
+    }
 
     const prevMonth = () => {
         if (currentMonth === 0) {

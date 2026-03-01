@@ -41,6 +41,45 @@ const pulse: Variants = {
 };
 
 export default function Home() {
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Axis Living",
+        "image": "https://axisliving.co.zm/og-image.jpg",
+        "@id": "https://axisliving.co.zm",
+        "url": "https://axisliving.co.zm",
+        "telephone": "+260 971 234 567",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Main Street",
+            "addressLocality": "Lusaka",
+            "addressRegion": "Lusaka",
+            "postalCode": "10101",
+            "addressCountry": "ZM"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -15.4167,
+            "longitude": 28.2833
+        },
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+            ],
+            "opens": "08:00",
+            "closes": "17:00"
+        },
+        "sameAs": [
+            "https://www.instagram.com/axisliving.zm"
+        ],
+        "priceRange": "$$$"
+    };
+
     const featuredProjects = getFeaturedProjects();
     const [heroElement, setHeroElement] = useState<HTMLElement | null>(null);
     const [mounted, setMounted] = useState(false);
@@ -61,7 +100,11 @@ export default function Home() {
     }
 
     return (
-        <div className="bg-background">
+        <div className="bg-background min-h-screen">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {/* Hero Section */}
             <section ref={setHeroElement} className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
                 <motion.div style={{ y }} className="absolute inset-0 z-0">

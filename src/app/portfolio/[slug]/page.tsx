@@ -13,11 +13,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!project) return { title: "Project Not Found" };
 
     return {
-        title: `${project.title} | Axis Living Portfolio`,
-        description: project.brief.body,
-        openGraph: {
-            images: [project.coverImage],
+        title: project.title,
+        description: project.brief.body.substring(0, 160) + "...",
+        alternates: {
+            canonical: `/portfolio/${slug}`,
         },
+        openGraph: {
+            title: `${project.title} | Axis Living`,
+            description: project.brief.body.substring(0, 160) + "...",
+            images: [
+                {
+                    url: project.coverImage,
+                    width: 1200,
+                    height: 630,
+                    alt: project.title,
+                }
+            ],
+            type: 'article',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: project.title,
+            description: project.brief.body.substring(0, 160) + "...",
+            images: [project.coverImage],
+        }
     };
 }
 
