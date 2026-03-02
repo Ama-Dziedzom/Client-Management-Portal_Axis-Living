@@ -109,10 +109,20 @@ export default function EmailSequencePage() {
             <div className="max-w-4xl mx-auto">
                 <header className="mb-12">
                     <h1 className="text-3xl font-heading mb-4 text-[#1C1C1C]">Nurture Email Sequence</h1>
-                    <p className="text-gray-600 max-w-2xl">
-                        Copy these emails into your marketing automation tool (Mailchimp, ConvertKit, etc.).
-                        The timing and subject lines are optimized for engagement.
-                    </p>
+                    <div className="space-y-6">
+                        <p className="text-gray-600 max-w-2xl">
+                            Copy these emails into your marketing automation tool (Mailchimp, ConvertKit, etc.).
+                            The timing and subject lines are optimized for engagement.
+                        </p>
+                        <div className="bg-[#C9A84C]/5 border-l-4 border-[#C9A84C] p-4 rounded-r-sm max-w-2xl">
+                            <p className="text-sm text-[#8a7233] leading-relaxed">
+                                <strong>To test the signup flow:</strong> submit the form with a real email address,
+                                then check your Mailchimp Audience to confirm the contact was added
+                                with the &apos;lookbook-signup&apos; tag. The 4-email nurture sequence will
+                                fire automatically once that tag triggers your automation.
+                            </p>
+                        </div>
+                    </div>
                 </header>
 
                 <div className="space-y-12">
