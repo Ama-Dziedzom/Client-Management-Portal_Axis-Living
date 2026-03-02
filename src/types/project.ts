@@ -11,8 +11,8 @@ export interface Project {
     style: string;
     category: string;
     year: string;
-    coverImage: string;
-    gallery: string[];
+    coverImage: string | null;
+    gallery: (string | null)[];
     tags: string[];
     featured: boolean;
     brief: ProjectSection;

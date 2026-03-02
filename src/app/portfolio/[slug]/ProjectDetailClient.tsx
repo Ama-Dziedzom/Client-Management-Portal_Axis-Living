@@ -34,11 +34,11 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
     return (
         <div className="bg-background min-h-screen">
             {/* Hero Section */}
-            <section ref={setHeroElement} className="relative h-screen w-full overflow-hidden">
+            <section ref={setHeroElement} className="relative h-screen w-full overflow-hidden bg-neutral-900">
                 <motion.div style={{ y }} className="absolute inset-0">
                     {project.coverImage && (
                         <Image
-                            src={project.coverImage}
+                            src={project.coverImage!}
                             alt={`${project.title} Interior Design - Final Result Showcase`}
                             fill
                             className="object-cover brightness-[0.4]"
@@ -82,7 +82,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                             <motion.div
                                 {...fadeInUpSettings}
                             >
-                                <span className="text-accent text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block">{project.brief.heading}</span>
+                                <span className="text-tan text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block">{project.brief.heading}</span>
                                 <h2 className="text-3xl md:text-5xl font-heading mb-8 font-light leading-[1.25] tracking-wide">The Story Behind the Space</h2>
                                 <p className="text-foreground/70 text-lg md:text-xl leading-relaxed max-w-2xl font-body">
                                     {project.brief.body}
@@ -94,7 +94,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     {...fadeInUpSettings}
                                     className="bg-accent/5 p-12 lg:p-16 border border-accent/10 rounded-sm"
                                 >
-                                    <span className="text-accent text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block underline decoration-accent/30 underline-offset-8">{project.approach.heading}</span>
+                                    <span className="text-tan text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block underline decoration-tan/30 underline-offset-8">{project.approach.heading}</span>
                                     <p className="text-foreground/80 leading-relaxed font-body">
                                         {project.approach.body}
                                     </p>
@@ -105,7 +105,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                         className="relative aspect-square grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl"
                                     >
                                         <Image
-                                            src={project.gallery[1]}
+                                            src={project.gallery[1]!}
                                             alt={`${project.title} - Close up of textures, materials, and process`}
                                             fill
                                             className="object-cover"
@@ -117,7 +117,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                             <motion.div
                                 {...fadeInUpSettings}
                             >
-                                <span className="text-accent text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block">{project.result.heading}</span>
+                                <span className="text-tan text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block">{project.result.heading}</span>
                                 <h3 className="text-3xl md:text-4xl font-heading mb-6 tracking-wide leading-[1.2]">The Final Outcome</h3>
                                 <p className="text-foreground/70 text-lg md:text-xl leading-relaxed max-w-2xl font-body mb-10">
                                     {project.result.body}
@@ -125,7 +125,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                 {project.gallery[2] && (
                                     <div className="h-[700px] relative mt-16 group overflow-hidden">
                                         <Image
-                                            src={project.gallery[2]}
+                                            src={project.gallery[2]!}
                                             alt={`${project.title} - Final design result preview`}
                                             fill
                                             className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -138,9 +138,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                         {/* Right Column: Sidebar CTA */}
                         <div className="md:col-span-4 sticky top-32 h-fit bg-foreground p-12 text-white rounded-sm shadow-2xl hidden md:block border-t-8 border-accent">
                             <Quote className="text-accent mb-8 opacity-40" size={40} />
-                            <h4 className="text-2xl font-heading mb-8 leading-[1.3] tracking-wide">
-                                "A project that redefined our expectations. A pure labor of artistic vision and functional design."
-                            </h4>
+                            {/* Removed hardcoded quote */}
                             <div className="space-y-6 pt-6 border-t border-white/10">
                                 <p className="text-sm opacity-60 uppercase tracking-widest font-bold">Inspired by this project?</p>
                                 <LinkNext
@@ -178,7 +176,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6"
                                 >
                                     <div className="md:col-span-7 h-[400px] md:h-[700px] relative overflow-hidden group">
-                                        {project.gallery[0] && <Image src={project.gallery[0]} alt="Gallery 1" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
+                                        {project.gallery[0] && <Image src={project.gallery[0]!} alt="Gallery 1" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 md:p-8">
                                             <p className="text-white/60 text-[8px] md:text-[10px] uppercase tracking-widest font-bold">{project.category}</p>
                                             <p className="text-white text-base md:text-lg font-heading mt-1">{project.title}</p>
@@ -186,10 +184,10 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     </div>
                                     <div className="md:col-span-5 flex flex-col gap-4 md:gap-6">
                                         <div className="h-[300px] md:h-[340px] relative overflow-hidden group">
-                                            {project.gallery[1] && <Image src={project.gallery[1]} alt="Gallery 2" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
+                                            {project.gallery[1] && <Image src={project.gallery[1]!} alt="Gallery 2" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
                                         </div>
                                         <div className="h-[300px] md:h-[340px] relative overflow-hidden group">
-                                            {project.gallery[2] && <Image src={project.gallery[2]} alt="Gallery 3" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
+                                            {project.gallery[2] && <Image src={project.gallery[2]!} alt="Gallery 3" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -206,17 +204,14 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                 >
                                     <div className="flex flex-col gap-4 md:gap-6">
                                         <div className="h-[300px] md:h-[420px] relative overflow-hidden group">
-                                            {project.gallery[3] && <Image src={project.gallery[3]} alt="Gallery 4" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
+                                            {project.gallery[3] && <Image src={project.gallery[3]!} alt="Gallery 4" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         </div>
                                         <div className="bg-white/5 p-6 md:p-12 flex flex-col justify-center">
-                                            <p className="text-white/30 text-[10px] uppercase tracking-widest font-bold mb-4">The Details</p>
-                                            <p className="text-white/80 text-lg md:text-2xl font-heading italic leading-relaxed">
-                                                Every surface, every texture, every angle was considered. Nothing is accidental.
-                                            </p>
+                                            {/* Removed hardcoded detail text */}
                                         </div>
                                     </div>
                                     <div className="h-[400px] md:h-full relative overflow-hidden group">
-                                        {(project.gallery[4] || project.gallery[3]) && <Image src={project.gallery[4] || project.gallery[3]} alt="Gallery 5" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
+                                        {(project.gallery[4] || project.gallery[3]) && <Image src={(project.gallery[4] || project.gallery[3])!} alt="Gallery 5" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full">
                                             <p className="text-white text-[10px] uppercase tracking-widest font-bold">{project.style}</p>
                                         </div>
@@ -234,7 +229,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6"
                                 >
                                     <div className="md:col-span-5 h-[400px] md:h-[700px] relative overflow-hidden group">
-                                        {project.gallery[5] && <Image src={project.gallery[5]} alt="Gallery 6" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
+                                        {project.gallery[5] && <Image src={project.gallery[5]!} alt="Gallery 6" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
                                     </div>
                                     <div className="md:col-span-7 flex flex-col justify-center p-6 md:p-16">
                                         <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold mb-6 md:mb-8">The Space</p>
@@ -297,7 +292,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     : "opacity-30 hover:opacity-60"
                                     }`}
                             >
-                                {img && <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />}
+                                {img && <Image src={img!} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />}
                             </button>
                         ))}
                     </div>

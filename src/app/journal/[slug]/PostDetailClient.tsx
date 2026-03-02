@@ -48,10 +48,10 @@ const PostDetailClient = ({ post, relatedPosts }: PostDetailClientProps) => {
             </AnimatePresence>
 
             {/* HERO HERO SECTION */}
-            <section className="relative h-[80vh] w-full group overflow-hidden">
+            <section className="relative h-[80vh] w-full group overflow-hidden bg-neutral-900">
                 {post.coverImage && (
                     <Image
-                        src={post.coverImage}
+                        src={post.coverImage!}
                         alt={post.title}
                         fill
                         className="object-cover transition-transform duration-[3s] scale-105 group-hover:scale-110"
@@ -86,7 +86,6 @@ const PostDetailClient = ({ post, relatedPosts }: PostDetailClientProps) => {
                         >
                             <span className="flex items-center gap-3"><Calendar size={16} className="text-white" /> {new Date(post.publishedAt).toLocaleDateString('en-ZM', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                             <span className="flex items-center gap-3"><Clock size={16} className="text-white" /> {post.readTime}</span>
-                            <span className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-accent" /> By Axis Living Studio</span>
                         </motion.div>
                     </div>
                 </div>
@@ -189,7 +188,7 @@ const PostDetailClient = ({ post, relatedPosts }: PostDetailClientProps) => {
                                     <div className="relative aspect-[16/9] overflow-hidden mb-8 border border-foreground/10">
                                         {rPost.coverImage && (
                                             <Image
-                                                src={rPost.coverImage}
+                                                src={rPost.coverImage!}
                                                 alt={rPost.title}
                                                 fill
                                                 className="object-cover transition-transform duration-1000 group-hover:scale-105"

@@ -13,7 +13,7 @@ export interface Post {
     readTime: string;
     publishedAt: string;
     excerpt: string;
-    coverImage: string;
+    coverImage: string | null;
     featured: boolean;
     tags: string[];
     content: PostContentBlock[];

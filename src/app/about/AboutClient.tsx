@@ -36,55 +36,50 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
 
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
-    const processes = (aboutData?.processSteps || [
+    // Hardcoded processes
+    const processes = (aboutData?.processes?.length > 0) ? aboutData.processes : [
         {
             step: "01",
             title: "Discovery",
-            description: "We start with a conversation. I learn about your life, your taste, your non-negotiables, and your budget. No judgement, just listening.",
+            description: "We begin with a deep dive into your lifestyle, needs, and aesthetic preferences to establish a clear design direction."
         },
         {
             step: "02",
-            title: "Concept",
-            description: "I develop a full design concept \u2014 mood boards, spatial plans, material palettes \u2014 and we align before anything is ordered or built.",
+            title: "Design Development",
+            description: "Our team crafts a cohesive design concept including space planning, material palettes, and bespoke furniture selection."
         },
         {
             step: "03",
-            title: "Design & Execution",
-            description: "I manage procurement, contractor coordination, and quality control so you don\u2019t have to. You stay informed without being overwhelmed.",
+            title: "Project Management",
+            description: "We handle all the details, from procurement to coordinating with contractors, ensuring a seamless implementation."
         },
         {
             step: "04",
-            title: "The Reveal",
-            description: "The moment the space comes together exactly as envisioned. We document everything, walk you through care instructions, and hand over your home.",
-        },
-    ]).map((p: any) => ({
-        step: p.number || p.step,
-        title: p.title,
-        description: p.description
-    }));
-
-    const press = aboutData?.pressLogos || [
-        "Design Digest Africa",
-        "Vanguard Style",
-        "The Guardian Life",
-        "Bella Naija Living",
-        "Dezeen*"
+            title: "Installation",
+            description: "The final reveal. We oversee the delivery and styling of every piece to bring your dream space to life."
+        }
     ];
 
-    const studioImages = [
-        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", // working
-        "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop", // fabric swatches
-        "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop", // meeting
-        "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=800&auto=format&fit=crop", // tools/samples
+    const press = aboutData?.press || [
+        "Lusaka Times",
+        "Zambia Design Week",
+        "Southern African Design"
+    ];
+
+    const studioImages = aboutData?.studioImages || [
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=800&auto=format&fit=crop",
     ];
 
     return (
         <div className="bg-background min-h-screen">
             {/* Hero Header */}
             <section ref={setHeroElement} className="h-[600px] relative overflow-hidden flex items-center justify-center pt-32">
-                <motion.div style={{ y }} className="absolute inset-0">
+                <motion.div style={{ y }} className="absolute inset-0 bg-neutral-900">
                     <Image
-                        src="https://images.unsplash.com/photo-1760072513442-9872656c1b07?fm=jpg&q=80&w=2000&auto=format&fit=crop"
+                        src={aboutData?.heroImage || "/projects/project-1-1.jpg"}
                         alt="Studio Aesthetic Portrait"
                         fill
                         className="object-cover brightness-50 contrast-125"
@@ -105,10 +100,10 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-9xl font-heading mb-10 font-light leading-[1.2] tracking-wide"
                     >
-                        {aboutData?.headline ? "Our Story" : "Our Philosophy"}
+                        About Us
                     </motion.h1>
                     <p className="max-w-2xl mx-auto text-white/90 text-sm tracking-[0.5em] uppercase font-bold text-center">
-                        {aboutData?.philosophy || "Good design isn't decorating. It's problem-solving with beauty."}
+                        {aboutData?.philosophy?.title || "Deliberate design for elevated living."}
                     </p>
                 </div>
             </section>
@@ -125,15 +120,15 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                             className="relative aspect-[3/4] shadow-2xl rounded-sm overflow-hidden"
                         >
                             <Image
-                                src={aboutData?.portrait || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2000&auto=format&fit=crop"}
+                                src={aboutData?.bio?.image || "/ama-portrait.jpg"}
                                 alt="Principal Designer"
                                 fill
                                 className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-12">
                                 <p className="text-white font-heading text-4xl italic leading-none border-l-4 border-accent pl-6">
-                                    Kas <br />
-                                    <span className="text-sm font-body uppercase font-bold tracking-[0.3em] opacity-70">Principal Designer &amp; Founder</span>
+                                    Ama <br />
+                                    <span className="text-sm font-body uppercase font-bold tracking-[0.3em] opacity-70">Founder & Creative Director</span>
                                 </p>
                             </div>
                         </motion.div>
@@ -144,28 +139,19 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                             whileInView="animate"
                             viewport={{ once: true, margin: "-100px" }}
                         >
-                            <span className="text-accent text-[10px] uppercase font-bold tracking-[0.4em] mb-4 block underline decoration-accent/30 underline-offset-8">My Story</span>
+                            <span className="text-accent text-[10px] uppercase font-bold tracking-[0.4em] mb-4 block underline decoration-accent/30 underline-offset-8">Our Philosophy</span>
                             <h2 className="text-3xl md:text-6xl font-heading mb-12 leading-[1.25] tracking-wide">
-                                {aboutData?.headline || "Design is more than aesthetic; it's problem-solving with beauty."}
+                                {aboutData?.headline || "Creating spaces that tell your story."}
                             </h2>
                             <div className="space-y-8 text-foreground/70 text-lg leading-relaxed font-body">
-                                <div className="whitespace-pre-wrap">
-                                    {aboutData?.bio || (
-                                        <>
-                                            <p>
-                                                I&apos;m the principal designer and founder of Axis Living. For over 5 years, I&apos;ve been transforming residential and commercial spaces across Lusaka and beyond. From intimate apartment refreshes to full-scale builds for clients who refuse to compromise on beauty.
-                                            </p>
-                                            <p>
-                                                My approach sits at the intersection of function and feeling. Every room I design begins with a deep understanding of the person who will live or work in it, their rhythms, their aesthetics, their aspirations. The result is always spaces that feel inevitable, like they couldn&apos;t have been any other way.
-                                            </p>
-                                            <p>
-                                                I&apos;ve worked with clients across Lusaka, and I collaborate with a trusted network of craftspeople, suppliers, and architects to deliver work that lasts.
-                                            </p>
-                                        </>
-                                    )}
-                                </div>
+                                <p>
+                                    {aboutData?.bio?.body || "Founded in Lusaka, Axis Living is a boutique interior design studio dedicated to crafting meaningful, luxury spaces. We believe that your home should be an extension of your soul—a place where every detail is intentional and every corner inspires comfort."}
+                                </p>
+                                <p>
+                                    Our approach is highly collaborative. We work closely with our clients to understand their vision and translate it into a reality that exceeds expectations. From contemporary Minimalist villas to eclectic heritage homes, we bring a refined aesthetic and professional rigour to every project.
+                                </p>
                                 <p className="font-heading italic text-foreground text-2xl py-8 border-y border-foreground/5 leading-relaxed">
-                                    &ldquo;{aboutData?.philosophy || "Good design isn't decorating. It's problem-solving with beauty. I believe every space has a best version of itself. My job is to find it, and then build it."}&rdquo;
+                                    &ldquo;{aboutData?.philosophy?.body || "We believe in the power of deliberate living—where design serves both function and the human spirit."}&rdquo;
                                 </p>
                                 <Link
                                     href="/booking"
@@ -190,7 +176,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                         className="mb-24 text-center"
                     >
                         <span className="text-white/70 text-xs font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
-                        <h2 className="text-white text-5xl md:text-8xl font-heading mb-12 font-light leading-[1.2] tracking-wide">My Process</h2>
+                        <h2 className="text-white text-5xl md:text-8xl font-heading mb-12 font-light leading-[1.2] tracking-wide">Our Process</h2>
                     </motion.header>
 
                     <motion.div
@@ -202,7 +188,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                     >
                         {processes.map((proc: any, idx: number) => (
                             <motion.div
-                                key={proc.step}
+                                key={idx}
                                 variants={fadeInUp}
                                 className="flex flex-col border-t border-white/10 pt-8 group"
                             >
@@ -226,7 +212,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                         whileInView="animate"
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-4xl font-heading mb-12 tracking-wide text-foreground">Press & Recognition</h2>
+                        <h2 className="text-4xl font-heading mb-12 tracking-wide text-foreground">As Featured In</h2>
                         <div className="flex flex-wrap justify-center gap-4 mb-8">
                             {press.map((item: string) => (
                                 <span
@@ -237,14 +223,11 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                                 </span>
                             ))}
                         </div>
-                        <p className="text-[10px] text-foreground/40 italic font-body">
-                            *Press logos update as features are published
-                        </p>
                     </motion.div>
                 </div>
             </section>
 
-            {/* Behind the Studio Section */}
+            {/* Gallery/Atmosphere Section */}
             <section className="py-32 px-6 lg:px-24 bg-background">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -255,15 +238,15 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                             viewport={{ once: true }}
                             className="grid grid-cols-2 gap-4"
                         >
-                            {studioImages.map((src, idx) => (
+                            {studioImages.map((src: string, idx: number) => (
                                 <motion.div
                                     key={idx}
                                     variants={fadeInUp}
-                                    className="relative aspect-square overflow-hidden"
+                                    className="relative aspect-square overflow-hidden bg-neutral-100"
                                 >
                                     <Image
                                         src={src}
-                                        alt="Behind the scenes at Axis Living"
+                                        alt="Behind the scenes"
                                         fill
                                         className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
                                     />
@@ -277,11 +260,12 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                             whileInView="animate"
                             viewport={{ once: true }}
                         >
-                            <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-tight tracking-wide">
-                                {aboutData?.behindStudioTitle || "Behind the Studio"}
-                            </h2>
+                            <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-tight tracking-wide">Behind the Studio</h2>
                             <p className="text-foreground/70 text-lg leading-relaxed font-body">
-                                {aboutData?.behindStudioBody || "Most of what we do happens before anything is bought or built. Site visits, material sourcing trips, vendor negotiations, late-night layout revisions. This is the work behind the work — and it's what separates a space that looks good in photos from one that feels right to live in."}
+                                Our studio is more than just a place of work; it's a sanctuary for creativity. We spend our days surrounded by textures, colors, and the raw materials that eventually become the foundations of your home.
+                            </p>
+                            <p className="mt-8 text-foreground/70 text-lg leading-relaxed font-body">
+                                Based in the heart of Lusaka, we are inspired by both the urban pulse and the natural beauty of the Zambian landscape.
                             </p>
                         </motion.div>
                     </div>

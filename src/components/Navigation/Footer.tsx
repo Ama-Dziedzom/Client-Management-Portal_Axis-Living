@@ -12,7 +12,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
             {/* Brand Statement */}
             <div className="flex-1 flex flex-col items-center justify-center py-16 text-center">
                 <span className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-bold mb-6 block">
-                    {siteSettings?.footerTagline || "Bespoke Interiors, Lusaka"}
+                    {siteSettings?.footerTagline || "DELIBERATE INTERIORS FOR MODERN LIVING"}
                 </span>
                 <h3 className="text-4xl md:text-9xl font-heading text-white/[0.15] tracking-wide leading-tight select-none">
                     {siteSettings?.studioName || "Axis Living"}
@@ -23,16 +23,20 @@ const Footer = ({ siteSettings }: FooterProps) => {
             <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-16 border-b border-white/10 pb-16 text-center">
                 <div className="flex flex-col items-center">
                     <Link href="/" className="relative block">
-                        <Image
-                            src={siteSettings?.footerLogo || "/logo-light.jpeg"}
-                            alt={siteSettings?.studioName || "Axis Living"}
-                            width={160}
-                            height={70}
-                            className="h-14 w-auto object-contain"
-                        />
+                        {siteSettings?.footerLogo ? (
+                            <Image
+                                src={siteSettings.footerLogo}
+                                alt={siteSettings?.studioName || "Bespoke Interiors"}
+                                width={160}
+                                height={70}
+                                className="h-14 w-auto object-contain"
+                            />
+                        ) : (
+                            <div className="text-2xl font-heading tracking-widest text-white/40 uppercase">Axis Living</div>
+                        )}
                     </Link>
                     <p className="mt-6 text-sm leading-relaxed max-w-xs">
-                        {siteSettings?.footerDescription || "Designing spaces that feel inevitable. We create interiors that are as intentional as they are beautiful, tailored to your life, not a trend."}
+                        {siteSettings?.footerDescription || "Bespoke interior design studio specializing in deliberate, elevated residential and commercial spaces."}
                     </p>
                     <div className="flex space-x-5 mt-8">
                         {siteSettings?.instagram && (
@@ -66,22 +70,16 @@ const Footer = ({ siteSettings }: FooterProps) => {
                 <div className="flex flex-col items-center">
                     <h4 className="text-white font-heading text-xl mb-6 tracking-wide">Connect</h4>
                     <ul className="space-y-4 text-sm font-body">
-                        {siteSettings?.email && (
-                            <li><a href={`mailto:${siteSettings.email}`} className="hover:text-accent transition-colors">{siteSettings.email}</a></li>
-                        )}
-                        {siteSettings?.instagram && (
-                            <li><Link href={siteSettings.instagram} target="_blank" className="hover:text-accent transition-colors">Instagram</Link></li>
-                        )}
-                        {siteSettings?.pinterest && (
-                            <li><Link href={siteSettings.pinterest} target="_blank" className="hover:text-accent transition-colors">Pinterest</Link></li>
-                        )}
+                        <li><a href={`mailto:${siteSettings?.email || "hello@axisliving.co.zm"}`} className="hover:text-accent transition-colors">{siteSettings?.email || "hello@axisliving.co.zm"}</a></li>
+                        <li><Link href={siteSettings?.instagram || "https://instagram.com/axisliving.zm"} target="_blank" className="hover:text-accent transition-colors">Instagram</Link></li>
+                        <li><Link href={siteSettings?.pinterest || "https://pinterest.com/axisliving"} target="_blank" className="hover:text-accent transition-colors">Pinterest</Link></li>
                         <li>Lusaka, Zambia</li>
                     </ul>
                 </div>
             </div>
 
             <div className="max-w-7xl mx-auto w-full pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-widest uppercase font-medium opacity-50">
-                <p>{siteSettings?.copyrightText || "Axis Living \u00B7 Bespoke Interiors \u00B7 Est. 2026"}</p>
+                <p>{siteSettings?.copyrightText || `© ${new Date().getFullYear()} Axis Living Studio. All rights reserved.`}</p>
                 <div className="mt-4 md:mt-0 flex gap-4">
                     {siteSettings?.email && <a href={`mailto:${siteSettings.email}`}>{siteSettings.email}</a>}
                     {siteSettings?.instagram && <Link href={siteSettings.instagram}>Instagram</Link>}

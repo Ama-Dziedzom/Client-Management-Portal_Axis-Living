@@ -56,7 +56,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
         "image": "https://axisliving.co.zm/og-image.jpg",
         "@id": "https://axisliving.co.zm",
         "url": "https://axisliving.co.zm",
-        "telephone": "+260 971 234 567",
+        "telephone": "+260 971 251 110",
         "address": {
             "@type": "PostalAddress",
             "streetAddress": "Main Street",
@@ -87,6 +87,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
         ],
         "priceRange": "$$$"
     };
+
     const [heroElement, setHeroElement] = useState<HTMLElement | null>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -105,6 +106,11 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
         return <div className="min-h-screen bg-background" />;
     }
 
+    // Default hardcoded content
+    const studioName = siteSettings?.studioName || "Axis Living";
+    const tagline = siteSettings?.tagline || "DELIBERATE INTERIORS FOR MODERN LIVING";
+    const heroImage = siteSettings?.heroImage || "/projects/project-1-1.jpg";
+
     return (
         <div className="bg-background min-h-screen">
             <script
@@ -113,9 +119,9 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
             />
             {/* Hero Section */}
             <section ref={setHeroElement} className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-                <motion.div style={{ y }} className="absolute inset-0 z-0">
+                <motion.div style={{ y }} className="absolute inset-0 z-0 bg-neutral-900">
                     <Image
-                        src={siteSettings?.heroImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop"}
+                        src={heroImage}
                         alt="Luxury Interior Design"
                         fill
                         className="object-cover brightness-50"
@@ -130,7 +136,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         transition={{ duration: 1 }}
                         className="text-white uppercase text-xs md:text-sm font-bold tracking-[0.5em] mb-6 drop-shadow-md"
                     >
-                        {siteSettings?.studioName || "Axis Living"}
+                        {studioName}
                     </motion.p>
                     <motion.h1
                         initial={{ opacity: 0, y: 50 }}
@@ -138,20 +144,13 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
                         className="text-white text-4xl md:text-8xl font-heading mb-10 leading-[1.2] md:leading-[1.25] tracking-wide"
                     >
-                        {siteSettings?.tagline ? (
-                            siteSettings.tagline.toLowerCase().includes('for') ? (
-                                <>
-                                    {siteSettings.tagline.split(/for/i)[0]}for <br />
-                                    <span className="italic font-light text-white/90">{siteSettings.tagline.split(/for/i)[1]}</span>
-                                </>
-                            ) : (
-                                <span>{siteSettings.tagline}</span>
-                            )
-                        ) : (
+                        {tagline.toLowerCase().includes('for') ? (
                             <>
-                                Spaces Designed for <br />
-                                <span className="italic font-light text-white/90">the Way You Live</span>
+                                {tagline.split(/for/i)[0]}for <br />
+                                <span className="italic font-light text-white/90">{tagline.split(/for/i)[1]}</span>
                             </>
+                        ) : (
+                            <span>{tagline}</span>
                         )}
                     </motion.h1>
                     <motion.div
@@ -203,16 +202,14 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         viewport={{ once: true, margin: "-100px" }}
                         className="md:w-1/2"
                     >
-                        <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">
+                        <span className="text-tan font-bold tracking-widest uppercase text-xs mb-4 block">
                             {siteSettings?.aboutSection?.subtitle || "About Us"}
                         </span>
                         <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-[1.2] tracking-wide">
-                            {siteSettings?.aboutSection?.title || (
-                                <>A Lusaka-based studio for <span className="italic">deliberate living</span>.</>
-                            )}
+                            {siteSettings?.aboutSection?.title || "A Lusaka-based studio for deliberate living."}
                         </h2>
                         <p className="text-foreground/70 text-lg leading-relaxed mb-8 max-w-xl">
-                            {siteSettings?.aboutSection?.body || "Axis Living is a Lusaka-based interior design practice working with clients who believe their space should feel like a deliberate choice. We don't do generic. We do yours."}
+                            {siteSettings?.aboutSection?.body || "We believe that your home should be a reflection of your soul. Our approach combines functional design with timeless aesthetics to create spaces that feel both elevated and lived-in."}
                         </p>
                         <Link href="/about" className="inline-flex items-center text-accent font-bold tracking-widest uppercase text-xs group">
                             {siteSettings?.aboutSection?.buttonText || "Learn Our Story"} <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" />
@@ -226,12 +223,14 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         viewport={{ once: true }}
                         className="md:w-1/2 relative aspect-[4/5] w-full"
                     >
-                        <Image
-                            src={siteSettings?.aboutSection?.image || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=2000&auto=format&fit=crop"}
-                            alt="Axis Living Aesthetic"
-                            fill
-                            className="object-cover rounded-sm grayscale hover:grayscale-0 transition-all duration-700"
-                        />
+                        <div className="w-full h-full bg-neutral-100 rounded-sm flex items-center justify-center overflow-hidden">
+                            <Image
+                                src={siteSettings?.aboutSection?.image || "/projects/project-1-2.jpg"}
+                                alt="Studio Aesthetic"
+                                fill
+                                className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                            />
+                        </div>
                     </motion.div>
                 </div>
             </section>
@@ -247,10 +246,10 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8 text-center md:text-left"
                     >
                         <div>
-                            <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">
+                            <span className="text-tan font-bold tracking-widest uppercase text-xs mb-4 block">
                                 {siteSettings?.projectsSection?.subtitle || "Selected Works"}
                             </span>
-                            <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2]">
+                            <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2] max-w-2xl">
                                 {siteSettings?.projectsSection?.title || "The Portfolio"}
                             </h2>
                         </div>
@@ -272,15 +271,13 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                                 variants={fadeInUp}
                                 className="group cursor-pointer overflow-hidden"
                             >
-                                <div className="relative aspect-[3/4] overflow-hidden">
-                                    {project.coverImage && (
-                                        <Image
-                                            src={project.coverImage}
-                                            alt={project.title}
-                                            fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
-                                    )}
+                                <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
+                                    <Image
+                                        src={project.coverImage || "/projects/project-1-1.jpg"}
+                                        alt={project.title}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
                                     <div className="absolute inset-0 bg-accent/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center text-center p-6">
                                         <h4 className="text-white text-2xl font-heading mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">{project.title}</h4>
                                         <Link
@@ -313,10 +310,12 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         viewport={{ once: true }}
                         className="text-center"
                     >
-                        <Quote className="mx-auto text-white/15 mb-8" size={48} />
-                        <span className="text-white/30 text-[10px] uppercase tracking-[0.4em] font-bold mb-6 block">Client Stories</span>
-                        <h2 className="text-3xl md:text-5xl font-heading font-light text-white leading-[1.3]">
-                            &ldquo;Working with Axis Living was the best decision we made for our new home.&rdquo;
+                        <Quote className="mx-auto text-white/15 mb-8" size={32} />
+                        <span className="text-white/30 text-[10px] uppercase tracking-[0.4em] font-bold mb-6 block">
+                            {siteSettings?.testimonialsSection?.subtitle || "Client Stories"}
+                        </span>
+                        <h2 className="text-3xl md:text-5xl font-heading font-light text-white leading-[1.3] max-w-4xl mx-auto">
+                            &ldquo;{siteSettings?.testimonialsSection?.title || "Designing with Purpose"}&rdquo;
                         </h2>
                     </motion.div>
                 </div>
@@ -329,13 +328,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
 
                     {/* Ticker row 1 */}
                     <div className="flex animate-marquee hover:[animation-play-state:paused] mb-6">
-                        {(testimonials || [
-                            { clientName: "Thandiwe M.", location: "Kabulonga", quote: "Working with Axis Living was the best decision we made for our new home. She understood our brief immediately and delivered something beyond what we imagined." },
-                            { clientName: "Mulenga C.", location: "Woodlands", quote: "The professionalism, the communication, the final result, everything was five stars. Our office has never felt more like us." },
-                            { clientName: "Chilufya B.", location: "Roma", quote: "I've worked with designers before but never one who truly listened. The space feels like me, not a showroom." },
-                            { clientName: "David K.", location: "Longacres", quote: "The penthouse transformation was beyond anything I imagined. Every guest asks who designed it. Bold, refined, and completely unique." },
-                            { clientName: "Grace M.", location: "Ibex Hill", quote: "From the first call to the final reveal, the process was seamless. They made something deeply personal out of a blank canvas." },
-                        ]).flatMap((t, idx) => [t, t].map((item, dupIdx) => (
+                        {(testimonials || []).flatMap((t, idx) => [t, t].map((item, dupIdx) => (
                             <div
                                 key={`${idx}-${dupIdx}`}
                                 className="flex-shrink-0 w-[350px] md:w-[420px] mx-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-sm p-8 group hover:bg-white/10 transition-colors duration-500"
@@ -364,20 +357,19 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
             {/* Journal Preview Section */}
             <section className="py-24 px-6 lg:px-24 bg-white border-t border-foreground/5 overflow-hidden">
                 <div className="max-w-7xl mx-auto">
-                    <header className="mb-20 flex flex-col md:flex-row justify-between items-end gap-8">
+                    <header className="mb-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                         <motion.div
                             variants={fadeInUp}
                             initial="initial"
                             whileInView="animate"
                             viewport={{ once: true }}
+                            className="max-w-4xl"
                         >
-                            <span className="text-accent font-bold tracking-widest uppercase text-xs mb-4 block">
+                            <span className="text-tan font-bold tracking-widest uppercase text-xs mb-4 block">
                                 {siteSettings?.journalSection?.subtitle || "From the Studio"}
                             </span>
                             <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2]">
-                                {siteSettings?.journalSection?.title || (
-                                    <>Thoughts on design, process, <br /><span className="italic font-light">and living well</span></>
-                                )}
+                                {siteSettings?.journalSection?.title || "Thoughts on design, process, and living well"}
                             </h2>
                         </motion.div>
                         <motion.div
@@ -386,7 +378,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                             whileInView="animate"
                             viewport={{ once: true }}
                         >
-                            <Link href="/journal" className="bg-accent text-white px-8 py-3 rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-lg flex items-center gap-2">
+                            <Link href="/journal" className="bg-accent text-white px-8 py-4 rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-lg flex items-center gap-2 whitespace-nowrap">
                                 {siteSettings?.journalSection?.buttonText || "Read All Articles"} <ArrowRight size={14} />
                             </Link>
                         </motion.div>
@@ -402,15 +394,13 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                                 viewport={{ once: true }}
                                 className="group bg-background overflow-hidden shadow-2xl flex flex-col md:flex-row border border-foreground/5 hover:border-accent/10 transition-all duration-500"
                             >
-                                <div className="relative aspect-[16/10] md:aspect-square md:w-[45%] overflow-hidden">
-                                    {post.coverImage && (
-                                        <Image
-                                            src={post.coverImage}
-                                            alt={post.title}
-                                            fill
-                                            className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                                        />
-                                    )}
+                                <div className="relative aspect-[16/10] md:aspect-square md:w-[45%] overflow-hidden bg-neutral-100">
+                                    <Image
+                                        src={post.coverImage || "/projects/project-1-1.jpg"}
+                                        alt={post.title}
+                                        fill
+                                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                    />
                                     <div className="absolute top-4 left-4">
                                         <span className="bg-white/90 backdrop-blur-md text-accent text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
                                             {post.category}
@@ -435,12 +425,14 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
 
             {/* Final CTA Hero */}
             <section className="relative h-[80vh] min-h-[500px] overflow-hidden flex items-center justify-center">
-                <Image
-                    src={siteSettings?.preFooterSection?.image || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1800&q=80&auto=format&fit=crop"}
-                    alt="Beautifully designed interior space"
-                    fill
-                    className="object-cover brightness-[0.3]"
-                />
+                <div className="absolute inset-0 bg-neutral-900">
+                    <Image
+                        src={siteSettings?.preFooterSection?.image || "/projects/project-2-1.jpg"}
+                        alt="Beautifully designed interior space"
+                        fill
+                        className="object-cover brightness-[0.3]"
+                    />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
                 <motion.div
                     variants={fadeInUp}
@@ -453,16 +445,10 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         {siteSettings?.preFooterSection?.subtitle || "Start Your Journey"}
                     </span>
                     <h2 className="text-4xl md:text-8xl font-heading text-white mb-8 leading-[1.15] tracking-wide">
-                        {siteSettings?.preFooterSection?.title ? (
-                            siteSettings.preFooterSection.title.includes("Your Space") ? (
-                                <>Let&apos;s Talk About <br /> <span className="italic">Your Space</span>.</>
-                            ) : siteSettings.preFooterSection.title
-                        ) : (
-                            <>Let&apos;s Talk About <br /> <span className="italic">Your Space</span>.</>
-                        )}
+                        {siteSettings?.preFooterSection?.title || "Let's Talk About Your Space."}
                     </h2>
                     <p className="text-white/50 text-sm md:text-base max-w-lg mb-12 leading-relaxed font-body">
-                        {siteSettings?.preFooterSection?.body || "Every great space begins with a conversation. Book your free discovery call and let's explore what's possible."}
+                        {siteSettings?.preFooterSection?.body || "Begin your design journey with a complimentary consultation. Tell us about your vision, and we'll help you bring it to life."}
                     </p>
                     <Link
                         href="/booking"

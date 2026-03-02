@@ -40,7 +40,7 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                         <motion.p
                             initial={{ opacity: 0, letterSpacing: "0.1em" }}
                             animate={{ opacity: 1, letterSpacing: "0.4em" }}
-                            className="text-accent text-xs uppercase font-bold mb-4"
+                            className="text-tan text-xs uppercase font-bold mb-4"
                         >
                             The Collection
                         </motion.p>
@@ -88,10 +88,10 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                                     className="group relative cursor-pointer"
                                 >
                                     <Link href={`/portfolio/${project.slug}`}>
-                                        <div className="relative aspect-[16/9] w-full overflow-hidden mb-8 shadow-2xl">
+                                        <div className="relative aspect-[16/9] w-full overflow-hidden mb-8 shadow-2xl bg-neutral-100 flex items-center justify-center">
                                             {project.coverImage && (
                                                 <Image
-                                                    src={project.coverImage}
+                                                    src={project.coverImage!}
                                                     alt={`${project.title} - ${project.category} Interior Design in ${project.location}`}
                                                     fill
                                                     className="object-cover transition-transform duration-1000 group-hover:scale-110"

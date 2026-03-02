@@ -14,11 +14,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
     metadataBase: new URL('https://axisliving.co.zm'),
     title: {
-        default: "Axis Living | Bespoke Interiors, Lusaka, Zambia",
-        template: "%s | Axis Living"
+        default: "Bespoke Interiors | Custom Design, Lusaka, Zambia",
+        template: "%s | Bespoke Interiors"
     },
     description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful, tailored to your life, not a trend. Lusaka-based interior design studio.",
-    keywords: ["interior design", "Lusaka", "Zambia", "bespoke design", "residential design", "commercial interiors", "Axis Living"],
+    keywords: ["interior design", "Lusaka", "Zambia", "bespoke design", "residential design", "commercial interiors", "Bespoke Interiors"],
     alternates: {
         canonical: '/',
     },
@@ -27,37 +27,40 @@ export const metadata: Metadata = {
         apple: "/apple-touch-icon.png",
     },
     openGraph: {
-        title: "Axis Living | Bespoke Interiors, Lusaka",
+        title: "Bespoke Interiors | Custom Design, Lusaka",
         description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful.",
         type: "website",
         url: "https://axisliving.co.zm",
-        siteName: "Axis Living",
+        siteName: "Bespoke Interiors",
         locale: "en_ZM",
         images: [
             {
                 url: "/og-image.jpg",
                 width: 1200,
                 height: 630,
-                alt: "Axis Living Interiors",
+                alt: "Bespoke Interiors",
             }
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: "Axis Living | Bespoke Interiors, Lusaka",
+        title: "Bespoke Interiors | Custom Design, Lusaka",
         description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful.",
         images: ["/og-image.jpg"],
     },
 };
 
-import { fetchSiteSettings } from "../lib/data";
+import { fetchSiteSettings, fetchHomeData } from "../lib/data";
 
 export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const siteSettings = await fetchSiteSettings();
+    const [siteSettings, homeData] = await Promise.all([
+        fetchSiteSettings(),
+        fetchHomeData()
+    ]);
 
     return (
         <html lang="en" className={`${manrope.variable} scroll-smooth`}>
@@ -67,7 +70,7 @@ export default async function RootLayout({
                     {children}
                 </main>
                 <Footer siteSettings={siteSettings} />
-                <LookbookPopup />
+                <LookbookPopup data={homeData?.lookbookSection} />
             </body>
         </html>
     );

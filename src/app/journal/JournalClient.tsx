@@ -99,7 +99,7 @@ const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProp
                                     className="group"
                                 >
                                     <Link href={`/journal/${post.slug}`} className="block">
-                                        <div className="relative aspect-[16/10] overflow-hidden mb-8 shadow-2xl rounded-sm">
+                                        <div className="relative aspect-[16/10] overflow-hidden mb-8 shadow-2xl rounded-sm bg-neutral-100 flex items-center justify-center">
                                             {post.coverImage && (
                                                 <Image
                                                     src={post.coverImage}
@@ -149,7 +149,7 @@ const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProp
                                     className="group"
                                 >
                                     <Link href={`/journal/${post.slug}`} className="block">
-                                        <div className="relative aspect-[4/3] overflow-hidden mb-6 shadow-xl rounded-sm">
+                                        <div className="relative aspect-[4/3] overflow-hidden mb-6 shadow-xl rounded-sm bg-neutral-100 flex items-center justify-center">
                                             {post.coverImage && (
                                                 <Image
                                                     src={post.coverImage}

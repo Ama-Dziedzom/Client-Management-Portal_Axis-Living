@@ -14,7 +14,7 @@ interface LookbookSectionProps {
 
 export default function LookbookSection({ data }: LookbookSectionProps) {
     return (
-        <section className="w-full bg-[#FAF9F6] border-l-8 border-[#C9A84C] py-20 px-6 lg:px-24">
+        <section className="w-full bg-[#FAF9F6] border-l-8 border-[#2F402C] py-20 px-6 lg:px-24">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
                     <motion.div
@@ -24,14 +24,14 @@ export default function LookbookSection({ data }: LookbookSectionProps) {
                         transition={{ duration: 0.8 }}
                         className="lg:w-3/5"
                     >
-                        <span className="text-accent text-[10px] uppercase font-bold tracking-[0.4em] mb-4 block">
+                        <span className="text-tan text-[10px] uppercase font-bold tracking-[0.4em] mb-4 block">
                             {data?.subtitle || "Free Resource"}
                         </span>
                         <h2 className="text-4xl md:text-6xl font-heading mb-8 text-foreground tracking-wide">
                             {data?.title || "Get the Lookbook"}
                         </h2>
                         <p className="text-foreground/70 text-lg leading-relaxed max-w-2xl font-body">
-                            {data?.body || "Behind the Design is our curated 12-page guide featuring material palettes, spatial planning tips, and an inside look at how we approach every project. It's free."}
+                            {data?.body || "Download our curated guide to modern interior styles and start envisioning your dream space today."}
                         </p>
                     </motion.div>
 
@@ -40,14 +40,12 @@ export default function LookbookSection({ data }: LookbookSectionProps) {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="w-full lg:w-2/5"
+                        className="w-full lg:w-2/5 flex items-center"
                     >
-                        <div className="bg-white p-8 md:p-10 shadow-sm border border-foreground/5">
-                            <EmailForm
-                                variant="inline"
-                                buttonText={data?.buttonText || "Get Free Access"}
-                            />
-                        </div>
+                        <EmailForm
+                            variant="inline"
+                            buttonText={data?.buttonText}
+                        />
                     </motion.div>
                 </div>
             </div>

@@ -11,7 +11,8 @@ const config: Config = {
             colors: {
                 background: "#FAF9F6",
                 foreground: "#1C1C1C",
-                accent: "#C9A84C",
+                accent: "#2F402C", // Dark Green
+                tan: "#C6B9AA",    // Tan/Beige
                 primary: "#1C1C1C",
                 secondary: "#FAF9F6",
                 gold: "#C9A84C",

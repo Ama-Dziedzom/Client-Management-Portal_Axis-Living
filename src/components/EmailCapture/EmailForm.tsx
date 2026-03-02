@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface EmailFormProps {
     variant: "popup" | "inline";
-    buttonText: string;
+    buttonText?: string;
     onSuccess?: (email: string) => void;
 }
 
@@ -73,19 +73,52 @@ export default function EmailForm({ variant, buttonText, onSuccess }: EmailFormP
         );
     }
 
+    if (variant === 'inline') {
+        return (
+            <form onSubmit={handleSubmit} className="w-full">
+                <div className="flex items-center rounded-full border border-foreground/15 bg-white overflow-hidden transition-all focus-within:border-accent/40 focus-within:shadow-md">
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Your email address"
+                        className="flex-grow px-6 py-4 bg-transparent text-foreground placeholder:text-foreground/35 outline-none text-sm"
+                        disabled={isSubmitting}
+                    />
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`px-7 py-3 mr-1.5 rounded-full font-bold uppercase tracking-widest text-[10px] transition-all whitespace-nowrap bg-[#2F402C] text-white hover:bg-[#3d5339] shadow-sm ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    >
+                        {isSubmitting ? "Sending..." : (buttonText || "Submit")}
+                    </button>
+                </div>
+                <AnimatePresence>
+                    {error && (
+                        <motion.p
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="text-red-500 text-[11px] mt-2 ml-6 font-medium"
+                        >
+                            {error}
+                        </motion.p>
+                    )}
+                </AnimatePresence>
+            </form>
+        );
+    }
+
     return (
         <form onSubmit={handleSubmit} className="w-full">
-            <div className={`flex flex-col gap-3 ${variant === 'inline' ? 'md:flex-row md:items-start' : ''}`}>
+            <div className="flex flex-col gap-3">
                 <div className="flex-grow">
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Your email address"
-                        className={`w-full px-4 py-3 rounded-none border outline-none transition-colors ${variant === 'popup'
-                                ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-white/40'
-                                : 'bg-transparent border-foreground/20 text-foreground placeholder:text-foreground/40 focus:border-accent'
-                            }`}
+                        className="w-full px-4 py-3 rounded-md border outline-none transition-colors bg-white/10 border-[#C6B9AA]/30 text-white placeholder:text-[#C6B9AA]/50 focus:border-[#C6B9AA]/60"
                         disabled={isSubmitting}
                     />
                     <AnimatePresence>
@@ -104,19 +137,14 @@ export default function EmailForm({ variant, buttonText, onSuccess }: EmailFormP
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-8 py-3 font-bold uppercase tracking-widest text-[10px] transition-all whitespace-nowrap ${variant === 'popup'
-                            ? 'bg-[#C9A84C] text-white hover:bg-[#B89740] shadow-lg'
-                            : 'bg-accent text-white hover:bg-foreground shadow-sm'
-                        } ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`px-8 py-3 rounded-full font-bold uppercase tracking-widest text-[10px] transition-all whitespace-nowrap bg-[#C6B9AA] text-[#2F402C] hover:bg-[#b8a999] shadow-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                    {isSubmitting ? "Sending..." : buttonText}
+                    {isSubmitting ? "Sending..." : (buttonText || "Submit")}
                 </button>
             </div>
-            {variant === 'popup' && (
-                <p className="text-[10px] text-white/40 mt-3 italic">
-                    No spam. Unsubscribe anytime.
-                </p>
-            )}
+            <p className="text-[10px] text-[#C6B9AA]/50 mt-3 italic">
+                No spam. Unsubscribe anytime.
+            </p>
         </form>
     );
 }

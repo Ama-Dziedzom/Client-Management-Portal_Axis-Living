@@ -6,7 +6,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import EmailForm from "./EmailForm";
 
-export default function LookbookPopup() {
+interface LookbookPopupProps {
+    data?: {
+        subtitle?: string;
+        title?: string;
+        body?: string;
+        buttonText?: string;
+    };
+}
+
+export default function LookbookPopup({ data }: LookbookPopupProps) {
     const pathname = usePathname();
     const [isVisible, setIsVisible] = useState(false);
     const [hasTriggered, setHasTriggered] = useState(false);
@@ -64,7 +73,7 @@ export default function LookbookPopup() {
                     transition={{ type: "spring", damping: 20, stiffness: 100 }}
                     className="fixed bottom-6 right-6 z-[9999] w-full max-w-[380px]"
                 >
-                    <div className="bg-[#1C1C1C] text-white p-8 rounded-sm shadow-2xl relative border border-white/5">
+                    <div className="bg-[#2F402C] text-white p-8 rounded-sm shadow-2xl relative border border-[#C6B9AA]/20">
                         <button
                             onClick={() => setIsVisible(false)}
                             className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
@@ -73,20 +82,20 @@ export default function LookbookPopup() {
                         </button>
 
                         <div className="mb-6">
-                            <span className="text-[#C9A84C] text-[10px] uppercase font-bold tracking-[0.3em] mb-2 block">
-                                Free Download
+                            <span className="text-[#C6B9AA] text-[10px] uppercase font-bold tracking-[0.3em] mb-2 block">
+                                {data?.subtitle || "Limited Edition"}
                             </span>
                             <h3 className="text-2xl font-heading mb-3 leading-tight tracking-wide">
-                                Behind the Design: <br />Our 2024 Lookbook
+                                {data?.title || "2024 Design Trends"}
                             </h3>
                             <p className="text-white/60 text-sm leading-relaxed font-body">
-                                12 pages of inspiration, material guides, and design insights from our latest projects
+                                {data?.body || "Receive our curated lookbook on this years most influential interior movements."}
                             </p>
                         </div>
 
                         <EmailForm
                             variant="popup"
-                            buttonText="Send Me the Lookbook"
+                            buttonText={data?.buttonText}
                             onSuccess={handleSuccess}
                         />
                     </div>
