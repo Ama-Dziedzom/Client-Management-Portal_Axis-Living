@@ -32,7 +32,7 @@ const Navbar = ({ siteSettings }: NavbarProps) => {
 
     const defaultLinks = [
         { name: "Portfolio", href: "/portfolio" },
-        { name: "Process", href: "/about" },
+        { name: "About", href: "/about" },
         { name: "Journal", href: "/journal" },
         { name: "Pricing", href: "/pricing" },
     ];

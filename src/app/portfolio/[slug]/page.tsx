@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             canonical: `/portfolio/${slug}`,
         },
         openGraph: {
-            title: `${project.title} | Axis Living`,
+            title: `${project.title} | Axis Living - Bespoke Interiors`,
             description: project.brief.body.substring(0, 160) + "...",
             images: [
                 {
-                    url: project.coverImage,
+                    url: project.coverImage ?? "/logo.jpg",
                     width: 1200,
                     height: 630,
                     alt: project.title,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             card: 'summary_large_image',
             title: project.title,
             description: project.brief.body.substring(0, 160) + "...",
-            images: [project.coverImage],
+            images: [project.coverImage ?? "/logo.jpg"],
         }
     };
 }

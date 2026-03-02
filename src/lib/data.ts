@@ -89,13 +89,13 @@ export async function fetchTestimonials() {
 
 export async function fetchHomeData() {
     return {
-        tagline: "DELIBERATE INTERIORS FOR MODERN LIVING",
-        heroImage: "/projects/project-1-1.jpg",
+        tagline: "Spaces Designed for the Way You Live",
+        heroImage: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80",
         aboutSection: {
             subtitle: "About Us",
             title: "A Lusaka-based studio for deliberate living.",
             body: "We believe that your home should be a reflection of your soul. Our approach combines functional design with timeless aesthetics to create spaces that feel both elevated and lived-in.",
-            image: "/projects/project-1-2.jpg",
+            image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=80",
             buttonText: "Learn Our Story"
         },
         projectsSection: {
@@ -109,20 +109,20 @@ export async function fetchHomeData() {
             body: "Download our curated guide to modern interior styles and start envisioning your dream space today.",
             buttonText: "Get Free Access"
         },
+        testimonialsSection: {
+            subtitle: "Client Stories",
+            title: "Working with Axis Living was the best decision we made for our new home."
+        },
         journalSection: {
             subtitle: "From the Studio",
             title: "Thoughts on design, process, and living well",
             buttonText: "Read All Articles"
         },
-        testimonialsSection: {
-            subtitle: "Client Stories",
-            title: "Designing with Purpose"
-        },
         preFooterSection: {
             subtitle: "Start Your Journey",
             title: "Let's Talk About Your Space.",
             body: "Begin your design journey with a complimentary consultation. Tell us about your vision, and we'll help you bring it to life.",
-            image: "/projects/project-2-1.jpg",
+            image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80",
             buttonText: "Book a Free Consultation"
         }
     };
@@ -135,6 +135,8 @@ export async function fetchSiteSettings() {
         email: "hello@axisliving.co.zm",
         phone: "+260 971 251 110",
         address: "Lusaka, Zambia",
+        headerLogo: "/favicon.jpeg",
+        footerLogo: "/logo-light.jpeg",
         socialLinks: [
             { platform: "Instagram", url: "https://instagram.com/axisliving.zm" },
             { platform: "Pinterest", url: "https://pinterest.com/axisliving" }
@@ -144,7 +146,7 @@ export async function fetchSiteSettings() {
 
 export async function fetchAboutData() {
     return {
-        heroImage: "/projects/project-1-1.jpg",
+        heroImage: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80",
         headline: "Deliberate design for elevated living.",
         philosophy: {
             title: "Our Philosophy",
@@ -153,17 +155,18 @@ export async function fetchAboutData() {
         bio: {
             title: "The Vision",
             body: "Founded on the principles of balance and beauty, Axis Living has grown into a studio known for its unique ability to blend contemporary luxury with African heritage.",
-            image: "/ama-portrait.jpg"
+            image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80"
         },
         studioImages: [
-            "/projects/project-1-2.jpg",
-            "/projects/project-2-1.jpg",
-            "/projects/project-3-1.jpg"
+            "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1000&q=80",
+            "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1000&q=80",
+            "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1000&q=80"
         ],
         processes: [
-            { title: "Discovery", description: "Getting to know you and your vision." },
-            { title: "Design", description: "Crafting the perfect aesthetic and layout." },
-            { title: "Delivery", description: "Bringing the design to life in your space." }
+            { step: "01", title: "Discovery", description: "Every project starts with a conversation to understand your needs, lifestyle, and aesthetic goals." },
+            { step: "02", title: "Design Development", description: "We develop comprehensive design concepts, material palettes, and bespoke spatial layouts." },
+            { step: "03", title: "Project Management", description: "Reviewing spatial details and technical documentation to ensure a seamless implementation." },
+            { step: "04", title: "Installation", description: "The final reveal—bringing the design to life through meticulous styling and placement." }
         ],
         press: [
             { name: "Lusaka Times", url: "#" },

@@ -4,7 +4,7 @@ import { fetchPosts, fetchFeaturedPosts } from "../../lib/data";
 
 export const metadata: Metadata = {
     title: "Journal | Axis Living - Design Thinking & Stories",
-    description: "Explore our collection of design thinking, project stories, and honest advice from the Axis Living studio.",
+    description: "Explore our collection of design thinking, project stories, and honest advice from our studio.",
 };
 
 export default async function JournalPage() {

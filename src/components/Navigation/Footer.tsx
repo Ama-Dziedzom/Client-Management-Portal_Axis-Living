@@ -26,7 +26,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
                         {siteSettings?.footerLogo ? (
                             <Image
                                 src={siteSettings.footerLogo}
-                                alt={siteSettings?.studioName || "Bespoke Interiors"}
+                                alt={siteSettings?.studioName || "Axis Living"}
                                 width={160}
                                 height={70}
                                 className="h-14 w-auto object-contain"

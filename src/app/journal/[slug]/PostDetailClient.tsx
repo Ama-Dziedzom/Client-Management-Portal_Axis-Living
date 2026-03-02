@@ -49,15 +49,13 @@ const PostDetailClient = ({ post, relatedPosts }: PostDetailClientProps) => {
 
             {/* HERO HERO SECTION */}
             <section className="relative h-[80vh] w-full group overflow-hidden bg-neutral-900">
-                {post.coverImage && (
-                    <Image
-                        src={post.coverImage!}
-                        alt={post.title}
-                        fill
-                        className="object-cover transition-transform duration-[3s] scale-105 group-hover:scale-110"
-                        priority
-                    />
-                )}
+                <Image
+                    src={post.coverImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"}
+                    alt={post.title}
+                    fill
+                    className="object-cover transition-transform duration-[3s] scale-105 group-hover:scale-110"
+                    priority
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-black/20 to-transparent" />
 
                 <div className="absolute inset-0 flex flex-col justify-end px-6 md:px-24 pb-20">
@@ -186,14 +184,12 @@ const PostDetailClient = ({ post, relatedPosts }: PostDetailClientProps) => {
                             >
                                 <Link href={`/journal/${rPost.slug}`} className="block">
                                     <div className="relative aspect-[16/9] overflow-hidden mb-8 border border-foreground/10">
-                                        {rPost.coverImage && (
-                                            <Image
-                                                src={rPost.coverImage!}
-                                                alt={rPost.title}
-                                                fill
-                                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                                            />
-                                        )}
+                                        <Image
+                                            src={rPost.coverImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"}
+                                            alt={rPost.title}
+                                            fill
+                                            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                        />
                                     </div>
                                     <h3 className="text-2xl font-heading mb-4 group-hover:text-accent transition-colors">
                                         {rPost.title}

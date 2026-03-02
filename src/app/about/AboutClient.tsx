@@ -79,7 +79,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
             <section ref={setHeroElement} className="h-[600px] relative overflow-hidden flex items-center justify-center pt-32">
                 <motion.div style={{ y }} className="absolute inset-0 bg-neutral-900">
                     <Image
-                        src={aboutData?.heroImage || "/projects/project-1-1.jpg"}
+                        src={aboutData?.heroImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80"}
                         alt="Studio Aesthetic Portrait"
                         fill
                         className="object-cover brightness-50 contrast-125"
@@ -120,7 +120,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                             className="relative aspect-[3/4] shadow-2xl rounded-sm overflow-hidden"
                         >
                             <Image
-                                src={aboutData?.bio?.image || "/ama-portrait.jpg"}
+                                src={aboutData?.bio?.image || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80"}
                                 alt="Principal Designer"
                                 fill
                                 className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
@@ -214,14 +214,17 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                     >
                         <h2 className="text-4xl font-heading mb-12 tracking-wide text-foreground">As Featured In</h2>
                         <div className="flex flex-wrap justify-center gap-4 mb-8">
-                            {press.map((item: string) => (
-                                <span
-                                    key={item}
-                                    className="px-6 py-3 border border-[#C9A84C] text-[#C9A84C] rounded-full text-[10px] font-bold uppercase tracking-widest"
-                                >
-                                    {item}
-                                </span>
-                            ))}
+                            {press.map((item: any, index: number) => {
+                                const label = typeof item === 'string' ? item : item.name;
+                                return (
+                                    <span
+                                        key={index}
+                                        className="px-6 py-3 border border-[#C9A84C] text-[#C9A84C] rounded-full text-[10px] font-bold uppercase tracking-widest"
+                                    >
+                                        {label}
+                                    </span>
+                                );
+                            })}
                         </div>
                     </motion.div>
                 </div>

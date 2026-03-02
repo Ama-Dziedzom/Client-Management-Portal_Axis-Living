@@ -108,8 +108,8 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
 
     // Default hardcoded content
     const studioName = siteSettings?.studioName || "Axis Living";
-    const tagline = siteSettings?.tagline || "DELIBERATE INTERIORS FOR MODERN LIVING";
-    const heroImage = siteSettings?.heroImage || "/projects/project-1-1.jpg";
+    const tagline = siteSettings?.tagline || "Spaces Designed for the Way You Live";
+    const heroImage = siteSettings?.heroImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80";
 
     return (
         <div className="bg-background min-h-screen">
@@ -225,7 +225,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                     >
                         <div className="w-full h-full bg-neutral-100 rounded-sm flex items-center justify-center overflow-hidden">
                             <Image
-                                src={siteSettings?.aboutSection?.image || "/projects/project-1-2.jpg"}
+                                src={siteSettings?.aboutSection?.image || "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=80"}
                                 alt="Studio Aesthetic"
                                 fill
                                 className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
@@ -273,7 +273,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                             >
                                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
                                     <Image
-                                        src={project.coverImage || "/projects/project-1-1.jpg"}
+                                        src={project.coverImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"}
                                         alt={project.title}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -315,7 +315,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                             {siteSettings?.testimonialsSection?.subtitle || "Client Stories"}
                         </span>
                         <h2 className="text-3xl md:text-5xl font-heading font-light text-white leading-[1.3] max-w-4xl mx-auto">
-                            &ldquo;{siteSettings?.testimonialsSection?.title || "Designing with Purpose"}&rdquo;
+                            {siteSettings?.testimonialsSection?.title || "Working with Axis Living was the best decision we made for our new home."}
                         </h2>
                     </motion.div>
                 </div>
@@ -396,7 +396,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                             >
                                 <div className="relative aspect-[16/10] md:aspect-square md:w-[45%] overflow-hidden bg-neutral-100">
                                     <Image
-                                        src={post.coverImage || "/projects/project-1-1.jpg"}
+                                        src={post.coverImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"}
                                         alt={post.title}
                                         fill
                                         className="object-cover transition-transform duration-1000 group-hover:scale-110"
@@ -427,7 +427,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
             <section className="relative h-[80vh] min-h-[500px] overflow-hidden flex items-center justify-center">
                 <div className="absolute inset-0 bg-neutral-900">
                     <Image
-                        src={siteSettings?.preFooterSection?.image || "/projects/project-2-1.jpg"}
+                        src={siteSettings?.preFooterSection?.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80"}
                         alt="Beautifully designed interior space"
                         fill
                         className="object-cover brightness-[0.3]"

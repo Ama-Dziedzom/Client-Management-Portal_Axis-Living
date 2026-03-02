@@ -102,7 +102,7 @@ const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProp
                                         <div className="relative aspect-[16/10] overflow-hidden mb-8 shadow-2xl rounded-sm bg-neutral-100 flex items-center justify-center">
                                             {post.coverImage && (
                                                 <Image
-                                                    src={post.coverImage}
+                                                    src={post.coverImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"}
                                                     alt={post.title}
                                                     fill
                                                     className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -152,7 +152,7 @@ const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProp
                                         <div className="relative aspect-[4/3] overflow-hidden mb-6 shadow-xl rounded-sm bg-neutral-100 flex items-center justify-center">
                                             {post.coverImage && (
                                                 <Image
-                                                    src={post.coverImage}
+                                                    src={post.coverImage || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"}
                                                     alt={post.title}
                                                     fill
                                                     className="object-cover transition-transform duration-700 group-hover:scale-105"

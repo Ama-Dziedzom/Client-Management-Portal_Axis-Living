@@ -14,11 +14,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
     metadataBase: new URL('https://axisliving.co.zm'),
     title: {
-        default: "Bespoke Interiors | Custom Design, Lusaka, Zambia",
-        template: "%s | Bespoke Interiors"
+        default: "Axis Living | Bespoke Interiors - Custom Design, Lusaka",
+        template: "%s | Axis Living"
     },
     description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful, tailored to your life, not a trend. Lusaka-based interior design studio.",
-    keywords: ["interior design", "Lusaka", "Zambia", "bespoke design", "residential design", "commercial interiors", "Bespoke Interiors"],
+    keywords: ["interior design", "Lusaka", "Zambia", "bespoke design", "residential design", "commercial interiors", "Axis Living", "Bespoke Interiors"],
     alternates: {
         canonical: '/',
     },
@@ -27,26 +27,26 @@ export const metadata: Metadata = {
         apple: "/apple-touch-icon.png",
     },
     openGraph: {
-        title: "Bespoke Interiors | Custom Design, Lusaka",
+        title: "Axis Living | Bespoke Interiors - Custom Design, Lusaka",
         description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful.",
         type: "website",
         url: "https://axisliving.co.zm",
-        siteName: "Bespoke Interiors",
+        siteName: "Axis Living",
         locale: "en_ZM",
         images: [
             {
-                url: "/og-image.jpg",
+                url: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80",
                 width: 1200,
                 height: 630,
-                alt: "Bespoke Interiors",
+                alt: "Axis Living - Bespoke Interiors",
             }
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: "Bespoke Interiors | Custom Design, Lusaka",
+        title: "Axis Living | Bespoke Interiors - Custom Design, Lusaka",
         description: "Spaces designed for the way you live. We create interiors that are as intentional as they are beautiful.",
-        images: ["/og-image.jpg"],
+        images: ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80"],
     },
 };
 

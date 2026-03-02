@@ -3,7 +3,7 @@ import PricingClient from "./PricingClient";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Pricing & Investment | Bespoke Interiors",
+    title: "Pricing & Investment | Axis Living - Bespoke Interiors",
     description: "Honest, transparent pricing for bespoke interior design services.",
 };
 

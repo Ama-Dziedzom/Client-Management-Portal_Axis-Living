@@ -97,7 +97,7 @@ export const posts: Post[] = [
         readTime: "8 min read",
         publishedAt: "2024-08-19",
         excerpt: "The question everyone has but few ask openly. We break down real costs, common budget mistakes, and how to get the most from whatever you're working with.",
-        coverImage: "https://images.unsplash.com/photo-1554469384-e58fac937c8b?w=1200&q=80",
+        coverImage: "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=1200&q=80",
         featured: false,
         tags: ["Budgeting", "Getting Started", "Zambia"],
         content: [
