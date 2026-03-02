@@ -5,12 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Clock, Calendar } from "lucide-react";
-import { posts, getFeaturedPosts } from "../../data/journal";
 import { cn } from "../../lib/utils";
 import { Post } from "../../types/journal";
 import LookbookSection from "../../components/EmailCapture/LookbookSection";
 
-const JournalClient = () => {
+interface JournalClientProps {
+    initialPosts: Post[];
+    initialFeaturedPosts: Post[];
+}
+
+const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProps) => {
     const [filter, setFilter] = useState("All");
     const [mounted, setMounted] = useState(false);
 
@@ -19,17 +23,16 @@ const JournalClient = () => {
     }, []);
 
     const categories = ["All", "Design Guides", "Art & Culture", "Budgeting", "Small Spaces"];
-    const featuredPosts = getFeaturedPosts();
 
-    const filteredPosts = posts.filter((post: Post) => {
+    const filteredPosts = initialPosts.filter((post: Post) => {
         if (filter === "All") return true;
         return post.category === filter;
     });
 
     // Separating posts for the layout - only when filter is "All"
-    const displayFeatured = filter === "All" ? featuredPosts : [];
+    const displayFeatured = filter === "All" ? initialFeaturedPosts : [];
     const displayGrid = filter === "All"
-        ? posts.filter(p => !p.featured)
+        ? initialPosts.filter(p => !p.featured)
         : filteredPosts;
 
     if (!mounted) {

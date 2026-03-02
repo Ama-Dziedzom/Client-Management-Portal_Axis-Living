@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPostBySlug, getRelatedPosts } from "../../../data/journal";
+import { fetchPostBySlug, fetchRelatedPosts } from "../../../lib/data";
 import PostDetailClient from "./PostDetailClient";
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
-    const post = getPostBySlug(slug);
+    const post = await fetchPostBySlug(slug);
     if (!post) return { title: "Post Not Found" };
 
     return {
@@ -41,10 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PostDetailPage({ params }: Props) {
     const { slug } = await params;
-    const post = getPostBySlug(slug);
+    const post = await fetchPostBySlug(slug);
     if (!post) notFound();
 
-    const relatedPosts = getRelatedPosts(post.slug, 2);
+    const relatedPosts = await fetchRelatedPosts(post.slug, 2);
 
     // JSON-LD for Search Engines
     const jsonLd = {
@@ -58,7 +58,7 @@ export default async function PostDetailPage({ params }: Props) {
             "name": "Axis Living"
         },
         "description": post.excerpt,
-        "articleBody": post.content.filter(block => block.type === 'paragraph').map(block => block.text).join(' ')
+        "articleBody": post.content.filter((block: { type: string }) => block.type === 'paragraph').map((block: { text: string }) => block.text).join(' ')
     };
 
     return (

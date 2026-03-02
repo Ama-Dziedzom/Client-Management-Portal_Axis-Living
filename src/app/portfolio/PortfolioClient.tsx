@@ -5,12 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { projects } from "../../data/projects";
 import { cn } from "../../lib/utils";
 import { Project } from "../../types/project";
 import LookbookSection from "../../components/EmailCapture/LookbookSection";
 
-const PortfolioClient = () => {
+interface PortfolioClientProps {
+    initialProjects: Project[];
+}
+
+const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
     const [filter, setFilter] = useState("All");
     const [mounted, setMounted] = useState(false);
 
@@ -20,7 +23,7 @@ const PortfolioClient = () => {
 
     const categories = ["All", "Residential", "Commercial", "Contemporary", "Minimalist", "Japandi", "Maximalist"];
 
-    const filteredProjects = projects.filter((project: Project) => {
+    const filteredProjects = initialProjects.filter((project: Project) => {
         if (filter === "All") return true;
         return project.category === filter || project.style === filter;
     });
