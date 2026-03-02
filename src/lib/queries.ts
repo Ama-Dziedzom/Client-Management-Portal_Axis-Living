@@ -80,16 +80,29 @@ export const testimonialsQuery = `
 export const aboutQuery = `
   *[_type == "about"][0] {
     headline, bio, philosophy,
-    portrait, processSteps, pressLogos
+    portrait, processSteps, pressLogos,
+    behindStudioTitle, behindStudioBody
+  }
+`
+
+// ───── Home ─────
+export const homeQuery = `
+  *[_type == "home"][0] {
+    tagline, heroSubtitle, heroImage,
+    aboutSubtitle, aboutTitle, aboutBody, aboutImage, aboutButtonText,
+    projectsSubtitle, projectsTitle, projectsButtonText,
+    lookbookSubtitle, lookbookTitle, lookbookBody, lookbookButtonText,
+    journalSubtitle, journalTitle, journalButtonText,
+    preFooterSubtitle, preFooterTitle, preFooterBody, preFooterButtonText, preFooterImage
   }
 `
 
 // ───── Site Settings ─────
-
 export const siteSettingsQuery = `
   *[_type == "siteSettings"][0] {
-    studioName, tagline, heroSubtitle, heroImage,
-    email, instagram, pinterest,
-    calendlyUrl, footerTagline
+    studioName, email, instagram, pinterest,
+    calendlyUrl, footerTagline, headerLogo,
+    footerLogo, footerDescription, copyrightText,
+    navbarLinks
   }
 `

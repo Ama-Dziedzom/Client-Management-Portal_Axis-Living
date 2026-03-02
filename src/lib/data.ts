@@ -6,7 +6,7 @@
  * static data files so the site always renders.
  */
 
-import { client } from './sanity'
+import { client, urlFor } from './sanity'
 import {
     projectsQuery,
     featuredProjectsQuery,
@@ -17,6 +17,8 @@ import {
     relatedPostsQuery,
     testimonialsQuery,
     siteSettingsQuery,
+    aboutQuery,
+    homeQuery,
 } from './queries'
 
 // Static fallbacks
@@ -128,12 +130,78 @@ export async function fetchTestimonials() {
 
 // ───── Site Settings ─────
 
+export async function fetchHomeData() {
+    try {
+        const home = await client.fetch(homeQuery)
+        if (home) {
+            return {
+                ...home,
+                heroImage: home.heroImage?.asset ? urlFor(home.heroImage).url() : null,
+                aboutSection: {
+                    subtitle: home.aboutSubtitle,
+                    title: home.aboutTitle,
+                    body: home.aboutBody,
+                    image: home.aboutImage?.asset ? urlFor(home.aboutImage).url() : null,
+                    buttonText: home.aboutButtonText
+                },
+                projectsSection: {
+                    subtitle: home.projectsSubtitle,
+                    title: home.projectsTitle,
+                    buttonText: home.projectsButtonText
+                },
+                lookbookSection: {
+                    subtitle: home.lookbookSubtitle,
+                    title: home.lookbookTitle,
+                    body: home.lookbookBody,
+                    buttonText: home.lookbookButtonText
+                },
+                journalSection: {
+                    subtitle: home.journalSubtitle,
+                    title: home.journalTitle,
+                    buttonText: home.journalButtonText
+                },
+                preFooterSection: {
+                    subtitle: home.preFooterSubtitle,
+                    title: home.preFooterTitle,
+                    body: home.preFooterBody,
+                    image: home.preFooterImage?.asset ? urlFor(home.preFooterImage).url() : null,
+                    buttonText: home.preFooterButtonText
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('Sanity fetch failed for home data, using static fallback', e)
+    }
+    return null
+}
+
 export async function fetchSiteSettings() {
     try {
         const settings = await client.fetch(siteSettingsQuery)
-        if (settings) return settings
+        if (settings) {
+            return {
+                ...settings,
+                headerLogo: settings.headerLogo?.asset ? urlFor(settings.headerLogo).url() : null,
+                footerLogo: settings.footerLogo?.asset ? urlFor(settings.footerLogo).url() : null,
+            }
+        }
     } catch (e) {
         console.warn('Sanity fetch failed for site settings, using static fallback', e)
+    }
+    return null
+}
+
+export async function fetchAboutData() {
+    try {
+        const about = await client.fetch(aboutQuery)
+        if (about) {
+            return {
+                ...about,
+                portrait: about.portrait?.asset ? urlFor(about.portrait).url() : null
+            }
+        }
+    } catch (e) {
+        console.warn('Sanity fetch failed for about data, using static fallback', e)
     }
     return null
 }
@@ -152,7 +220,7 @@ function normaliseSanityProject(doc: any) {
         category: doc.category,
         style: doc.style,
         year: doc.year,
-        coverImage: doc.coverImage, // Will be a Sanity image reference if uploaded
+        coverImage: doc.coverImage?.asset ? urlFor(doc.coverImage).url() : null,
         featured: doc.featured,
         tags: doc.tags || [],
     }
@@ -168,8 +236,8 @@ function normaliseSanityProjectDetail(doc: any) {
         category: doc.category,
         style: doc.style,
         year: doc.year,
-        coverImage: doc.coverImage,
-        gallery: doc.gallery || [],
+        coverImage: doc.coverImage?.asset ? urlFor(doc.coverImage).url() : null,
+        gallery: (doc.gallery || []).map((img: any) => img?.asset ? urlFor(img).url() : null).filter(Boolean),
         tags: doc.tags || [],
         featured: doc.featured ?? false,
         brief: { heading: doc.briefHeading || '', body: doc.briefBody || '' },
@@ -188,7 +256,7 @@ function normaliseSanityPost(doc: any) {
         readTime: doc.readTime,
         publishedAt: doc.publishedAt,
         excerpt: doc.excerpt,
-        coverImage: doc.coverImage,
+        coverImage: doc.coverImage?.asset ? urlFor(doc.coverImage).url() : null,
         featured: doc.featured,
         tags: doc.tags || [],
     }
@@ -216,7 +284,7 @@ function normaliseSanityPostDetail(doc: any) {
         readTime: doc.readTime,
         publishedAt: doc.publishedAt,
         excerpt: doc.excerpt,
-        coverImage: doc.coverImage,
+        coverImage: doc.coverImage?.asset ? urlFor(doc.coverImage).url() : null,
         featured: doc.featured ?? false,
         tags: doc.tags || [],
         content,

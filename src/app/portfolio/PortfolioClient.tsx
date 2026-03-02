@@ -89,12 +89,14 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                                 >
                                     <Link href={`/portfolio/${project.slug}`}>
                                         <div className="relative aspect-[16/9] w-full overflow-hidden mb-8 shadow-2xl">
-                                            <Image
-                                                src={project.coverImage}
-                                                alt={`${project.title} - ${project.category} Interior Design in ${project.location}`}
-                                                fill
-                                                className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                                            />
+                                            {project.coverImage && (
+                                                <Image
+                                                    src={project.coverImage}
+                                                    alt={`${project.title} - ${project.category} Interior Design in ${project.location}`}
+                                                    fill
+                                                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                                />
+                                            )}
                                             <div className="absolute inset-0 bg-accent/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-8 text-center text-white">
                                                 <h3 className="text-3xl md:text-4xl font-heading mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                                     {project.title}

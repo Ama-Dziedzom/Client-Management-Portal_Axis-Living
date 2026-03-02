@@ -28,5 +28,17 @@ export default {
             type: 'array',
             of: [{ type: 'string' }],
         },
+        {
+            name: 'behindStudioTitle',
+            title: 'Behind the Studio Title',
+            type: 'string',
+            initialValue: 'Behind the Studio'
+        },
+        {
+            name: 'behindStudioBody',
+            title: 'Behind the Studio Body',
+            type: 'text',
+            initialValue: 'Most of what we do happens before anything is bought or built. Site visits, material sourcing trips, vendor negotiations, late-night layout revisions. This is the work behind the work — and it’s what separates a space that looks good in photos from one that feels right to live in.'
+        },
     ],
 }

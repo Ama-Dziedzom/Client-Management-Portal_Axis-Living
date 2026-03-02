@@ -50,19 +50,23 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({
+import { fetchSiteSettings } from "../lib/data";
+
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const siteSettings = await fetchSiteSettings();
+
     return (
         <html lang="en" className={`${manrope.variable} scroll-smooth`}>
             <body className="bg-background text-foreground antialiased min-h-screen overflow-x-hidden">
-                <Navbar />
+                <Navbar siteSettings={siteSettings} />
                 <main>
                     {children}
                 </main>
-                <Footer />
+                <Footer siteSettings={siteSettings} />
                 <LookbookPopup />
             </body>
         </html>

@@ -100,12 +100,14 @@ const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProp
                                 >
                                     <Link href={`/journal/${post.slug}`} className="block">
                                         <div className="relative aspect-[16/10] overflow-hidden mb-8 shadow-2xl rounded-sm">
-                                            <Image
-                                                src={post.coverImage}
-                                                alt={post.title}
-                                                fill
-                                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                                            />
+                                            {post.coverImage && (
+                                                <Image
+                                                    src={post.coverImage}
+                                                    alt={post.title}
+                                                    fill
+                                                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                                />
+                                            )}
                                             <div className="absolute top-6 left-6">
                                                 <span className="bg-white/90 backdrop-blur-md text-accent text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full shadow-sm">
                                                     {post.category}
@@ -148,12 +150,14 @@ const JournalClient = ({ initialPosts, initialFeaturedPosts }: JournalClientProp
                                 >
                                     <Link href={`/journal/${post.slug}`} className="block">
                                         <div className="relative aspect-[4/3] overflow-hidden mb-6 shadow-xl rounded-sm">
-                                            <Image
-                                                src={post.coverImage}
-                                                alt={post.title}
-                                                fill
-                                                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                            />
+                                            {post.coverImage && (
+                                                <Image
+                                                    src={post.coverImage}
+                                                    alt={post.title}
+                                                    fill
+                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                />
+                                            )}
                                             <div className="absolute top-4 left-4">
                                                 <span className="bg-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-accent shadow-sm">
                                                     {post.category}

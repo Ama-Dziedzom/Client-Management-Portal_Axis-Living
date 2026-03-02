@@ -36,13 +36,15 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
             {/* Hero Section */}
             <section ref={setHeroElement} className="relative h-screen w-full overflow-hidden">
                 <motion.div style={{ y }} className="absolute inset-0">
-                    <Image
-                        src={project.coverImage}
-                        alt={`${project.title} Interior Design - Final Result Showcase`}
-                        fill
-                        className="object-cover brightness-[0.4]"
-                        priority
-                    />
+                    {project.coverImage && (
+                        <Image
+                            src={project.coverImage}
+                            alt={`${project.title} Interior Design - Final Result Showcase`}
+                            fill
+                            className="object-cover brightness-[0.4]"
+                            priority
+                        />
+                    )}
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 z-10 flex flex-col justify-end p-8 md:p-24">
                     <motion.div
@@ -97,17 +99,19 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                         {project.approach.body}
                                     </p>
                                 </motion.div>
-                                <motion.div
-                                    {...fadeInUpSettings}
-                                    className="relative aspect-square grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl"
-                                >
-                                    <Image
-                                        src={project.gallery[1]}
-                                        alt={`${project.title} - Close up of textures, materials, and process`}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </motion.div>
+                                {project.gallery[1] && (
+                                    <motion.div
+                                        {...fadeInUpSettings}
+                                        className="relative aspect-square grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl"
+                                    >
+                                        <Image
+                                            src={project.gallery[1]}
+                                            alt={`${project.title} - Close up of textures, materials, and process`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </motion.div>
+                                )}
                             </div>
 
                             <motion.div
@@ -118,14 +122,16 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                 <p className="text-foreground/70 text-lg md:text-xl leading-relaxed max-w-2xl font-body mb-10">
                                     {project.result.body}
                                 </p>
-                                <div className="h-[700px] relative mt-16 group overflow-hidden">
-                                    <Image
-                                        src={project.gallery[2]}
-                                        alt={`${project.title} - Final design result preview`}
-                                        fill
-                                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    />
-                                </div>
+                                {project.gallery[2] && (
+                                    <div className="h-[700px] relative mt-16 group overflow-hidden">
+                                        <Image
+                                            src={project.gallery[2]}
+                                            alt={`${project.title} - Final design result preview`}
+                                            fill
+                                            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                        />
+                                    </div>
+                                )}
                             </motion.div>
                         </div>
 
@@ -172,7 +178,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6"
                                 >
                                     <div className="md:col-span-7 h-[400px] md:h-[700px] relative overflow-hidden group">
-                                        <Image src={project.gallery[0] || ""} alt="Gallery 1" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                        {project.gallery[0] && <Image src={project.gallery[0]} alt="Gallery 1" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 md:p-8">
                                             <p className="text-white/60 text-[8px] md:text-[10px] uppercase tracking-widest font-bold">{project.category}</p>
                                             <p className="text-white text-base md:text-lg font-heading mt-1">{project.title}</p>
@@ -180,10 +186,10 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     </div>
                                     <div className="md:col-span-5 flex flex-col gap-4 md:gap-6">
                                         <div className="h-[300px] md:h-[340px] relative overflow-hidden group">
-                                            <Image src={project.gallery[1] || ""} alt="Gallery 2" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                            {project.gallery[1] && <Image src={project.gallery[1]} alt="Gallery 2" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
                                         </div>
                                         <div className="h-[300px] md:h-[340px] relative overflow-hidden group">
-                                            <Image src={project.gallery[2] || ""} alt="Gallery 3" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                            {project.gallery[2] && <Image src={project.gallery[2]} alt="Gallery 3" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -200,7 +206,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                 >
                                     <div className="flex flex-col gap-4 md:gap-6">
                                         <div className="h-[300px] md:h-[420px] relative overflow-hidden group">
-                                            <Image src={project.gallery[3] || ""} alt="Gallery 4" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                            {project.gallery[3] && <Image src={project.gallery[3]} alt="Gallery 4" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         </div>
                                         <div className="bg-white/5 p-6 md:p-12 flex flex-col justify-center">
                                             <p className="text-white/30 text-[10px] uppercase tracking-widest font-bold mb-4">The Details</p>
@@ -210,7 +216,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                         </div>
                                     </div>
                                     <div className="h-[400px] md:h-full relative overflow-hidden group">
-                                        <Image src={project.gallery[4] || project.gallery[3] || ""} alt="Gallery 5" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                                        {(project.gallery[4] || project.gallery[3]) && <Image src={project.gallery[4] || project.gallery[3]} alt="Gallery 5" fill className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />}
                                         <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full">
                                             <p className="text-white text-[10px] uppercase tracking-widest font-bold">{project.style}</p>
                                         </div>
@@ -228,7 +234,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6"
                                 >
                                     <div className="md:col-span-5 h-[400px] md:h-[700px] relative overflow-hidden group">
-                                        <Image src={project.gallery[5] || ""} alt="Gallery 6" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                        {project.gallery[5] && <Image src={project.gallery[5]} alt="Gallery 6" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
                                     </div>
                                     <div className="md:col-span-7 flex flex-col justify-center p-6 md:p-16">
                                         <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold mb-6 md:mb-8">The Space</p>
@@ -291,7 +297,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                                     : "opacity-30 hover:opacity-60"
                                     }`}
                             >
-                                <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
+                                {img && <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />}
                             </button>
                         ))}
                     </div>
@@ -306,7 +312,7 @@ const ProjectDetailClient = ({ project, relatedProjects }: ProjectDetailClientPr
                         {relatedProjects.map((p: Project) => (
                             <LinkNext key={p.id} href={`/portfolio/${p.slug}`} className="group flex flex-col items-center">
                                 <div className="w-full aspect-[16/6] relative overflow-hidden mb-6 rounded-sm">
-                                    <Image src={p.coverImage} alt={p.title} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                    {p.coverImage && <Image src={p.coverImage} alt={p.title} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />}
                                     <div className="absolute inset-0 bg-accent/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-center p-4">
                                         <h6 className="text-white text-xl md:text-2xl font-heading mb-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{p.title}</h6>
                                         <span className="text-white border-b border-white text-[10px] font-bold tracking-widest uppercase pb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">View Project</span>

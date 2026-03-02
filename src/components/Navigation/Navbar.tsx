@@ -8,7 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 
-const Navbar = () => {
+interface NavbarProps {
+    siteSettings?: any;
+}
+
+const Navbar = ({ siteSettings }: NavbarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [scrollAmount, setScrollAmount] = useState(0);
@@ -26,12 +30,16 @@ const Navbar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navLinks = [
+    const defaultLinks = [
         { name: "Portfolio", href: "/portfolio" },
         { name: "Pricing", href: "/pricing" },
         { name: "About", href: "/about" },
         { name: "Journal", href: "/journal" },
     ];
+
+    const navLinks = siteSettings?.navbarLinks && siteSettings.navbarLinks.length > 0
+        ? siteSettings.navbarLinks
+        : defaultLinks;
 
     const isProjectDetail = pathname.startsWith("/portfolio/") && pathname !== "/portfolio";
     const isDarkHero = pathname === "/" || pathname === "/about" || isProjectDetail;
@@ -51,8 +59,8 @@ const Navbar = () => {
         >
             <Link href="/" className="relative block">
                 <Image
-                    src="/logo.jpg"
-                    alt="Axis Living - Bespoke Interiors"
+                    src={siteSettings?.headerLogo || "/logo.jpg"}
+                    alt={`${siteSettings?.studioName || "Axis Living"} - Bespoke Interiors`}
                     width={180}
                     height={80}
                     className="h-12 md:h-16 w-auto object-contain"
@@ -62,7 +70,7 @@ const Navbar = () => {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-10 text-sm font-medium tracking-wide uppercase">
-                {navLinks.map((link) => {
+                {navLinks.map((link: { name: string; href: string }) => {
                     const isActive = pathname === link.href;
                     return (
                         <Link
@@ -135,7 +143,7 @@ const Navbar = () => {
                                     Home
                                 </Link>
                             </motion.div>
-                            {navLinks.map((link) => (
+                            {navLinks.map((link: { name: string; href: string }) => (
                                 <motion.div
                                     key={link.href}
                                     variants={{

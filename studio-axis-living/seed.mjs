@@ -205,22 +205,100 @@ const testimonials = [
     },
 ]
 
+// ───── ABOUT PAGE ─────
+const about = {
+    _id: 'about',
+    _type: 'about',
+    headline: "Design is more than aesthetic; it's problem-solving with beauty.",
+    bio: "I'm Kas, the principal designer and founder of Axis Living. For over 5 years, I've been transforming residential and commercial spaces across Lusaka and beyond. From intimate apartment refreshes to full-scale builds for clients who refuse to compromise on beauty.\n\nMy approach sits at the intersection of function and feeling. Every room I design begins with a deep understanding of the person who will live or work in it, their rhythms, their aesthetics, their aspirations. The result is always spaces that feel inevitable, like they couldn't have been any other way.\n\nI've worked with clients across Lusaka, and I collaborate with a trusted network of craftspeople, suppliers, and architects to deliver work that lasts.",
+    philosophy: "Good design isn't decorating. It's problem-solving with beauty. I believe every space has a best version of itself. My job is to find it, and then build it.",
+    processSteps: [
+        {
+            _key: 'step1',
+            number: "01",
+            title: "Discovery",
+            description: "We start with a conversation. I learn about your life, your taste, your non-negotiables, and your budget. No judgement, just listening.",
+        },
+        {
+            _key: 'step2',
+            number: "02",
+            title: "Concept",
+            description: "I develop a full design concept — mood boards, spatial plans, material palettes — and we align before anything is ordered or built.",
+        },
+        {
+            _key: 'step3',
+            number: "03",
+            title: "Design & Execution",
+            description: "I manage procurement, contractor coordination, and quality control so you don’t have to. You stay informed without being overwhelmed.",
+        },
+        {
+            _key: 'step4',
+            number: "04",
+            title: "The Reveal",
+            description: "The moment the space comes together exactly as envisioned. We document everything, walk you through care instructions, and hand over your home.",
+        },
+    ],
+    pressLogos: [
+        "Design Digest Africa",
+        "Vanguard Style",
+        "The Guardian Life",
+        "Bella Naija Living",
+        "Dezeen",
+    ],
+    behindStudioTitle: "Behind the Studio",
+    behindStudioBody: "Most of what we do happens before anything is bought or built. Site visits, material sourcing trips, vendor negotiations, late-night layout revisions. This is the work behind the work — and it's what separates a space that looks good in photos from one that feels right to live in.",
+}
+
+// ───── HOME PAGE ─────
+const home = {
+    _id: 'home',
+    _type: 'home',
+    tagline: 'Spaces Designed for the Way You Live',
+    heroSubtitle: 'Bespoke interior design for discerning homeowners and forward-thinking businesses across Zambia.',
+    aboutSubtitle: 'About Us',
+    aboutTitle: 'A Lusaka-based studio for deliberate living.',
+    aboutBody: "Axis Living is a Lusaka-based interior design practice working with clients who believe their space should feel like a deliberate choice. We don't do generic. We do yours.",
+    aboutButtonText: 'Learn Our Story',
+    projectsSubtitle: 'Selected Works',
+    projectsTitle: 'The Portfolio',
+    projectsButtonText: 'Explore All Projects',
+    lookbookSubtitle: 'Free Resource',
+    lookbookTitle: 'Get the Lookbook',
+    lookbookBody: "Behind the Design is our curated 12-page guide featuring material palettes, spatial planning tips, and an inside look at how we approach every project. It's free.",
+    lookbookButtonText: 'Get Free Access',
+    journalSubtitle: 'From the Studio',
+    journalTitle: 'Thoughts on design, process, and living well',
+    journalButtonText: 'Read All Articles',
+    preFooterSubtitle: 'Start Your Journey',
+    preFooterTitle: "Let's Talk About Your Space.",
+    preFooterBody: "Every great space begins with a conversation. Book your free discovery call and let's explore what's possible.",
+    preFooterButtonText: 'Book a Free Consultation',
+}
+
 // ───── SITE SETTINGS ─────
 const siteSettings = {
     _id: 'siteSettings',
     _type: 'siteSettings',
     studioName: 'Axis Living',
-    tagline: 'Spaces Designed for the Way You Live',
-    heroSubtitle: 'Bespoke interior design for discerning homeowners and forward-thinking businesses across Zambia.',
     email: 'hello@axisliving.co.zm',
-    footerTagline: "Let's create something worth coming home to.",
+    footerTagline: "Bespoke Interiors, Lusaka",
+    footerDescription: "Designing spaces that feel inevitable. We create interiors that are as intentional as they are beautiful, tailored to your life, not a trend.",
+    copyrightText: "Axis Living · Bespoke Interiors · Est. 2026",
+    instagram: "https://www.instagram.com/axisliving.zm",
+    pinterest: "https://pinterest.com",
+    navbarLinks: [
+        { _key: 'link1', name: "Portfolio", href: "/portfolio" },
+        { _key: 'link2', name: "Pricing", href: "/pricing" },
+        { _key: 'link3', name: "About", href: "/about" },
+        { _key: 'link4', name: "Journal", href: "/journal" },
+    ]
 }
 
 // ───── SEED FUNCTION ─────
 async function seed() {
     console.log('🌱 Starting Sanity seed...\n')
 
-    const allDocs = [...projects, ...posts, ...testimonials, siteSettings]
+    const allDocs = [...projects, ...posts, ...testimonials, about, home, siteSettings]
 
     for (const doc of allDocs) {
         try {

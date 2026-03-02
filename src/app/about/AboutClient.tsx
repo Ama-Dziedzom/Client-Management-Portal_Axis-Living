@@ -23,7 +23,11 @@ const staggerContainer: Variants = {
     }
 };
 
-const AboutClient = () => {
+interface AboutClientProps {
+    aboutData?: any;
+}
+
+const AboutClient = ({ aboutData }: AboutClientProps) => {
     const [heroElement, setHeroElement] = useState<HTMLElement | null>(null);
     const { scrollYProgress } = useScroll({
         target: heroElement ? { current: heroElement } : undefined,
@@ -32,7 +36,7 @@ const AboutClient = () => {
 
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
-    const processes = [
+    const processes = (aboutData?.processSteps || [
         {
             step: "01",
             title: "Discovery",
@@ -53,9 +57,13 @@ const AboutClient = () => {
             title: "The Reveal",
             description: "The moment the space comes together exactly as envisioned. We document everything, walk you through care instructions, and hand over your home.",
         },
-    ];
+    ]).map((p: any) => ({
+        step: p.number || p.step,
+        title: p.title,
+        description: p.description
+    }));
 
-    const press = [
+    const press = aboutData?.pressLogos || [
         "Design Digest Africa",
         "Vanguard Style",
         "The Guardian Life",
@@ -97,10 +105,10 @@ const AboutClient = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-9xl font-heading mb-10 font-light leading-[1.2] tracking-wide"
                     >
-                        Our Philosophy
+                        {aboutData?.headline ? "Our Story" : "Our Philosophy"}
                     </motion.h1>
-                    <p className="max-w-2xl mx-auto text-white/90 text-sm tracking-[0.5em] uppercase font-bold">
-                        Good design isn&apos;t decorating. It&apos;s problem-solving with beauty.
+                    <p className="max-w-2xl mx-auto text-white/90 text-sm tracking-[0.5em] uppercase font-bold text-center">
+                        {aboutData?.philosophy || "Good design isn't decorating. It's problem-solving with beauty."}
                     </p>
                 </div>
             </section>
@@ -117,7 +125,7 @@ const AboutClient = () => {
                             className="relative aspect-[3/4] shadow-2xl rounded-sm overflow-hidden"
                         >
                             <Image
-                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2000&auto=format&fit=crop"
+                                src={aboutData?.portrait || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2000&auto=format&fit=crop"}
                                 alt="Principal Designer"
                                 fill
                                 className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
@@ -138,20 +146,26 @@ const AboutClient = () => {
                         >
                             <span className="text-accent text-[10px] uppercase font-bold tracking-[0.4em] mb-4 block underline decoration-accent/30 underline-offset-8">My Story</span>
                             <h2 className="text-3xl md:text-6xl font-heading mb-12 leading-[1.25] tracking-wide">
-                                Design is more than <span className="text-accent">aesthetic</span>; it&apos;s problem-solving with beauty.
+                                {aboutData?.headline || "Design is more than aesthetic; it's problem-solving with beauty."}
                             </h2>
                             <div className="space-y-8 text-foreground/70 text-lg leading-relaxed font-body">
-                                <p>
-                                    I&apos;m the principal designer and founder of Axis Living. For over 5 years, I&apos;ve been transforming residential and commercial spaces across Lusaka and beyond. From intimate apartment refreshes to full-scale builds for clients who refuse to compromise on beauty.
-                                </p>
-                                <p>
-                                    My approach sits at the intersection of function and feeling. Every room I design begins with a deep understanding of the person who will live or work in it, their rhythms, their aesthetics, their aspirations. The result is always spaces that feel inevitable, like they couldn&apos;t have been any other way.
-                                </p>
-                                <p>
-                                    I&apos;ve worked with clients across Lusaka, and I collaborate with a trusted network of craftspeople, suppliers, and architects to deliver work that lasts.
-                                </p>
+                                <div className="whitespace-pre-wrap">
+                                    {aboutData?.bio || (
+                                        <>
+                                            <p>
+                                                I&apos;m the principal designer and founder of Axis Living. For over 5 years, I&apos;ve been transforming residential and commercial spaces across Lusaka and beyond. From intimate apartment refreshes to full-scale builds for clients who refuse to compromise on beauty.
+                                            </p>
+                                            <p>
+                                                My approach sits at the intersection of function and feeling. Every room I design begins with a deep understanding of the person who will live or work in it, their rhythms, their aesthetics, their aspirations. The result is always spaces that feel inevitable, like they couldn&apos;t have been any other way.
+                                            </p>
+                                            <p>
+                                                I&apos;ve worked with clients across Lusaka, and I collaborate with a trusted network of craftspeople, suppliers, and architects to deliver work that lasts.
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
                                 <p className="font-heading italic text-foreground text-2xl py-8 border-y border-foreground/5 leading-relaxed">
-                                    &ldquo;Good design isn&apos;t decorating. It&apos;s problem-solving with beauty. I believe every space has a best version of itself. My job is to find it, and then build it.&rdquo;
+                                    &ldquo;{aboutData?.philosophy || "Good design isn't decorating. It's problem-solving with beauty. I believe every space has a best version of itself. My job is to find it, and then build it."}&rdquo;
                                 </p>
                                 <Link
                                     href="/booking"
@@ -186,7 +200,7 @@ const AboutClient = () => {
                         viewport={{ once: true }}
                         className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-16"
                     >
-                        {processes.map((proc, idx) => (
+                        {processes.map((proc: any, idx: number) => (
                             <motion.div
                                 key={proc.step}
                                 variants={fadeInUp}
@@ -214,7 +228,7 @@ const AboutClient = () => {
                     >
                         <h2 className="text-4xl font-heading mb-12 tracking-wide text-foreground">Press & Recognition</h2>
                         <div className="flex flex-wrap justify-center gap-4 mb-8">
-                            {press.map((item) => (
+                            {press.map((item: string) => (
                                 <span
                                     key={item}
                                     className="px-6 py-3 border border-[#C9A84C] text-[#C9A84C] rounded-full text-[10px] font-bold uppercase tracking-widest"
@@ -263,9 +277,11 @@ const AboutClient = () => {
                             whileInView="animate"
                             viewport={{ once: true }}
                         >
-                            <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-tight tracking-wide">Behind the Studio</h2>
+                            <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-tight tracking-wide">
+                                {aboutData?.behindStudioTitle || "Behind the Studio"}
+                            </h2>
                             <p className="text-foreground/70 text-lg leading-relaxed font-body">
-                                Most of what we do happens before anything is bought or built. Site visits, material sourcing trips, vendor negotiations, late-night layout revisions. This is the work behind the work — and it&apos;s what separates a space that looks good in photos from one that feels right to live in.
+                                {aboutData?.behindStudioBody || "Most of what we do happens before anything is bought or built. Site visits, material sourcing trips, vendor negotiations, late-night layout revisions. This is the work behind the work — and it's what separates a space that looks good in photos from one that feels right to live in."}
                             </p>
                         </motion.div>
                     </div>
