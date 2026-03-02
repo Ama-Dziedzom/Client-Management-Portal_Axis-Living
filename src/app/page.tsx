@@ -299,7 +299,7 @@ export default function Home() {
                     <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-foreground to-transparent z-10 pointer-events-none" />
 
                     {/* Ticker row 1 */}
-                    <div className="flex animate-marquee hover:[animation-play-state:paused] mb-6">
+                    <div className="flex overflow-x-auto md:overflow-x-hidden scrollbar-hide animate-marquee hover:[animation-play-state:paused] mb-12 py-4 snap-x snap-mandatory px-4 md:px-0">
                         {[
                             { name: "Thandiwe M.", role: "Kabulonga", content: "Working with Axis Living was the best decision we made for our new home. She understood our brief immediately and delivered something beyond what we imagined." },
                             { name: "Mulenga C.", role: "Woodlands", content: "The professionalism, the communication, the final result, everything was five stars. Our office has never felt more like us." },
@@ -309,7 +309,7 @@ export default function Home() {
                         ].flatMap((t, idx) => [t, t].map((item, dupIdx) => (
                             <div
                                 key={`${idx}-${dupIdx}`}
-                                className="flex-shrink-0 w-[350px] md:w-[420px] mx-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-sm p-8 group hover:bg-white/10 transition-colors duration-500"
+                                className="flex-shrink-0 w-[85vw] md:w-[420px] mx-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-sm p-8 group hover:bg-white/10 transition-colors duration-500 snap-center"
                             >
                                 <Quote size={20} className="text-white/15 mb-4" />
                                 <p className="text-white/70 text-sm leading-relaxed mb-6 italic font-body">
