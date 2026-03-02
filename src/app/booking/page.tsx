@@ -172,6 +172,8 @@ const BookingPage = () => {
         setFormData({ name: "", email: "", phone: "", projectType: "", message: "" });
     };
 
+
+
     const formatSelectedDate = () => {
         if (!selectedDate) return "";
         return `${MONTH_NAMES[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}`;
