@@ -163,10 +163,37 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
-        await new Promise((r) => setTimeout(r, 2000));
-        setIsSubmitting(false);
-        setStep("confirmed");
+
+        try {
+            const response = await fetch('/api/book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    date: formatSelectedDate(),
+                    time: selectedTime,
+                    projectType: formData.projectType,
+                    message: formData.message,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                setStep("confirmed");
+            } else {
+                alert(result.message || "Something went wrong. Please try again.");
+            }
+        } catch (error) {
+            console.error("Booking error:", error);
+            alert("Failed to connect to the booking service. Please try again later.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleReset = () => {
