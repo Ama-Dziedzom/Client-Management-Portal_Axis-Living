@@ -30,8 +30,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const router = useRouter()
 
     useEffect(() => {
+        // Set a fallback timeout to prevent infinite loading
+        const timer = setTimeout(() => {
+            if (loading) {
+                console.warn('[AuthContext] Auth session fetch timed out, forcing loading finish.')
+                setLoading(false)
+            }
+        }, 5000)
+
         // Get initial session
         supabase.auth.getSession().then(({ data: { session } }) => {
+            clearTimeout(timer)
             setSession(session)
             setUser(session?.user ?? null)
             if (session?.user) {
@@ -39,6 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             } else {
                 setLoading(false)
             }
+        }).catch(err => {
+            console.error('[AuthContext] getSession error:', err)
+            clearTimeout(timer)
+            setLoading(false)
         })
 
         // Listen for auth changes
