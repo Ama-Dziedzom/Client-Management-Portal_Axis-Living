@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -19,6 +19,14 @@ export default function LookbookPopup({ data }: LookbookPopupProps) {
     const pathname = usePathname();
     const [isVisible, setIsVisible] = useState(false);
     const [hasTriggered, setHasTriggered] = useState(false);
+
+    const triggerPopup = useCallback(() => {
+        if (!hasTriggered) {
+            setIsVisible(true);
+            setHasTriggered(true);
+            sessionStorage.setItem("lookbook_popup_shown", "true");
+        }
+    }, [hasTriggered]);
 
     useEffect(() => {
         // Don't show on booking page
@@ -46,15 +54,7 @@ export default function LookbookPopup({ data }: LookbookPopupProps) {
             clearTimeout(timer);
             window.removeEventListener("scroll", handleScroll);
         };
-    }, [pathname]);
-
-    const triggerPopup = () => {
-        if (!hasTriggered) {
-            setIsVisible(true);
-            setHasTriggered(true);
-            sessionStorage.setItem("lookbook_popup_shown", "true");
-        }
-    };
+    }, [pathname, triggerPopup]);
 
     const handleSuccess = () => {
         // Auto-dismiss after 4 seconds

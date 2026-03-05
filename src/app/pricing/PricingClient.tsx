@@ -5,8 +5,15 @@ import { Check, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface PricingClientProps {
-    siteSettings?: any;
-    pricingData?: any[];
+    siteSettings?: {
+        studioName?: string;
+    };
+    pricingData?: {
+        title: string;
+        price: string;
+        description: string;
+        inclusions: string[];
+    }[];
 }
 
 const PricingClient = ({ siteSettings, pricingData }: PricingClientProps) => {

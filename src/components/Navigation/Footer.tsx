@@ -1,9 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, PinIcon as Pinterest, Mail, Phone, MapPin } from "lucide-react";
+import { Instagram, PinIcon as Pinterest, Mail } from "lucide-react";
 
 interface FooterProps {
-    siteSettings?: any;
+    siteSettings?: {
+        footerTagline?: string;
+        studioName?: string;
+        footerLogo?: string;
+        footerDescription?: string;
+        instagram?: string;
+        pinterest?: string;
+        email?: string;
+        copyrightText?: string;
+    };
 }
 
 const Footer = ({ siteSettings }: FooterProps) => {

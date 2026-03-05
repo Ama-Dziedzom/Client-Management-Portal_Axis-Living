@@ -12,8 +12,50 @@ import LookbookSection from "../components/EmailCapture/LookbookSection";
 interface HomeClientProps {
     featuredProjects: Project[];
     featuredPosts: Post[];
-    siteSettings?: any;
-    testimonials?: any[];
+    siteSettings?: {
+        studioName?: string;
+        tagline?: string;
+        heroImage?: string;
+        aboutSection?: {
+            subtitle?: string;
+            title?: string;
+            body?: string;
+            buttonText?: string;
+            image?: string;
+        };
+        projectsSection?: {
+            subtitle?: string;
+            title?: string;
+            buttonText?: string;
+        };
+        testimonialsSection?: {
+            subtitle?: string;
+            title?: string;
+        };
+        journalSection?: {
+            subtitle?: string;
+            title?: string;
+            buttonText?: string;
+        };
+        preFooterSection?: {
+            subtitle?: string;
+            title?: string;
+            body?: string;
+            image?: string;
+            buttonText?: string;
+        };
+        lookbookSection?: {
+            subtitle?: string;
+            title?: string;
+            body?: string;
+            buttonText?: string;
+        };
+    };
+    testimonials?: {
+        quote: string;
+        clientName: string;
+        location: string;
+    }[];
 }
 
 const staggerContainer: Variants = {
@@ -92,6 +134,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 

@@ -22,7 +22,7 @@ export async function POST(req: Request) {
             from: FROM,
             to: [email],
             subject: 'Consultation Confirmed: Axis Living',
-            react: BookingConfirmationEmail({
+            react: React.createElement(BookingConfirmationEmail, {
                 name,
                 date,
                 time,

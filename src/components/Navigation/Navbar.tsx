@@ -9,7 +9,11 @@ import { Menu, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 interface NavbarProps {
-    siteSettings?: any;
+    siteSettings?: {
+        headerLogo?: string;
+        studioName?: string;
+        navbarLinks?: { name: string; href: string }[];
+    };
 }
 
 const Navbar = ({ siteSettings }: NavbarProps) => {
@@ -25,8 +29,7 @@ const Navbar = ({ siteSettings }: NavbarProps) => {
         };
         window.addEventListener("scroll", handleScroll);
         // Set initial state
-        setScrolled(window.scrollY > 20);
-        setScrollAmount(window.scrollY);
+        handleScroll();
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
@@ -37,7 +40,7 @@ const Navbar = ({ siteSettings }: NavbarProps) => {
         { name: "Pricing", href: "/pricing" },
     ];
 
-    const navLinks = siteSettings?.navbarLinks?.length > 0
+    const navLinks = (siteSettings?.navbarLinks && siteSettings.navbarLinks.length > 0)
         ? siteSettings.navbarLinks.filter((link: { name?: string; href?: string }) => link.href)
         : defaultLinks;
 

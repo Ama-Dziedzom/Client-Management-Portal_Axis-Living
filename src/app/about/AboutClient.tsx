@@ -24,7 +24,26 @@ const staggerContainer: Variants = {
 };
 
 interface AboutClientProps {
-    aboutData?: any;
+    aboutData?: {
+        heroImage?: string;
+        headline?: string;
+        philosophy?: {
+            title?: string;
+            body?: string;
+        };
+        bio?: {
+            title?: string;
+            body?: string;
+            image?: string;
+        };
+        studioImages?: string[];
+        processes?: {
+            step: string;
+            title: string;
+            description: string;
+        }[];
+        press?: (string | { name: string })[];
+    };
 }
 
 const AboutClient = ({ aboutData }: AboutClientProps) => {
@@ -37,7 +56,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
     // Hardcoded processes
-    const processes = (aboutData?.processes?.length > 0) ? aboutData.processes : [
+    const processes = (aboutData?.processes && aboutData.processes.length > 0) ? aboutData.processes : [
         {
             step: "01",
             title: "Discovery",
@@ -186,7 +205,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                         viewport={{ once: true }}
                         className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-16"
                     >
-                        {processes.map((proc: any, idx: number) => (
+                        {processes.map((proc, idx: number) => (
                             <motion.div
                                 key={idx}
                                 variants={fadeInUp}
@@ -214,7 +233,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                     >
                         <h2 className="text-4xl font-heading mb-12 tracking-wide text-foreground">As Featured In</h2>
                         <div className="flex flex-wrap justify-center gap-4 mb-8">
-                            {press.map((item: any, index: number) => {
+                            {press.map((item, index: number) => {
                                 const label = typeof item === 'string' ? item : item.name;
                                 return (
                                     <span
@@ -265,7 +284,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                         >
                             <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-tight tracking-wide">Behind the Studio</h2>
                             <p className="text-foreground/70 text-lg leading-relaxed font-body">
-                                Our studio is more than just a place of work; it's a sanctuary for creativity. We spend our days surrounded by textures, colors, and the raw materials that eventually become the foundations of your home.
+                                Our studio is more than just a place of work; it&apos;s a sanctuary for creativity. We spend our days surrounded by textures, colors, and the raw materials that eventually become the foundations of your home.
                             </p>
                             <p className="mt-8 text-foreground/70 text-lg leading-relaxed font-body">
                                 Based in the heart of Lusaka, we are inspired by both the urban pulse and the natural beauty of the Zambian landscape.

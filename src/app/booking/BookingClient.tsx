@@ -84,7 +84,10 @@ interface BookingFormData {
 
 // ───── Component ─────
 interface BookingClientProps {
-    siteSettings?: any;
+    siteSettings?: {
+        studioName?: string;
+        email?: string;
+    };
 }
 
 const BookingClient = ({ siteSettings }: BookingClientProps) => {

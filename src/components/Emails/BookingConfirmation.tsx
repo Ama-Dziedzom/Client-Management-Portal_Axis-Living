@@ -93,7 +93,7 @@ export const BookingConfirmationEmail: React.FC<Readonly<BookingConfirmationEmai
                 {/* Meeting Link Section */}
                 <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                     <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '24px', fontFamily: "'Manrope', sans-serif" }}>
-                        We'll meet via Google Meet at the scheduled time.
+                        We&apos;ll meet via Google Meet at the scheduled time.
                     </p>
                     <a href={meetingLink} style={{
                         display: 'inline-block',
