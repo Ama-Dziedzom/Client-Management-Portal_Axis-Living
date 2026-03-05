@@ -22,8 +22,7 @@ export const BookingConfirmationEmail: React.FC<Readonly<BookingConfirmationEmai
         {/* Font Imports */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
-        <link href="https://fonts.cdnfonts.com/css/quinsi" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
         <div style={{
             maxWidth: '600px',
@@ -42,11 +41,11 @@ export const BookingConfirmationEmail: React.FC<Readonly<BookingConfirmationEmai
                 <h1 style={{
                     margin: 0,
                     color: '#FFFFFF',
-                    fontSize: '22px',
-                    fontWeight: 'normal',
-                    letterSpacing: '0.2em',
+                    fontSize: '20px',
+                    fontWeight: '300',
+                    letterSpacing: '8px',
                     textTransform: 'uppercase',
-                    fontFamily: "'Quinsi', Georgia, serif",
+                    fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
                 }}>
                     Appointment Confirmed
                 </h1>
@@ -112,7 +111,7 @@ export const BookingConfirmationEmail: React.FC<Readonly<BookingConfirmationEmai
                     </a>
                 </div>
 
-                <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#94A3B8', fontStyle: 'italic', borderTop: '1px solid #E2E8F0', paddingTop: '24px', fontFamily: "'Playfair Display', Georgia, serif" }}>
+                <p style={{ fontSize: '18px', lineHeight: '1.6', color: '#2F402C', fontStyle: 'italic', borderTop: '1px solid #E2E8F0', paddingTop: '24px', fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: '300' }}>
                     If you need to reschedule, please use the link in your original calendar invite or contact us at least 24 hours in advance.
                 </p>
             </div>

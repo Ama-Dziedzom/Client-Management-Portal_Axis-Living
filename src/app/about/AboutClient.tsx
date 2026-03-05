@@ -222,7 +222,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                 </div>
             </section>
 
-            {/* Press Section */}
+            {/* Press / "As Featured In" Section — hidden for now
             <section className="py-24 px-6 lg:px-24 bg-white">
                 <div className="max-w-7xl mx-auto text-center">
                     <motion.div
@@ -248,6 +248,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                     </motion.div>
                 </div>
             </section>
+            */}
 
             {/* Gallery/Atmosphere Section */}
             <section className="py-32 px-6 lg:px-24 bg-background">

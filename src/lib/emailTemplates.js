@@ -53,30 +53,30 @@ const baseStyles = `
     font-family: 'Manrope', sans-serif;
   }
   .body h2 { 
-    font-family: 'Quinsi', Georgia, serif; 
-    color: ${COLORS.primary}; /* Brand Dark Green */
-    font-size: 28px; 
+    font-family: 'Cormorant Garamond', Georgia, serif; 
+    color: ${COLORS.primary}; 
+    font-size: 38px; 
     margin-top: 0; 
-    margin-bottom: 28px;
-    font-weight: normal;
-    line-height: 1.2;
+    margin-bottom: 30px;
+    font-weight: 300;
+    line-height: 1.1;
   }
   .cta-button { 
     display: inline-block; 
-    background-color: ${COLORS.primary}; /* Brand Dark Green */
+    background-color: ${COLORS.primary}; 
     color: ${COLORS.white} !important; 
-    padding: 20px 40px; 
+    padding: 22px 44px; 
     text-decoration: none; 
     border-radius: 99px; 
-    font-weight: bold; 
+    font-weight: 600; 
     margin: 35px 0;
     text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 10px;
+    letter-spacing: 3px;
     font-family: 'Manrope', sans-serif;
   }
   .details-card { 
-    background-color: ${COLORS.background}; /* Brand Off-white */
+    background-color: ${COLORS.background}; 
     padding: 40px; 
     border-radius: 8px; 
     margin: 30px 0; 
@@ -87,7 +87,7 @@ const baseStyles = `
   }
   .details-label {
     font-weight: bold;
-    color: ${COLORS.tan}; /* Brand Tan */
+    color: ${COLORS.tan}; 
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -96,14 +96,14 @@ const baseStyles = `
     font-family: 'Manrope', sans-serif;
   }
   .details-value {
-    color: ${COLORS.primary}; /* Brand Dark Green */
+    color: ${COLORS.primary}; 
     font-size: 16px;
     font-weight: 500;
   }
   .message-preview {
     background-color: ${COLORS.background}; 
     padding: 30px; 
-    border-left: 4px solid ${COLORS.gold}; /* Brand Gold */
+    border-left: 4px solid ${COLORS.gold}; 
     font-style: italic;
     margin: 30px 0;
     color: #444444;
@@ -112,10 +112,11 @@ const baseStyles = `
   }
   .signature {
     margin-top: 50px;
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-style: italic;
-    color: ${COLORS.primary}; /* Brand Dark Green */
-    font-size: 18px;
+    color: ${COLORS.primary}; 
+    font-size: 20px;
+    font-weight: 300;
   }
   .ps-line {
     margin-top: 40px;
@@ -136,6 +137,12 @@ const baseStyles = `
   }
   .footer p { margin: 10px 0; }
   .footer a { color: ${COLORS.tan}; text-decoration: underline; font-weight: bold; }
+  
+  /* Mobile responsiveness */
+  @media only screen and (max-width: 600px) {
+    .body { padding: 40px 25px !important; }
+    .body h2 { font-size: 32px !important; }
+  }
 `;
 
 const wrap = (content, footerNote = '') => `
@@ -146,15 +153,20 @@ const wrap = (content, footerNote = '') => `
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/quinsi" rel="stylesheet">
-  <style>${baseStyles}</style>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    ${baseStyles}
+    /* Font override for specific high-end look */
+    .header h1, .body h2 {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif !important;
+    }
+  </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="container">
       <div class="header">
-        <h1>${STUDIO_NAME}</h1>
+        <h1 style="letter-spacing: 8px; font-weight: 300; font-size: 20px;">${STUDIO_NAME}</h1>
       </div>
       <div class="body">
         ${content}
