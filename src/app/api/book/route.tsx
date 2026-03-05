@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { resend, FROM, AUDIENCE_ID } from '@/lib/resend';
+import { getResend, FROM, AUDIENCE_ID } from '@/lib/resend';
 import { BookingConfirmationEmail } from '@/components/Emails/BookingConfirmation';
 import React from 'react';
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         const meetingLink = process.env.MEETING_LINK || 'https://meet.google.com/owu-zhiz-bns';
 
         // 1. Send confirmation email to client
-        const { data: clientEmail, error: clientError } = await resend.emails.send({
+        const { data: clientEmail, error: clientError } = await getResend().emails.send({
             from: FROM,
             to: [email],
             subject: 'Consultation Confirmed: Axis Living',
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         }
 
         // 2. Send notification email to admin
-        const { data: adminEmail, error: adminError } = await resend.emails.send({
+        const { data: adminEmail, error: adminError } = await getResend().emails.send({
             from: FROM,
             to: [process.env.RESEND_FROM_EMAIL || 'hello@axisliving.co.zm'],
             subject: `New Consultation Booked: ${name}`,
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         try {
             if (AUDIENCE_ID) {
                 const [firstName, ...lastNameParts] = name.split(' ');
-                await resend.contacts.create({
+                await getResend().contacts.create({
                     email,
                     firstName,
                     lastName: lastNameParts.join(' '),
