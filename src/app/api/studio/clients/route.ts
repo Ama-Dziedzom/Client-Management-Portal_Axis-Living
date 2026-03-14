@@ -30,13 +30,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const adminClient = getSupabaseAdmin()
+
         // 2. Verify requester is a studio user
-        const { data: studioUser, error: studioError } = await supabase
+        const { data: studioUser, error: studioError } = await adminClient
             .from('studio_users')
             .select('role')
             .eq('id', session.user.id)
             .single()
-
         if (studioError || !studioUser) {
             return NextResponse.json({ error: 'Forbidden: Studio access required' }, { status: 403 })
         }
@@ -46,8 +47,6 @@ export async function POST(req: Request) {
         if (!name || !email || !password) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
         }
-
-        const adminClient = getSupabaseAdmin()
 
         // 3. Create Auth User
         const { data: authData, error: authError } = await adminClient.auth.admin.createUser({

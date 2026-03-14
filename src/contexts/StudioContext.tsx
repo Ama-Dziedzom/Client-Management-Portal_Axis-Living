@@ -71,7 +71,15 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
                 .maybeSingle()
 
             if (error) throw error
-            setStudioUser(data)
+            
+            if (!data) {
+                console.warn('[StudioContext] Auth user found but is NOT a studio user. Signing out.')
+                setStudioUser(null)
+                await supabase.auth.signOut()
+                router.push('/studio-login')
+            } else {
+                setStudioUser(data)
+            }
         } catch (error) {
             console.error('Error fetching studio user:', error)
         } finally {
