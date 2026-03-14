@@ -58,32 +58,57 @@ export default function StudioMessagesPage() {
 
     const fetchProjectsWithMessages = async () => {
         try {
-            // Get projects with their messages and client info
-            const { data: projectsData, error } = await supabase
+            setLoading(true)
+
+            // 1. Fetch Projects
+            const { data: projectsData, error: projectsError } = await supabase
                 .from('projects')
-                .select('*, messages(*)')
+                .select('*')
                 .order('updated_at', { ascending: false })
 
-            if (error) throw error
+            if (projectsError) throw projectsError
 
-            // Fetch client names separately for better control
-            const { data: clients } = await supabase.from('clients').select('id, name')
-            const clientMap = Object.fromEntries(clients?.map(c => [c.id, c.name]) || [])
+            if (!projectsData || projectsData.length === 0) {
+                setProjects([])
+                return
+            }
 
-            const formatted: ChatProject[] = (projectsData || []).map((p: any) => ({
-                ...p,
-                client_name: clientMap[p.client_id] || 'Unknown Client',
-                messages: (p.messages || []).sort(
-                    (a: Message, b: Message) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-                ),
-                unread_count: (p.messages || []).filter((m: Message) => !m.read && m.sender_type === 'client').length
-            }))
+            // 2. Fetch all messages for these projects
+            const projectIds = projectsData.map(p => p.id)
+            const { data: messagesData, error: messagesError } = await supabase
+                .from('messages')
+                .select('*')
+                .in('project_id', projectIds)
+                .order('created_at', { ascending: true })
 
-            setProjects(formatted)
+            if (messagesError) throw messagesError
+
+            // 3. Fetch client names
+            const { data: clientsData } = await supabase.from('clients').select('id, name')
+            const clientMap = Object.fromEntries(clientsData?.map(c => [c.id, c.name]) || [])
+
+            // 4. Format data
+            const formatted: ChatProject[] = projectsData.map((p: Project) => {
+                const projectMessages = (messagesData || []).filter(m => m.project_id === p.id)
+                return {
+                    ...p,
+                    client_name: clientMap[p.client_id] || 'Unknown Client',
+                    messages: projectMessages,
+                    unread_count: projectMessages.filter((m: Message) => !m.read && m.sender_type === 'client').length
+                }
+            })
+
+            // 5. Final sort by most recent message
+            const sorted = [...formatted].sort((a, b) => {
+                const lastA = a.messages[a.messages.length - 1]?.created_at || a.updated_at
+                const lastB = b.messages[b.messages.length - 1]?.created_at || b.updated_at
+                return new Date(lastB).getTime() - new Date(lastA).getTime()
+            })
+
+            setProjects(sorted)
             
-            if (formatted.length > 0 && !selectedProjectId) {
-                // Auto-select project with most recent activity or first one
-                setSelectedProjectId(formatted[0].id)
+            if (sorted.length > 0 && !selectedProjectId) {
+                setSelectedProjectId(sorted[0].id)
             }
         } catch (error) {
             console.error('Error fetching chat data:', error)

@@ -27,31 +27,56 @@ export default function MessagesPage() {
 
     const fetchProjects = async () => {
         try {
-            const { data, error } = await supabase
+            setLoading(true)
+            
+            // 1. Fetch Projects
+            const { data: projectsData, error: projectsError } = await supabase
                 .from('projects')
-                .select('*, messages(*)')
+                .select('*')
                 .eq('client_id', client!.id)
                 .order('updated_at', { ascending: false })
 
-            if (error) throw error
+            if (projectsError) throw projectsError
 
-            const withUnread = (data || []).map((p: any) => ({
-                ...p,
-                messages: (p.messages || []).sort(
-                    (a: Message, b: Message) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-                ),
-                unread_count: (p.messages || []).filter((m: Message) => !m.read && m.sender_type === 'studio').length,
-            }))
+            if (!projectsData || projectsData.length === 0) {
+                setProjects([])
+                return
+            }
 
-            setProjects(withUnread)
+            // 2. Fetch Messages for all fetched projects
+            const projectIds = projectsData.map(p => p.id)
+            const { data: messagesData, error: messagesError } = await supabase
+                .from('messages')
+                .select('*')
+                .in('project_id', projectIds)
+                .order('created_at', { ascending: true })
 
-            // Auto-select first project with messages or just first project
-            if (withUnread.length > 0 && !selectedProjectId) {
-                const withMessages = withUnread.find((p: any) => p.messages.length > 0)
-                setSelectedProjectId(withMessages?.id || withUnread[0].id)
+            if (messagesError) throw messagesError
+
+            // 3. Map messages to projects
+            const withMessages = projectsData.map((p: Project) => {
+                const projectMessages = (messagesData || []).filter(m => m.project_id === p.id)
+                return {
+                    ...p,
+                    messages: projectMessages,
+                    unread_count: projectMessages.filter(m => !m.read && m.sender_type === 'studio').length,
+                }
+            })
+
+            setProjects(withMessages)
+
+            // 4. Auto-select project
+            if (withMessages.length > 0 && !selectedProjectId) {
+                const withRecentMessages = [...withMessages].sort((a, b) => {
+                    const lastA = a.messages[a.messages.length - 1]?.created_at || a.updated_at
+                    const lastB = b.messages[b.messages.length - 1]?.created_at || b.updated_at
+                    return new Date(lastB).getTime() - new Date(lastA).getTime()
+                })
+                setSelectedProjectId(withRecentMessages[0].id)
             }
         } catch (error) {
-            console.error('Error fetching projects with messages:', error)
+            console.error('Error fetching messages:', error)
+            toast.error('Failed to load messages')
         } finally {
             setLoading(false)
         }
@@ -64,19 +89,34 @@ export default function MessagesPage() {
         if (!newMessage.trim() || !client || !selectedProjectId) return
 
         setSending(true)
+        const messageBody = newMessage.trim()
+        
         try {
-            const { error } = await supabase.from('messages').insert({
+            const { data, error } = await supabase.from('messages').insert({
                 project_id: selectedProjectId,
+                sender_id: client.id,
                 sender_type: 'client',
                 sender_name: client.name,
-                body: newMessage.trim(),
-            })
+                body: messageBody,
+            }).select().single()
 
             if (error) throw error
+            
             setNewMessage('')
             toast.success('Message sent')
-            fetchProjects()
+            
+            // Update local state immediately for better UX
+            setProjects(prev => prev.map(p => {
+                if (p.id === selectedProjectId) {
+                    return {
+                        ...p,
+                        messages: [...p.messages, data]
+                    }
+                }
+                return p
+            }))
         } catch (error: any) {
+            console.error('Send error:', error)
             toast.error(error.message || 'Failed to send message')
         } finally {
             setSending(false)

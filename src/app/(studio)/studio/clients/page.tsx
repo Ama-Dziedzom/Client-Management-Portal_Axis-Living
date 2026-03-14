@@ -82,6 +82,9 @@ export default function StudioClientsPage() {
                     <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Clients</h1>
                     <p className="text-text-secondary font-body text-lg">Manage your client accounts</p>
                 </div>
+                <Link href="/studio/clients/new" className="btn-primary w-full sm:w-auto">
+                    <Plus className="w-4 h-4" /> New Client
+                </Link>
             </motion.div>
 
             {/* Search */}

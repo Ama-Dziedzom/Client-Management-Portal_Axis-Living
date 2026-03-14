@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS documents (
 CREATE TABLE IF NOT EXISTS messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    sender_id UUID,
     sender_type TEXT NOT NULL CHECK (sender_type IN ('studio', 'client')),
     sender_name TEXT NOT NULL,
     body TEXT NOT NULL,

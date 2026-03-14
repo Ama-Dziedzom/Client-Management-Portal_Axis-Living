@@ -75,6 +75,7 @@ export type SenderType = 'studio' | 'client';
 export interface Message {
     id: string;
     project_id: string;
+    sender_id?: string;
     sender_type: SenderType;
     sender_name: string;
     body: string;

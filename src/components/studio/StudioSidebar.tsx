@@ -21,6 +21,7 @@ const navItems = [
     { label: 'Projects', icon: FolderKanban, href: '/studio/projects' },
     { label: 'Messages', icon: MessageSquare, href: '/studio/messages' },
     { label: 'Invoices', icon: Receipt, href: '/studio/invoices' },
+    { label: 'Settings', icon: Settings, href: '/studio/settings' },
 ]
 
 export default function StudioSidebar() {
