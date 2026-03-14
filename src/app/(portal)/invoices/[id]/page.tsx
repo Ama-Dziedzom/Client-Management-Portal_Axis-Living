@@ -18,14 +18,18 @@ import toast from 'react-hot-toast'
 
 export default function InvoiceDetailPage() {
     const { id } = useParams()
-    const { client } = useAuth()
+    const { client, loading: authLoading } = useAuth()
     const [invoice, setInvoice] = useState<Invoice | null>(null)
     const [loading, setLoading] = useState(true)
     const [paying, setPaying] = useState(false)
 
     useEffect(() => {
-        if (client && id) fetchInvoice()
-    }, [client, id])
+        if (client && id) {
+            fetchInvoice()
+        } else if (!authLoading) {
+            setLoading(false)
+        }
+    }, [client, id, authLoading])
 
     const fetchInvoice = async () => {
         try {

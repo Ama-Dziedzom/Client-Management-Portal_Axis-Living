@@ -20,14 +20,18 @@ const item = {
 }
 
 export default function ProjectsPage() {
-    const { client } = useAuth()
+    const { client, loading: authLoading } = useAuth()
     const [projects, setProjects] = useState<(Project & { timeline_stages: TimelineStage[] })[]>([])
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState<string>('all')
 
     useEffect(() => {
-        if (client) fetchProjects()
-    }, [client])
+        if (client) {
+            fetchProjects()
+        } else if (!authLoading) {
+            setLoading(false)
+        }
+    }, [client, authLoading])
 
     const fetchProjects = async () => {
         try {

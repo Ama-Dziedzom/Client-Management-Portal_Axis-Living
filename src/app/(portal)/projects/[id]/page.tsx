@@ -35,7 +35,7 @@ const item = {
 
 export default function ProjectDetailPage() {
     const { id } = useParams()
-    const { client } = useAuth()
+    const { client, loading: authLoading } = useAuth()
     const [project, setProject] = useState<ProjectWithDetails | null>(null)
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('overview')
@@ -44,8 +44,12 @@ export default function ProjectDetailPage() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
     useEffect(() => {
-        if (client && id) fetchProject()
-    }, [client, id])
+        if (client && id) {
+            fetchProject()
+        } else if (!authLoading) {
+            setLoading(false)
+        }
+    }, [client, id, authLoading])
 
     const fetchProject = async () => {
         try {

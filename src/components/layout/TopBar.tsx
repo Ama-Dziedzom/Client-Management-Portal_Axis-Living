@@ -26,7 +26,7 @@ export default function TopBar() {
             </Link>
 
             <div className="relative">
-                <Link href="/dashboard/messages" className="p-2 -mr-2 text-[#2F402C]">
+                <Link href="/messages" className="p-2 -mr-2 text-[#2F402C]">
                     <MessageSquare className="w-6 h-6" />
                     {unreadCount > 0 && (
                         <span className="absolute top-1 right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">

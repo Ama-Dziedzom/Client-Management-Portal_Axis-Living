@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
     LayoutDashboard,
-    GitBranch,
-    Image,
+    FolderKanban,
     FileText,
     MessageSquare,
     Receipt,
+    Settings,
     LogOut
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
@@ -18,11 +18,11 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
     { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
-    { label: 'Timeline', icon: GitBranch, href: '/dashboard/timeline' },
-    { label: 'Moodboard', icon: Image, href: '/dashboard/moodboard' },
-    { label: 'Documents', icon: FileText, href: '/dashboard/documents' },
-    { label: 'Messages', icon: MessageSquare, href: '/dashboard/messages', showBadge: true },
-    { label: 'Invoices', icon: Receipt, href: '/dashboard/invoices' },
+    { label: 'Projects', icon: FolderKanban, href: '/projects' },
+    { label: 'Documents', icon: FileText, href: '/documents' },
+    { label: 'Messages', icon: MessageSquare, href: '/messages', showBadge: true },
+    { label: 'Invoices', icon: Receipt, href: '/invoices' },
+    { label: 'Settings', icon: Settings, href: '/settings' },
 ]
 
 export default function Sidebar() {
@@ -47,7 +47,7 @@ export default function Sidebar() {
             {/* Navigation */}
             <nav className="flex-1 px-4 space-y-1">
                 {navItems.map((item) => {
-                    const isActive = pathname === item.href
+                    const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
                     const Icon = item.icon
 
                     return (

@@ -56,11 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event, session) => {
+            (_event, session) => {
                 setSession(session)
                 setUser(session?.user ?? null)
                 if (session?.user) {
-                    await fetchClient(session.user.id)
+                    fetchClient(session.user.id)
                 } else {
                     setClient(null)
                     setLoading(false)
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 .from('clients')
                 .select('*')
                 .eq('id', userId)
-                .single()
+                .maybeSingle()
 
             if (error) throw error
             setClient(data)

@@ -24,20 +24,48 @@ export async function middleware(req: NextRequest) {
     )
 
     const { data: { session } } = await supabase.auth.getSession()
+    const pathname = req.nextUrl.pathname
 
-    // Protect all /dashboard/* routes
-    if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
+    // Client portal protected routes
+    const clientProtectedPaths = ['/dashboard', '/projects', '/documents', '/invoices', '/messages', '/settings']
+    const isClientProtected = clientProtectedPaths.some(path => pathname.startsWith(path))
+
+    // Studio protected routes (but not /studio-login)
+    const isStudioProtected = pathname.startsWith('/studio') && !pathname.startsWith('/studio-login')
+
+    // Protect client portal routes
+    if (!session && isClientProtected) {
         return NextResponse.redirect(new URL('/login', req.url))
     }
 
-    // Redirect logged-in users away from login page
-    if (session && req.nextUrl.pathname === '/login') {
+    // Protect studio routes
+    if (!session && isStudioProtected) {
+        return NextResponse.redirect(new URL('/studio-login', req.url))
+    }
+
+    // Redirect logged-in users away from client login page
+    if (session && pathname === '/login') {
         return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+
+    // Redirect logged-in users away from studio login page
+    if (session && pathname === '/studio-login') {
+        return NextResponse.redirect(new URL('/studio', req.url))
     }
 
     return res
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/login']
+    matcher: [
+        '/dashboard/:path*',
+        '/projects/:path*',
+        '/documents/:path*',
+        '/invoices/:path*',
+        '/messages/:path*',
+        '/settings/:path*',
+        '/studio/:path*',
+        '/studio-login',
+        '/login',
+    ]
 }

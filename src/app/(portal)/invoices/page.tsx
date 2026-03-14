@@ -20,14 +20,18 @@ const item = {
 }
 
 export default function InvoicesPage() {
-    const { client } = useAuth()
+    const { client, loading: authLoading } = useAuth()
     const [invoices, setInvoices] = useState<Invoice[]>([])
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState<string>('all')
 
     useEffect(() => {
-        if (client) fetchInvoices()
-    }, [client])
+        if (client) {
+            fetchInvoices()
+        } else if (!authLoading) {
+            setLoading(false)
+        }
+    }, [client, authLoading])
 
     const fetchInvoices = async () => {
         try {

@@ -10,7 +10,7 @@ import { MessageCircle, Send, Sparkles, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function MessagesPage() {
-    const { client } = useAuth()
+    const { client, loading: authLoading } = useAuth()
     const [projects, setProjects] = useState<(Project & { messages: Message[]; unread_count: number })[]>([])
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
@@ -18,8 +18,12 @@ export default function MessagesPage() {
     const [sending, setSending] = useState(false)
 
     useEffect(() => {
-        if (client) fetchProjects()
-    }, [client])
+        if (client) {
+            fetchProjects()
+        } else if (!authLoading) {
+            setLoading(false)
+        }
+    }, [client, authLoading])
 
     const fetchProjects = async () => {
         try {

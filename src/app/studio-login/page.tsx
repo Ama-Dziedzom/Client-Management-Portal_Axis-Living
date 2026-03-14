@@ -1,15 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 
-export default function LoginPage() {
-    const router = useRouter()
+export default function StudioLoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -22,7 +19,7 @@ export default function LoginPage() {
         setError(null)
 
         try {
-            const { error: authError } = await supabase.auth.signInWithPassword({
+            const { data, error: authError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             })
@@ -34,10 +31,24 @@ export default function LoginPage() {
                 return
             }
 
+            // Verify the user is a studio user
+            const { data: studioUser, error: studioError } = await supabase
+                .from('studio_users')
+                .select('id')
+                .eq('id', data.user.id)
+                .maybeSingle()
+
+            if (studioError || !studioUser) {
+                await supabase.auth.signOut()
+                setError('Access denied. This login is for studio team members only.')
+                toast.error('Access denied')
+                setLoading(false)
+                return
+            }
+
             toast.success('Welcome back!')
-            // Use setTimeout to ensure the redirect happens after auth state updates
             setTimeout(() => {
-                window.location.href = '/dashboard'
+                window.location.href = '/studio'
             }, 100)
         } catch (err) {
             console.error('Sign in error:', err)
@@ -47,44 +58,31 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen bg-background">
-            {/* Left panel - desktop only (45% width) */}
-            <div className="hidden lg:relative lg:flex lg:w-[45%] lg:flex-col lg:items-center lg:justify-center overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop"
-                        alt="Interior design"
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-black/40" />
+        <div className="flex min-h-screen bg-[#0f1117]">
+            {/* Left panel */}
+            <div className="hidden lg:flex lg:w-[45%] flex-col items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-[#0f1117] to-purple-600/10" />
+                <div className="absolute inset-0">
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
                 </div>
 
-                <div className="relative z-10 flex flex-col items-center text-center px-12">
-                    {/* Logo - Centered in white */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="mb-6"
-                    >
-                        <h1 className="text-white text-5xl font-heading tracking-tight">AXIS</h1>
-                        <div className="h-px w-12 bg-white/40 mx-auto mt-4" />
-                    </motion.div>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-white/90 text-lg font-body italic"
-                    >
-                        Your project, your space, your portal.
-                    </motion.p>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="relative z-10 text-center px-12"
+                >
+                    <h1 className="text-white text-5xl font-heading tracking-tight mb-4">AXIS</h1>
+                    <div className="h-px w-12 bg-white/20 mx-auto mb-6" />
+                    <p className="text-white/50 text-lg font-body">
+                        Studio Management Panel
+                    </p>
+                </motion.div>
             </div>
 
-            {/* Right panel (full width on mobile) */}
-            <div className="flex flex-1 flex-col items-center justify-center p-8 lg:p-12">
+            {/* Right panel */}
+            <div className="flex flex-1 flex-col items-center justify-center p-8 lg:p-12 bg-[#f7f4f1]">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -92,13 +90,17 @@ export default function LoginPage() {
                     className="w-full max-w-md"
                 >
                     <div className="mb-10 text-center lg:text-left">
-                        <h2 className="text-4xl font-semibold text-text-primary mb-3 font-heading">Welcome back</h2>
-                        <p className="text-text-secondary font-body text-lg">Sign in to view your project</p>
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#111318]/10 rounded-full mb-4">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                            <span className="text-xs font-bold tracking-wider uppercase text-[#111318]/60">Studio Access</span>
+                        </div>
+                        <h2 className="text-4xl font-semibold text-text-primary mb-3 font-heading">Studio Login</h2>
+                        <p className="text-text-secondary font-body text-lg">Sign in to manage your clients and projects</p>
                     </div>
 
                     <form onSubmit={handleSignIn} className="space-y-6">
                         <div className="space-y-2">
-                            <label htmlFor="email" className="block text-sm font-medium text-text-primary font-body ml-1">
+                            <label htmlFor="studio-email" className="block text-sm font-medium text-text-primary font-body ml-1">
                                 Email
                             </label>
                             <div className="relative">
@@ -106,19 +108,19 @@ export default function LoginPage() {
                                     <Mail className="h-4 w-4 text-text-secondary" />
                                 </div>
                                 <input
-                                    id="email"
+                                    id="studio-email"
                                     type="email"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="input-field pl-11 shadow-sm border-[#e5e0da]"
-                                    placeholder="name@example.com"
+                                    placeholder="studio@axisliving.com"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="block text-sm font-medium text-text-primary font-body ml-1">
+                            <label htmlFor="studio-password" className="block text-sm font-medium text-text-primary font-body ml-1">
                                 Password
                             </label>
                             <div className="relative">
@@ -126,7 +128,7 @@ export default function LoginPage() {
                                     <Lock className="h-4 w-4 text-text-secondary" />
                                 </div>
                                 <input
-                                    id="password"
+                                    id="studio-password"
                                     type={showPassword ? 'text' : 'password'}
                                     required
                                     value={password}
@@ -147,7 +149,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-primary w-full py-4 text-base shadow-lg shadow-primary/10"
+                            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#111318] text-white font-body font-semibold text-base rounded-xl transition-all duration-200 ease-out hover:bg-[#1a1f2e] hover:shadow-elevated active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <>
@@ -155,7 +157,7 @@ export default function LoginPage() {
                                     Signing in...
                                 </>
                             ) : (
-                                'Sign In'
+                                'Sign In to Studio'
                             )}
                         </button>
 
@@ -172,9 +174,9 @@ export default function LoginPage() {
 
                     <div className="mt-12 text-center">
                         <p className="text-sm text-text-secondary font-body">
-                            Having trouble?{' '}
-                            <a href="mailto:hello@axisliving.com" className="text-primary font-semibold hover:underline">
-                                Contact your designer.
+                            Looking for the client portal?{' '}
+                            <a href="/login" className="text-primary font-semibold hover:underline">
+                                Sign in here
                             </a>
                         </p>
                     </div>

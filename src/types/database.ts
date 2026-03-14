@@ -9,6 +9,15 @@ export interface Client {
     created_at: string;
 }
 
+export interface StudioUser {
+    id: string;
+    email: string;
+    name: string;
+    role: 'admin' | 'designer';
+    avatar_url: string | null;
+    created_at: string;
+}
+
 export type ProjectStatus = 'planning' | 'in_progress' | 'on_hold' | 'complete';
 
 export interface Project {

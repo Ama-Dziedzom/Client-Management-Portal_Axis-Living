@@ -37,14 +37,18 @@ function getIcon(fileType: string | null) {
 }
 
 export default function DocumentsPage() {
-    const { client } = useAuth()
+    const { client, loading: authLoading } = useAuth()
     const [documents, setDocuments] = useState<(DocType & { project_title?: string })[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
 
     useEffect(() => {
-        if (client) fetchDocuments()
-    }, [client])
+        if (client) {
+            fetchDocuments()
+        } else if (!authLoading) {
+            setLoading(false)
+        }
+    }, [client, authLoading])
 
     const fetchDocuments = async () => {
         try {
