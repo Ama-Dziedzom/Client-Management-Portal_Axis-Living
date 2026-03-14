@@ -19,6 +19,7 @@ import {
     Search as SearchIcon,
     AlertCircle
 } from 'lucide-react'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn, getInitials } from '@/lib/utils'
 

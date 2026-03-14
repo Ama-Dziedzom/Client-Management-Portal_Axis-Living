@@ -227,7 +227,7 @@ export default function StudioInvoiceDetailPage() {
                         </div>
                         <div className="flex justify-between items-center text-sm text-text-secondary font-body border-b border-border pb-3">
                             <span>Tax (16% VAT)</span>
-                            <span>{formatCurrency(invoice.tax)}</span>
+                            <span>{formatCurrency(invoice.tax_amount)}</span>
                         </div>
                         <div className="flex justify-between items-center pt-2">
                             <span className="font-heading text-lg font-bold text-text-primary">Total Amount</span>

@@ -31,7 +31,8 @@ import {
     Search,
     AlertCircle,
     Globe,
-    MapPin
+    MapPin,
+    MessageSquare
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
@@ -446,7 +447,7 @@ export default function StudioProjectDetailPage() {
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {project.gallery.map((img) => (
+                                {project.gallery.map((img: GalleryImage) => (
                                     <div key={img.id} className="group relative aspect-square bg-accent/10 rounded-2xl overflow-hidden border border-border">
                                         <img 
                                             src={img.image_url} 

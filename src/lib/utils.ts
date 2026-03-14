@@ -16,13 +16,20 @@ export function formatCurrency(amount: number, currency: string = 'ZMW'): string
 }
 
 // Format date
-export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOptions): string {
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    };
-    return new Date(date).toLocaleDateString('en-GB', options || defaultOptions);
+export function formatDate(date: string | Date | null, options?: Intl.DateTimeFormatOptions): string {
+    if (!date) return 'N/A';
+    try {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return 'Invalid Date';
+        const defaultOptions: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        };
+        return d.toLocaleDateString('en-GB', options || defaultOptions);
+    } catch (e) {
+        return 'Invalid Date';
+    }
 }
 
 // Format relative time
@@ -97,4 +104,20 @@ export function getInitials(name: string): string {
         .join('')
         .toUpperCase()
         .slice(0, 2);
+}
+
+// Format file size
+export function formatFileSize(bytes: number | string | null): string {
+    if (bytes === null) return '0 B';
+    const numBytes = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
+    if (isNaN(numBytes)) return '0 B';
+    
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let i = 0;
+    let size = numBytes;
+    while (size >= 1024 && i < units.length - 1) {
+        size /= 1024;
+        i++;
+    }
+    return `${size.toFixed(1)} ${units[i]}`;
 }

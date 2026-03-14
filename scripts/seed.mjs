@@ -2,17 +2,39 @@ import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'fs'
 
 // Load .env.local manually
-const envFile = readFileSync('.env.local', 'utf-8')
-const env = Object.fromEntries(
-    envFile.split('\n')
-        .filter(line => line && !line.startsWith('#'))
-        .map(line => line.split('='))
-        .map(([key, ...val]) => [key.trim(), val.join('=').trim()])
-)
+let env = {}
+try {
+    const envFile = readFileSync('.env.local', 'utf-8')
+    env = Object.fromEntries(
+        envFile.split('\n')
+            .filter(line => line && !line.startsWith('#'))
+            .map(line => {
+                const firstEq = line.indexOf('=')
+                if (firstEq === -1) return [line.trim(), '']
+                return [line.slice(0, firstEq).trim(), line.slice(firstEq + 1).trim()]
+            })
+    )
+} catch (e) {
+    console.error('Error: Could not read .env.local file.')
+    process.exit(1)
+}
+
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('\n--- ERROR: MISSING CONFIGURATION ---')
+    if (!supabaseUrl) console.error('Missing: NEXT_PUBLIC_SUPABASE_URL')
+    if (!supabaseServiceKey) console.error('Missing: SUPABASE_SERVICE_ROLE_KEY')
+    console.error('\nPlease add these to your .env.local file.')
+    console.error('You can find the Service Role Key in: Supabase Dashboard -> Settings -> API')
+    console.error('------------------------------------\n')
+    process.exit(1)
+}
 
 const supabase = createClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY,
+    supabaseUrl,
+    supabaseServiceKey,
     {
         auth: {
             autoRefreshToken: false,
@@ -67,24 +89,38 @@ async function seed() {
     }
     console.log('Client record created.')
 
-    // 3. Create Project
-    const { data: project, error: projectError } = await supabase
+    // 3. Create/Get Project
+    let project
+    const { data: existingProjects, error: fetchError } = await supabase
         .from('projects')
-        .upsert({
-            client_id: authId,
-            title: 'The Axis Residence',
-            location: 'Lusaka, Zambia',
-            status: 'in_progress',
-            description: 'A contemporary luxury residence featuring Quinsi-inspired architectural elements and modern minimalist interiors.'
-        }, { onConflict: 'client_id' })
-        .select()
-        .single()
+        .select('*')
+        .eq('client_id', authId)
+        .limit(1)
 
-    if (projectError) {
-        console.error('Error upserting project:', projectError.message)
-        return
+    if (existingProjects && existingProjects.length > 0) {
+        project = existingProjects[0]
+        console.log('Using existing project:', project.title)
+    } else {
+        console.log('Creating new project...')
+        const { data: newProject, error: projectError } = await supabase
+            .from('projects')
+            .insert({
+                client_id: authId,
+                title: 'The Axis Residence',
+                location: 'Lusaka, Zambia',
+                status: 'in_progress',
+                description: 'A contemporary luxury residence featuring Quinsi-inspired architectural elements and modern minimalist interiors.'
+            })
+            .select()
+            .single()
+
+        if (projectError) {
+            console.error('Error creating project:', projectError.message)
+            return
+        }
+        project = newProject
+        console.log('Project created:', project.title)
     }
-    console.log('Project created:', project.title)
 
     // 4. Create Timeline Stages
     const stages = [

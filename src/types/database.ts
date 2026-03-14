@@ -5,6 +5,7 @@ export interface Client {
     email: string;
     name: string;
     phone: string | null;
+    address: string | null;
     active: boolean;
     created_at: string;
 }
@@ -35,6 +36,17 @@ export interface Project {
     updated_at: string;
 }
 
+export type DocType = 'proposal' | 'contract' | 'drawing' | 'invoice' | 'other';
+
+export interface GalleryImage {
+    id: string;
+    project_id: string;
+    image_url: string;
+    caption: string | null;
+    display_order: number;
+    created_at: string;
+}
+
 export type TimelineStatus = 'upcoming' | 'active' | 'complete';
 
 export interface TimelineStage {
@@ -54,6 +66,7 @@ export interface Document {
     file_url: string;
     file_type: string | null;
     file_size: string | null;
+    size?: number | string | null; // Alias for consistency with some UI components
     uploaded_at: string;
 }
 
@@ -88,6 +101,7 @@ export interface Invoice {
     subtotal: number;
     tax_rate: number;
     tax_amount: number;
+    tax?: number; // Alias for UI
     total: number;
     currency: string;
     status: InvoiceStatus;
@@ -104,4 +118,5 @@ export interface ProjectWithDetails extends Project {
     documents?: Document[];
     messages?: Message[];
     invoices?: Invoice[];
+    gallery?: GalleryImage[];
 }
