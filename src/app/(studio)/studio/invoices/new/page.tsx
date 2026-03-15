@@ -92,8 +92,9 @@ export default function NewInvoicePage() {
     }
 
     const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0)
-    const tax = subtotal * 0.16 // Example VAT
-    const total = subtotal + tax
+    const taxRate = 16 // VAT percentage
+    const taxAmount = subtotal * (taxRate / 100)
+    const total = subtotal + taxAmount
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -110,10 +111,13 @@ export default function NewInvoicePage() {
                     client_id: clientId,
                     project_id: projectId,
                     invoice_number: invoiceNumber,
+                    title: invoiceNumber,
                     due_date: dueDate,
                     subtotal,
-                    tax,
+                    tax_rate: taxRate,
+                    tax_amount: taxAmount,
                     total,
+                    currency: 'ZMW',
                     status: 'draft' as InvoiceStatus,
                     line_items: lineItems,
                     notes
@@ -221,8 +225,9 @@ export default function NewInvoicePage() {
                                             <input
                                                 type="number"
                                                 min="1"
-                                                value={item.quantity}
-                                                onChange={e => updateLineItem(idx, { quantity: Number(e.target.value) })}
+                                                value={item.quantity || ''}
+                                                onChange={e => updateLineItem(idx, { quantity: Number(e.target.value) || 0 })}
+                                                onBlur={e => { if (!e.target.value) updateLineItem(idx, { quantity: 1 }) }}
                                                 className="w-full bg-white border border-border rounded-xl px-4 py-3 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary/10"
                                             />
                                         </div>
@@ -233,8 +238,9 @@ export default function NewInvoicePage() {
                                                 <input
                                                     type="number"
                                                     min="0"
-                                                    value={item.unit_price}
-                                                    onChange={e => updateLineItem(idx, { unit_price: Number(e.target.value) })}
+                                                    value={item.unit_price || ''}
+                                                    placeholder="0"
+                                                    onChange={e => updateLineItem(idx, { unit_price: Number(e.target.value) || 0 })}
                                                     className="w-full bg-white border border-border rounded-xl pl-8 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/10"
                                                 />
                                             </div>
@@ -320,7 +326,7 @@ export default function NewInvoicePage() {
                                 </div>
                                 <div className="flex justify-between items-center text-sm border-b border-white/10 pb-4">
                                     <span className="text-white/60">Tax (16% VAT)</span>
-                                    <span className="font-semibold">{new Intl.NumberFormat('en-ZM', { style: 'currency', currency: 'ZMW' }).format(tax)}</span>
+                                    <span className="font-semibold">{new Intl.NumberFormat('en-ZM', { style: 'currency', currency: 'ZMW' }).format(taxAmount)}</span>
                                 </div>
                                 <div className="flex justify-between items-end pt-2">
                                     <span className="font-heading text-lg font-bold">Total Due</span>

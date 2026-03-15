@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import { User, Mail, Phone, Lock, LogOut, Loader2, Shield } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { formatPhoneInput, unformatPhone } from '@/lib/utils'
 
 interface ProfileForm {
     name: string
@@ -28,10 +29,11 @@ export default function SettingsPage() {
         register: registerProfile,
         handleSubmit: handleProfileSubmit,
         formState: { errors: profileErrors },
+        setValue: setProfileValue,
     } = useForm<ProfileForm>({
         defaultValues: {
             name: client?.name || '',
-            phone: client?.phone || '',
+            phone: formatPhoneInput(client?.phone || ''),
         },
     })
 
@@ -51,7 +53,7 @@ export default function SettingsPage() {
         try {
             const { error } = await supabase
                 .from('clients')
-                .update({ name: data.name, phone: data.phone })
+                .update({ name: data.name, phone: unformatPhone(data.phone) })
                 .eq('id', client.id)
 
             if (error) throw error
@@ -160,9 +162,15 @@ export default function SettingsPage() {
                                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                                     <input
                                         type="tel"
-                                        placeholder="+260 97 XXX XXXX"
+                                        placeholder="097 045 6789"
                                         className="input-field pl-11"
-                                        {...registerProfile('phone')}
+                                        maxLength={12}
+                                        {...registerProfile('phone', {
+                                            onChange: (e) => {
+                                                const formatted = formatPhoneInput(e.target.value);
+                                                setProfileValue('phone', formatted);
+                                            },
+                                        })}
                                     />
                                 </div>
                             </div>

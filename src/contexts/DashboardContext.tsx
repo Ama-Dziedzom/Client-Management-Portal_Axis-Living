@@ -11,6 +11,7 @@ interface DashboardContextType {
     client: Client | null
     unreadCount: number
     loading: boolean
+    refreshUnreadCount: () => void
 }
 
 const DashboardContext = createContext<DashboardContextType>({
@@ -18,6 +19,7 @@ const DashboardContext = createContext<DashboardContextType>({
     client: null,
     unreadCount: 0,
     loading: true,
+    refreshUnreadCount: () => {},
 })
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
@@ -26,6 +28,24 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const [unreadCount, setUnreadCount] = useState(0)
     const [loading, setLoading] = useState(true)
     const router = useRouter()
+
+    const refreshUnreadCount = async () => {
+        if (!project) return
+        try {
+            const { count, error } = await supabase
+                .from('messages')
+                .select('*', { count: 'exact', head: true })
+                .eq('project_id', project.id)
+                .eq('sender_type', 'studio')
+                .eq('read', false)
+
+            if (!error) {
+                setUnreadCount(count || 0)
+            }
+        } catch (err) {
+            console.error('[DashboardContext] refreshUnreadCount error:', err)
+        }
+    }
 
     useEffect(() => {
         if (authLoading) return
@@ -89,7 +109,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             project,
             client: authClient,
             unreadCount,
-            loading: loading || authLoading
+            loading: loading || authLoading,
+            refreshUnreadCount,
         }}>
             {children}
         </DashboardContext.Provider>

@@ -7,22 +7,19 @@ import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { Invoice, LineItem } from '@/types/database'
 import { formatCurrency, formatDate, formatStatus, getStatusBadgeClass } from '@/lib/utils'
-import { publicEnv } from '@/lib/env'
 import {
     ArrowLeft,
-    CreditCard,
     CheckCircle2,
+    Info,
     Loader2,
 } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
 
 export default function InvoiceDetailPage() {
     const { id } = useParams()
     const { client, loading: authLoading } = useAuth()
     const [invoice, setInvoice] = useState<Invoice | null>(null)
     const [loading, setLoading] = useState(true)
-    const [paying, setPaying] = useState(false)
 
     useEffect(() => {
         if (client && id) {
@@ -46,60 +43,6 @@ export default function InvoiceDetailPage() {
             console.error('Error fetching invoice:', error)
         } finally {
             setLoading(false)
-        }
-    }
-
-    const handlePayment = async () => {
-        if (!invoice || !client) return
-
-        setPaying(true)
-        try {
-            // Dynamically import Paystack
-            const PaystackPop = (await import('@paystack/inline-js')).default
-            const paystack = new PaystackPop()
-
-            paystack.newTransaction({
-                key: publicEnv.paystackPublicKey,
-                email: client.email,
-                amount: Math.round(invoice.total * 100), // Paystack uses kobo/pesewas
-                currency: invoice.currency === 'ZMW' ? 'ZAR' : invoice.currency, // Paystack supported currencies
-                reference: `INV-${invoice.id}-${Date.now()}`,
-                metadata: {
-                    invoice_id: invoice.id,
-                    invoice_number: invoice.invoice_number,
-                    client_id: client.id,
-                },
-                onSuccess: (transaction: any) => {
-                    toast.success('Payment submitted successfully!')
-                    
-                    // The actual update happens via webhook for security.
-                    // We poll the database to see when it's updated.
-                    setLoading(true)
-                    let checkCount = 0
-                    const interval = setInterval(async () => {
-                        const { data } = await supabase
-                            .from('invoices')
-                            .select('status')
-                            .eq('id', invoice.id)
-                            .single()
-                        
-                        if (data?.status === 'paid' || checkCount > 15) {
-                            clearInterval(interval)
-                            fetchInvoice() // Refresh page data
-                        }
-                        checkCount++
-                    }, 3000)
-                },
-                onCancel: () => {
-                    toast.error('Payment cancelled')
-                    setPaying(false)
-                },
-            })
-        } catch (error: any) {
-            toast.error('Failed to initialize payment')
-            console.error(error)
-        } finally {
-            setPaying(false)
         }
     }
 
@@ -244,22 +187,18 @@ export default function InvoiceDetailPage() {
                         </div>
                     )}
 
-                    {/* Payment CTA */}
+                    {/* Payment info — No online payment for Phase 1 */}
                     {(invoice.status === 'sent' || invoice.status === 'overdue') && (
-                        <button
-                            onClick={handlePayment}
-                            disabled={paying}
-                            className="btn-primary w-full justify-center py-4 text-base"
-                        >
-                            {paying ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                <>
-                                    <CreditCard className="w-5 h-5" />
-                                    Pay {formatCurrency(invoice.total, invoice.currency)}
-                                </>
-                            )}
-                        </button>
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-start gap-3">
+                            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                            <div>
+                                <p className="text-sm font-semibold text-blue-800">Payment Instructions</p>
+                                <p className="text-xs text-blue-600 mt-1 leading-relaxed">
+                                    Please contact the Axis Living studio to arrange payment via bank transfer or other method. 
+                                    Reference this invoice number: <span className="font-bold">{invoice.invoice_number}</span>
+                                </p>
+                            </div>
+                        </div>
                     )}
 
                     {/* Paid confirmation */}
@@ -270,7 +209,6 @@ export default function InvoiceDetailPage() {
                                 <p className="text-sm font-semibold text-emerald-800">Payment Received</p>
                                 <p className="text-xs text-emerald-600 mt-0.5">
                                     Paid on {invoice.paid_at ? formatDate(invoice.paid_at) : '—'}
-                                    {invoice.paystack_reference && ` · Ref: ${invoice.paystack_reference}`}
                                 </p>
                             </div>
                         </div>

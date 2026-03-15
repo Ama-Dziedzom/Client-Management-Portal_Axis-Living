@@ -108,6 +108,23 @@ export function getInitials(name: string | null | undefined): string {
         .slice(0, 2);
 }
 
+// Format phone number input with auto-spacing (XXX XXX XXXX)
+export function formatPhoneInput(value: string): string {
+    // Strip everything except digits
+    const digits = value.replace(/\D/g, '');
+    // Apply spacing: XXX XXX XXXX
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 3));
+    if (digits.length > 3) parts.push(digits.slice(3, 6));
+    if (digits.length > 6) parts.push(digits.slice(6, 10));
+    return parts.join(' ');
+}
+
+// Strip formatting from phone number for storage
+export function unformatPhone(value: string): string {
+    return value.replace(/\D/g, '');
+}
+
 // Format file size
 export function formatFileSize(bytes: number | string | null): string {
     if (bytes === null) return '0 B';

@@ -7,19 +7,13 @@ import { studioSupabase as supabase } from '@/lib/supabase'
 import { Invoice, Project, Client } from '@/types/database'
 import { 
     ArrowLeft, 
-    Download, 
     Send, 
-    Clock, 
     CheckCircle2, 
-    AlertCircle, 
     Trash2, 
-    Edit2,
-    Receipt,
     Printer,
     Mail,
     Loader2,
     ShieldCheck,
-    CreditCard
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
@@ -31,6 +25,7 @@ export default function StudioInvoiceDetailPage() {
     const [invoice, setInvoice] = useState<(Invoice & { project: Project; client: Client }) | null>(null)
     const [loading, setLoading] = useState(true)
     const [updating, setUpdating] = useState(false)
+    const [sendingReminder, setSendingReminder] = useState(false)
 
     useEffect(() => {
         if (id) fetchInvoice()
@@ -90,6 +85,33 @@ export default function StudioInvoiceDetailPage() {
         }
     }
 
+    const sendReminder = async () => {
+        if (!invoice) return
+        setSendingReminder(true)
+        try {
+            const res = await fetch('/api/invoices/send-reminder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientName: invoice.client.name,
+                    clientEmail: invoice.client.email,
+                    invoiceNumber: invoice.invoice_number,
+                    total: invoice.total,
+                    currency: invoice.currency,
+                    dueDate: invoice.due_date,
+                }),
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to send reminder')
+            toast.success(data.message || 'Reminder sent!')
+        } catch (error: any) {
+            console.error('Send reminder error:', error)
+            toast.error(error.message || 'Failed to send reminder')
+        } finally {
+            setSendingReminder(false)
+        }
+    }
+
     if (loading) return (
             <div className="flex items-center justify-center py-20">
                 <Loader2 className="w-8 h-8 text-primary animate-spin opacity-40" />
@@ -104,6 +126,7 @@ export default function StudioInvoiceDetailPage() {
     )
 
     const lineItems = (invoice.line_items as any[]) || []
+    const canSendReminder = invoice.status === 'sent' || invoice.status === 'overdue'
 
     return (
         <div className="max-w-4xl mx-auto pb-20">
@@ -244,29 +267,34 @@ export default function StudioInvoiceDetailPage() {
                 )}
             </div>
 
-            {/* Quick Actions Sidebar / Bottom */}
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="card-flat flex items-center gap-4">
-                    <div className="p-3 bg-blue-50 rounded-xl">
-                        <CreditCard className="w-6 h-6 text-blue-600" />
+            {/* Send Reminder Action */}
+            {canSendReminder && (
+                <div className="mt-10">
+                    <div className="card-flat flex items-center gap-4">
+                        <div className="p-3 bg-primary/10 rounded-xl">
+                            <Mail className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-bold text-text-primary">Send Reminder</h4>
+                            <p className="text-xs text-text-secondary">
+                                Email {invoice.client.name} a payment reminder for this invoice.
+                            </p>
+                        </div>
+                        <button 
+                            onClick={sendReminder}
+                            disabled={sendingReminder}
+                            className="btn-secondary text-xs ml-auto"
+                        >
+                            {sendingReminder ? (
+                                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Sending...</>
+                            ) : (
+                                <><Mail className="w-3.5 h-3.5" /> Send Email</>
+                            )}
+                        </button>
                     </div>
-                    <div>
-                        <h4 className="text-sm font-bold text-text-primary">Payment Tracking</h4>
-                        <p className="text-xs text-text-secondary">Keep records of all incoming transfers.</p>
-                    </div>
-                    <button className="btn-ghost text-xs ml-auto">Log Payment</button>
                 </div>
-                <div className="card-flat flex items-center gap-4">
-                    <div className="p-3 bg-primary/10 rounded-xl">
-                        <Mail className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-bold text-text-primary">Send Reminder</h4>
-                        <p className="text-xs text-text-secondary">Notify client of due date if pending.</p>
-                    </div>
-                    <button className="btn-ghost text-xs ml-auto">Email Hub</button>
-                </div>
-            </div>
+            )}
         </div>
     )
 }
+

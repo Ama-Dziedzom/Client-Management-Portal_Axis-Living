@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
+import { useDashboard } from '@/contexts/DashboardContext'
 import { supabase } from '@/lib/supabase'
 import { Message, Project } from '@/types/database'
 import { formatRelativeTime, getInitials } from '@/lib/utils'
@@ -11,11 +12,13 @@ import toast from 'react-hot-toast'
 
 export default function MessagesPage() {
     const { client, loading: authLoading } = useAuth()
+    const { refreshUnreadCount } = useDashboard()
     const [projects, setProjects] = useState<(Project & { messages: Message[]; unread_count: number })[]>([])
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [newMessage, setNewMessage] = useState('')
     const [sending, setSending] = useState(false)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (client) {
@@ -84,6 +87,55 @@ export default function MessagesPage() {
 
     const selectedProject = projects.find((p) => p.id === selectedProjectId)
     const messages = selectedProject?.messages || []
+
+    // Mark messages as read when a conversation is selected
+    useEffect(() => {
+        if (selectedProjectId) {
+            markMessagesAsRead(selectedProjectId)
+        }
+        scrollToBottom()
+    }, [selectedProjectId, projects])
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    const markMessagesAsRead = async (projectId: string) => {
+        try {
+            const unreadIds = projects
+                .find(p => p.id === projectId)
+                ?.messages.filter(m => !m.read && m.sender_type === 'studio')
+                .map(m => m.id) || []
+
+            if (unreadIds.length === 0) return
+
+            const { error } = await supabase
+                .from('messages')
+                .update({ read: true })
+                .in('id', unreadIds)
+
+            if (error) throw error
+
+            // Update local state
+            setProjects(prev => prev.map(p => {
+                if (p.id === projectId) {
+                    return {
+                        ...p,
+                        unread_count: 0,
+                        messages: p.messages.map(m =>
+                            unreadIds.includes(m.id) ? { ...m, read: true } : m
+                        )
+                    }
+                }
+                return p
+            }))
+
+            // Refresh the global unread count in sidebar/topbar
+            refreshUnreadCount()
+        } catch (error) {
+            console.error('Error marking messages as read:', error)
+        }
+    }
 
     const sendMessage = async () => {
         if (!newMessage.trim() || !client || !selectedProjectId) return
@@ -260,6 +312,7 @@ export default function MessagesPage() {
                                         </div>
                                     ))
                                 )}
+                                <div ref={messagesEndRef} />
                             </div>
 
                             {/* Input */}

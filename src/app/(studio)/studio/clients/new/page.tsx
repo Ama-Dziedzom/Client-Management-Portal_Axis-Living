@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Loader2, Save, Sparkles, User, Mail, Phone, Lock, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { formatPhoneInput, unformatPhone } from '@/lib/utils'
 
 const item = {
     hidden: { opacity: 0, y: 12 },
@@ -36,7 +37,7 @@ export default function NewClientPage() {
             const response = await fetch('/api/studio/clients', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone, password }),
+                body: JSON.stringify({ name, email, phone: unformatPhone(phone), password }),
             })
 
             const result = await response.json()
@@ -129,9 +130,10 @@ export default function NewClientPage() {
                                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
                                 <input
                                     type="tel"
-                                    placeholder="+260 97..."
+                                    placeholder="097 045 6789"
                                     value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    onChange={(e) => setPhone(formatPhoneInput(e.target.value))}
+                                    maxLength={12}
                                     className="input-field pl-11"
                                 />
                             </div>
