@@ -1,13 +1,23 @@
 'use client'
 
-import { Plus, FileText, Globe, Trash2 } from 'lucide-react'
+import { Plus, FileText, Globe, Trash2, Image as ImageIcon, Table, File } from 'lucide-react'
 import { Document } from '@/types/database'
-import { getFileIcon, formatFileSize, formatDate } from '@/lib/utils'
+import { formatFileSize, formatDate } from '@/lib/utils'
 
 interface DocumentsTabProps {
     documents: Document[]
     onAdd: () => void
     onDelete: (id: string) => void
+}
+
+function getDocIcon(fileType: string | null) {
+    if (!fileType) return <File className="w-5 h-5" />
+    if (fileType.includes('pdf') || fileType.includes('document') || fileType.includes('word'))
+        return <FileText className="w-5 h-5" />
+    if (fileType.includes('image')) return <ImageIcon className="w-5 h-5" />
+    if (fileType.includes('spreadsheet') || fileType.includes('excel') || fileType.includes('csv'))
+        return <Table className="w-5 h-5" />
+    return <File className="w-5 h-5" />
 }
 
 export function DocumentsTab({ documents, onAdd, onDelete }: DocumentsTabProps) {
@@ -35,12 +45,12 @@ export function DocumentsTab({ documents, onAdd, onDelete }: DocumentsTabProps) 
                     {documents.map((doc) => (
                         <div key={doc.id} className="card-flat group flex items-center gap-4 hover:border-primary/30 transition-all">
                             <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary flex-shrink-0">
-                                {getFileIcon(doc.file_type || '')}
+                                {getDocIcon(doc.file_type || '')}
                             </div>
                             <div className="flex-1 min-w-0 pr-4">
                                 <h4 className="text-sm font-semibold text-text-primary truncate">{doc.name}</h4>
                                 <p className="text-xs text-text-secondary mt-1">
-                                    {formatFileSize(doc.size || 0)} · Uploaded {formatDate(doc.uploaded_at)}
+                                    {formatFileSize(doc.size || doc.file_size || 0)} · Uploaded {formatDate(doc.uploaded_at)}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

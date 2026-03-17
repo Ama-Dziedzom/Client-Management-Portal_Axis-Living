@@ -8,11 +8,13 @@ import {
     ProjectWithDetails,
     ProjectStatus,
     TimelineStage,
-    GalleryImage
+    GalleryImage,
+    Document
 } from '@/types/database'
 import { Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { logger } from '@/lib/logger'
+import { UploadModal } from '@/components/shared/UploadModal'
 
 // Sub-components
 import { ProjectHeader } from './_components/ProjectHeader'
@@ -30,6 +32,11 @@ export default function StudioProjectDetailPage() {
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('overview')
     const [isEditingInfo, setIsEditingInfo] = useState(false)
+
+    // Upload modal state
+    const [showGalleryUpload, setShowGalleryUpload] = useState(false)
+    const [showDocumentUpload, setShowDocumentUpload] = useState(false)
+    const [editingImage, setEditingImage] = useState<GalleryImage | null>(null)
 
     useEffect(() => {
         if (id) fetchProject()
@@ -89,17 +96,195 @@ export default function StudioProjectDetailPage() {
         }
     }
 
-    // Placeholder handlers for other features (to be implemented)
+    // Placeholder handlers for timeline (to be implemented)
     const handleAddStage = () => toast('Add stage feature coming soon')
     const handleEditStage = (stage: TimelineStage) => toast('Edit stage feature coming soon')
     const handleDeleteStage = (stageId: string) => toast('Delete stage feature coming soon')
-    
-    const handleUploadPhoto = () => toast('Upload photo feature coming soon')
-    const handleEditPhoto = (image: GalleryImage) => toast('Edit photo feature coming soon')
-    const handleDeletePhoto = (imageId: string) => toast('Delete photo feature coming soon')
-    
-    const handleAddDocument = () => toast('Add document feature coming soon')
-    const handleDeleteDocument = (docId: string) => toast('Delete document feature coming soon')
+
+    // ─── Gallery Handlers ─────────────────────────────────────────────
+    const handleUploadPhoto = () => setShowGalleryUpload(true)
+
+    const handleGalleryUpload = async (file: File, meta: { name: string; caption?: string }) => {
+        const projectId = id as string
+        const ext = file.name.split('.').pop() || 'jpg'
+        const storagePath = `${projectId}/${Date.now()}-${meta.name.replace(/\s+/g, '_')}.${ext}`
+
+        // Upload to Supabase Storage
+        const { error: uploadError } = await supabase.storage
+            .from('Gallery')
+            .upload(storagePath, file, { cacheControl: '3600', upsert: false })
+
+        if (uploadError) throw uploadError
+
+        // Get the public URL
+        const { data: urlData } = supabase.storage.from('Gallery').getPublicUrl(storagePath)
+        const imageUrl = urlData.publicUrl
+
+        // Get current max display_order
+        const currentImages = project?.gallery || []
+        const maxOrder = currentImages.reduce((max, img) => Math.max(max, img.display_order || 0), 0)
+
+        // Insert into gallery table
+        const { data: newImage, error: dbError } = await supabase
+            .from('gallery')
+            .insert({
+                project_id: projectId,
+                image_url: imageUrl,
+                caption: meta.caption || null,
+                display_order: maxOrder + 1,
+            })
+            .select()
+            .single()
+
+        if (dbError) throw dbError
+
+        // Update local state
+        setProject(prev => prev ? {
+            ...prev,
+            gallery: [...(prev.gallery || []), newImage as GalleryImage]
+        } : null)
+
+        toast.success('Photo uploaded!')
+    }
+
+    const handleEditPhoto = (image: GalleryImage) => {
+        const newCaption = window.prompt('Edit caption:', image.caption || '')
+        if (newCaption === null) return // cancelled
+
+        supabase
+            .from('gallery')
+            .update({ caption: newCaption })
+            .eq('id', image.id)
+            .then(({ error }) => {
+                if (error) {
+                    logger.error('Studio', 'Update caption error', error)
+                    toast.error('Failed to update caption')
+                    return
+                }
+                toast.success('Caption updated')
+                setProject(prev => prev ? {
+                    ...prev,
+                    gallery: (prev.gallery || []).map(img =>
+                        img.id === image.id ? { ...img, caption: newCaption } : img
+                    )
+                } : null)
+            })
+    }
+
+    const handleDeletePhoto = async (imageId: string) => {
+        if (!window.confirm('Delete this photo?')) return
+
+        try {
+            // Find the image to get its storage path
+            const image = project?.gallery?.find(img => img.id === imageId)
+
+            // Delete from database
+            const { error } = await supabase
+                .from('gallery')
+                .delete()
+                .eq('id', imageId)
+
+            if (error) throw error
+
+            // Try to delete from storage (extract path from URL)
+            if (image?.image_url) {
+                const urlParts = image.image_url.split('/storage/v1/object/public/Gallery/')
+                if (urlParts[1]) {
+                    await supabase.storage.from('Gallery').remove([urlParts[1]])
+                }
+            }
+
+            // Update local state
+            setProject(prev => prev ? {
+                ...prev,
+                gallery: (prev.gallery || []).filter(img => img.id !== imageId)
+            } : null)
+
+            toast.success('Photo deleted')
+        } catch (error) {
+            logger.error('Studio', 'Delete photo error', error)
+            toast.error('Failed to delete photo')
+        }
+    }
+
+    // ─── Documents Handlers ───────────────────────────────────────────
+    const handleAddDocument = () => setShowDocumentUpload(true)
+
+    const handleDocumentUpload = async (file: File, meta: { name: string; caption?: string }) => {
+        const projectId = id as string
+        const ext = file.name.split('.').pop() || 'pdf'
+        const storagePath = `${projectId}/${Date.now()}-${meta.name.replace(/\s+/g, '_')}.${ext}`
+
+        // Upload to Supabase Storage
+        const { error: uploadError } = await supabase.storage
+            .from('Documents')
+            .upload(storagePath, file, { cacheControl: '3600', upsert: false })
+
+        if (uploadError) throw uploadError
+
+        // Get the public URL
+        const { data: urlData } = supabase.storage.from('Documents').getPublicUrl(storagePath)
+        const fileUrl = urlData.publicUrl
+
+        // Insert into documents table
+        const { data: newDoc, error: dbError } = await supabase
+            .from('documents')
+            .insert({
+                project_id: projectId,
+                name: meta.name || file.name,
+                file_url: fileUrl,
+                file_type: file.type || null,
+                file_size: String(file.size),
+            })
+            .select()
+            .single()
+
+        if (dbError) throw dbError
+
+        // Update local state
+        setProject(prev => prev ? {
+            ...prev,
+            documents: [...(prev.documents || []), newDoc as Document]
+        } : null)
+
+        toast.success('Document uploaded!')
+    }
+
+    const handleDeleteDocument = async (docId: string) => {
+        if (!window.confirm('Delete this document?')) return
+
+        try {
+            // Find the doc to get its storage path
+            const doc = project?.documents?.find(d => d.id === docId)
+
+            // Delete from database
+            const { error } = await supabase
+                .from('documents')
+                .delete()
+                .eq('id', docId)
+
+            if (error) throw error
+
+            // Try to delete from storage
+            if (doc?.file_url) {
+                const urlParts = doc.file_url.split('/storage/v1/object/public/Documents/')
+                if (urlParts[1]) {
+                    await supabase.storage.from('Documents').remove([urlParts[1]])
+                }
+            }
+
+            // Update local state
+            setProject(prev => prev ? {
+                ...prev,
+                documents: (prev.documents || []).filter(d => d.id !== docId)
+            } : null)
+
+            toast.success('Document deleted')
+        } catch (error) {
+            logger.error('Studio', 'Delete document error', error)
+            toast.error('Failed to delete document')
+        }
+    }
 
     if (loading) {
         return (
@@ -176,6 +361,31 @@ export default function StudioProjectDetailPage() {
                     />
                 )}
             </motion.div>
+
+            {/* Gallery Upload Modal */}
+            <UploadModal
+                isOpen={showGalleryUpload}
+                onClose={() => setShowGalleryUpload(false)}
+                onUpload={handleGalleryUpload}
+                title="Upload Photo"
+                description="Add a photo to the project gallery"
+                accept="image/*"
+                maxSizeMB={10}
+                showCaption={true}
+                captionLabel="Photo Caption"
+            />
+
+            {/* Document Upload Modal */}
+            <UploadModal
+                isOpen={showDocumentUpload}
+                onClose={() => setShowDocumentUpload(false)}
+                onUpload={handleDocumentUpload}
+                title="Upload Document"
+                description="Share drawings, contracts, or proposals"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip,.dwg,.dxf,.ai,.psd,.eps,.svg"
+                maxSizeMB={25}
+                showCaption={false}
+            />
         </div>
     )
 }

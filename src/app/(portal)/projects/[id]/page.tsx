@@ -55,7 +55,7 @@ export default function ProjectDetailPage() {
         try {
             const { data, error } = await supabase
                 .from('projects')
-                .select('*, timeline_stages(*), documents(*), messages(*), invoices(*)')
+                .select('*, timeline_stages(*), documents(*), messages(*), invoices(*), gallery(*)')
                 .eq('id', id as string)
                 .single()
 
@@ -125,7 +125,7 @@ export default function ProjectDetailPage() {
     const tabs = [
         { id: 'overview', label: 'Overview' },
         { id: 'timeline', label: 'Timeline', count: stages.length },
-        { id: 'gallery', label: 'Gallery', count: project.gallery_urls?.length || 0 },
+        { id: 'gallery', label: 'Gallery', count: project.gallery?.length || 0 },
         { id: 'documents', label: 'Documents', count: documents.length },
         { id: 'messages', label: 'Messages', count: messages.length },
     ]
@@ -366,7 +366,7 @@ export default function ProjectDetailPage() {
                     {/* Gallery Tab */}
                     {activeTab === 'gallery' && (
                         <div>
-                            {(!project.gallery_urls || project.gallery_urls.length === 0) ? (
+                            {(!project.gallery || project.gallery.length === 0) ? (
                                 <div className="card-flat text-center py-12">
                                     <ImageIcon className="w-8 h-8 text-accent mx-auto mb-3" />
                                     <p className="text-text-secondary">Gallery images will appear here as your project progresses.</p>
@@ -374,17 +374,24 @@ export default function ProjectDetailPage() {
                             ) : (
                                 <>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                        {project.gallery_urls.map((url, idx) => (
+                                        {project.gallery.map((img) => (
                                             <button
-                                                key={idx}
-                                                onClick={() => setSelectedImage(url)}
-                                                className="aspect-square rounded-2xl overflow-hidden bg-accent/10 group"
+                                                key={img.id}
+                                                onClick={() => setSelectedImage(img.image_url)}
+                                                className="aspect-square rounded-2xl overflow-hidden bg-accent/10 group relative"
                                             >
                                                 <img
-                                                    src={url}
-                                                    alt={`${project.title} - Image ${idx + 1}`}
+                                                    src={img.image_url}
+                                                    alt={img.caption || `${project.title} gallery`}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
+                                                {img.caption && (
+                                                    <div className="absolute bottom-2 left-2 right-2">
+                                                        <p className="text-[10px] text-white font-medium bg-black/30 backdrop-blur-sm px-2 py-1 rounded w-fit truncate">
+                                                            {img.caption}
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </button>
                                         ))}
                                     </div>
