@@ -135,8 +135,8 @@ export async function fetchSiteSettings() {
         email: "hello@axisliving.co.zm",
         phone: "+260 971 251 110",
         address: "Lusaka, Zambia",
-        headerLogo: "/favicon.jpeg",
-        footerLogo: "/logo-light.jpeg",
+        headerLogo: "/axis-living.png",
+        footerLogo: "/axis-living.png",
         socialLinks: [
             { platform: "Instagram", url: "https://instagram.com/axisliving.zm" },
             { platform: "Pinterest", url: "https://pinterest.com/axisliving" }
