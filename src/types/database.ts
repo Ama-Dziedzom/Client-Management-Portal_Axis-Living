@@ -113,6 +113,26 @@ export interface Invoice {
     created_at: string;
 }
 
+// ===== Bookings =====
+
+export type BookingStatus = 'confirmed' | 'cancelled' | 'completed' | 'no_show';
+
+export interface Booking {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    date: string;
+    time: string;
+    project_type: string | null;
+    message: string | null;
+    currency: string;
+    amount: number | null;
+    payment_reference: string | null;
+    status: BookingStatus;
+    created_at: string;
+}
+
 // ===== Website CMS Types =====
 
 export interface WebsiteProject {
