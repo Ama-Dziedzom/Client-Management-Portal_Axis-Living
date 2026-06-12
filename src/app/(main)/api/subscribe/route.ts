@@ -13,12 +13,22 @@ export async function POST(req: Request) {
             );
         }
 
-        // 1. Add to Resend Audience (Newsletter List)
+        // 1. Add to Resend Audience + fire automation event
         try {
             if (AUDIENCE_ID) {
                 await getResend().contacts.create({
                     email,
                     audienceId: AUDIENCE_ID,
+                });
+
+                // Triggers the lookbook nurture sequence automation in Resend
+                await (getResend() as any).contacts.createEvent({
+                    audienceId: AUDIENCE_ID,
+                    email,
+                    eventName: 'lookbook_downloaded',
+                    properties: {
+                        subscribed_at: new Date().toISOString(),
+                    },
                 });
             }
         } catch (contactError) {

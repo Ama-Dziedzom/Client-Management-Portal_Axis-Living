@@ -123,7 +123,7 @@ export const emailTemplates = {
     }),
   }),
 
-  bookingConfirmation: (name, date, time, meetingLink) => ({
+  bookingConfirmation: (name, date, time, meetingLink, cancellationUrl = null) => ({
     subject: `You're booked. See you ${date} ✦`,
     html: wrap({
       image: randomImage(),
@@ -160,7 +160,23 @@ export const emailTemplates = {
 
         <p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:${COLORS.primary};">${YOUR_NAME}</p>
       `,
-      note: 'Need to reschedule? Reply to this email at least 24 hours in advance.',
+      note: cancellationUrl
+        ? `Need to cancel? <a href="${cancellationUrl}" style="color:${COLORS.tan};">Cancel your booking</a> at least 24 hours before your appointment. To reschedule, reply to this email.`
+        : 'Need to reschedule? Reply to this email at least 24 hours in advance.',
+    }),
+  }),
+
+  bookingCancelled: (name, date, time) => ({
+    subject: 'Your booking has been cancelled ✦',
+    html: wrap({
+      image: randomImage(),
+      heading: 'Booking cancelled.',
+      body: `We've received your cancellation, ${name}. Your consultation slot on ${date} at ${time} (CAT) has been released.`,
+      content: `
+        ${btn('Book a New Time', `${SITE_URL}/booking`)}
+        <p style="margin:32px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:${COLORS.primary};">${YOUR_NAME}</p>
+      `,
+      note: `If this was a mistake, you're welcome to book again at ${SITE_URL}/booking.`,
     }),
   }),
 
