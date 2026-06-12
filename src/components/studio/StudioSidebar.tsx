@@ -11,6 +11,12 @@ import {
     Receipt,
     LogOut,
     Settings,
+    Globe,
+    ImageIcon,
+    BookOpen,
+    Tag,
+    Star,
+    BookMarked,
 } from 'lucide-react'
 import { useStudio } from '@/contexts/StudioContext'
 import { cn, getInitials } from '@/lib/utils'
@@ -22,6 +28,16 @@ const navItems = [
     { label: 'Messages', icon: MessageSquare, href: '/studio/messages' },
     { label: 'Invoices', icon: Receipt, href: '/studio/invoices' },
     { label: 'Settings', icon: Settings, href: '/studio/settings' },
+]
+
+const websiteNavItems = [
+    { label: 'Overview', icon: Globe, href: '/studio/website' },
+    { label: 'Portfolio', icon: ImageIcon, href: '/studio/website/portfolio' },
+    { label: 'Journal', icon: BookOpen, href: '/studio/website/journal' },
+    { label: 'Pricing', icon: Tag, href: '/studio/website/pricing' },
+    { label: 'Testimonials', icon: Star, href: '/studio/website/testimonials' },
+    { label: 'Lookbook', icon: BookMarked, href: '/studio/website/lookbook' },
+    { label: 'Site Settings', icon: Settings, href: '/studio/website/settings' },
 ]
 
 export default function StudioSidebar() {
@@ -43,9 +59,9 @@ export default function StudioSidebar() {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 space-y-1">
+            <nav className="flex-1 px-4 overflow-y-auto space-y-1 pb-4">
                 {navItems.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/studio' && pathname.startsWith(item.href))
+                    const isActive = pathname === item.href || (item.href !== '/studio' && pathname.startsWith(item.href) && !pathname.startsWith('/studio/website'))
                     const Icon = item.icon
 
                     return (
@@ -64,6 +80,35 @@ export default function StudioSidebar() {
                         </Link>
                     )
                 })}
+
+                {/* Website CMS Section */}
+                <div className="pt-4">
+                    <div className="px-4 mb-2">
+                        <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#4b4f63]">Website</span>
+                    </div>
+                    {websiteNavItems.map((item) => {
+                        const isActive = item.href === '/studio/website'
+                            ? pathname === '/studio/website'
+                            : pathname.startsWith(item.href)
+                        const Icon = item.icon
+
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all relative",
+                                    isActive
+                                        ? "bg-white/10 text-white"
+                                        : "text-[#8b8fa3] hover:bg-white/5 hover:text-white"
+                                )}
+                            >
+                                <Icon className={cn("w-5 h-5", isActive ? "text-emerald-400" : "text-[#8b8fa3] group-hover:text-white")} />
+                                <span className="flex-1">{item.label}</span>
+                            </Link>
+                        )
+                    })}
+                </div>
             </nav>
 
             {/* Bottom Section */}

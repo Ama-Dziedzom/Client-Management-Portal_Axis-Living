@@ -113,6 +113,73 @@ export interface Invoice {
     created_at: string;
 }
 
+// ===== Website CMS Types =====
+
+export interface WebsiteProject {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    category: string | null;
+    images: string[];
+    featured: boolean;
+    published: boolean;
+    display_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface WebsitePost {
+    id: string;
+    title: string;
+    slug: string;
+    body: string | null;
+    cover_image: string | null;
+    published: boolean;
+    published_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface WebsitePricing {
+    id: string;
+    name: string;
+    price: number | null;
+    currency: string;
+    description: string | null;
+    features: string[];
+    highlighted: boolean;
+    display_order: number;
+    created_at: string;
+}
+
+export interface WebsiteTestimonial {
+    id: string;
+    name: string;
+    quote: string;
+    project: string | null;
+    avatar_url: string | null;
+    featured: boolean;
+    display_order: number;
+    created_at: string;
+}
+
+export interface WebsiteSetting {
+    id: string;
+    key: string;
+    value: string | null;
+    updated_at: string;
+}
+
+export interface WebsiteLookbook {
+    id: string;
+    name: string;
+    file_url: string;
+    thumbnail_url: string | null;
+    active: boolean;
+    created_at: string;
+}
+
 // Extended types with relations
 export interface ProjectWithDetails extends Project {
     timeline_stages?: TimelineStage[];
