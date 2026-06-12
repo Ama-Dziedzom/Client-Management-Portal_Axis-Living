@@ -41,7 +41,7 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                         <motion.p
                             initial={{ opacity: 0, letterSpacing: "0.1em" }}
                             animate={{ opacity: 1, letterSpacing: "0.4em" }}
-                            className="text-tan text-xs uppercase font-bold mb-4"
+                            className="text-[#705D4E] text-xs uppercase font-bold mb-4"
                         >
                             The Collection
                         </motion.p>
@@ -63,7 +63,7 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                                         "text-[10px] md:text-xs uppercase font-bold tracking-[0.2em] px-6 py-2 rounded-full border transition-all",
                                         filter === cat
                                             ? "bg-accent text-white border-accent"
-                                            : "bg-transparent text-foreground/60 border-foreground/20 hover:border-accent hover:text-accent hover:bg-accent/5"
+                                            : "bg-transparent text-foreground/70 border-foreground/30 hover:border-accent hover:text-accent hover:bg-accent/5"
                                     )}
                                 >
                                     {cat}
@@ -103,11 +103,11 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                                                     {project.title}
                                                 </h3>
                                                 <div className="w-12 h-[1px] bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 mb-4" />
-                                                <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200">View Details</p>
+                                                <p className="text-xs uppercase tracking-[0.2em] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200">View Details</p>
                                             </div>
                                         </div>
                                         <div className="flex justify-between items-center py-4">
-                                            <p className="text-[10px] uppercase tracking-widest text-foreground/40">
+                                            <p className="text-xs uppercase tracking-widest text-foreground/65">
                                                 {project.location} · <span className="text-accent">{project.style}</span>
                                             </p>
                                             <motion.div
@@ -123,7 +123,7 @@ const PortfolioClient = ({ initialProjects }: PortfolioClientProps) => {
                     </motion.div>
 
                     {filteredProjects.length === 0 && (
-                        <div className="py-32 text-center text-foreground/40 uppercase tracking-widest text-sm">
+                        <div className="py-32 text-center text-foreground/65 uppercase tracking-widest text-sm">
                             No projects found in this category.
                         </div>
                     )}
