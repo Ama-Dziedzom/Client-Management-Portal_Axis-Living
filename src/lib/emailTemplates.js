@@ -60,8 +60,8 @@ function wrap({ image, heading, body, content = '', note = '' }) {
       <td align="center">
 
         <!-- Logo -->
-        <div style="margin-bottom:32px;">
-          <img src="${SITE_URL}/axis-living.png" alt="${STUDIO_NAME}" width="120" style="height:auto;display:block;margin:0 auto;filter:brightness(0);" />
+        <div style="margin-bottom:32px;text-align:center;">
+          <span style="font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:normal;color:${COLORS.primary};letter-spacing:6px;text-transform:uppercase;">Axis Living</span>
         </div>
 
         <!-- Card -->
