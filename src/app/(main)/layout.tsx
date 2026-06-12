@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
 import "@/styles/globals.css";
 import Navbar from "@/components/Navigation/Navbar";
 import Footer from "@/components/Navigation/Footer";
 import LookbookPopup from "@/components/EmailCapture/LookbookPopup";
 import { fetchSiteSettings, fetchHomeData } from "@/lib/data";
-
-const manrope = Manrope({
-    subsets: ["latin"],
-    variable: "--font-manrope",
-    display: 'swap',
-});
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://axisliving.co.zm'),
@@ -62,7 +55,7 @@ export default async function MainLayout({
     ]);
 
     return (
-        <html lang="en" className={`${manrope.variable} scroll-smooth`}>
+        <html lang="en" className="scroll-smooth">
             <body className="bg-background text-foreground antialiased min-h-screen overflow-x-hidden">
                 <Navbar siteSettings={siteSettings} />
                 <main>

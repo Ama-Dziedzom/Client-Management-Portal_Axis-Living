@@ -54,18 +54,18 @@ const PricingClient = ({ siteSettings, pricingData }: PricingClientProps) => {
                         </div>
 
                         <div className="mb-12 text-center">
-                            <h3 className="text-4xl md:text-5xl font-heading mb-4 leading-tight">Discovery Call</h3>
-                            <p className="text-foreground/60 text-sm italic font-body mb-8 max-w-md mx-auto">
+                            <h3 className="text-4xl md:text-5xl font-body mb-4 leading-tight">Discovery Call</h3>
+                            <p className="text-foreground/70 text-sm italic font-body mb-8 max-w-md mx-auto">
                                 A no-obligation conversation to understand your space, your style, and your vision, before any commitment.
                             </p>
                             <div className="flex items-center justify-center gap-3 text-foreground">
                                 <span className="text-6xl md:text-7xl font-heading font-light">Free</span>
                             </div>
-                            <p className="text-[10px] uppercase tracking-widest font-bold opacity-40 mt-2">30 Minutes &middot; Virtual or In-Person</p>
+                            <p className="text-xs uppercase tracking-widest font-bold text-foreground/55 mt-2">30 Minutes &middot; Virtual or In-Person</p>
                         </div>
 
                         <div className="space-y-6 mb-12">
-                            <p className="text-[10px] uppercase tracking-widest font-bold text-accent mb-6 border-b border-accent/10 pb-2">What to expect:</p>
+                            <p className="text-xs uppercase tracking-widest font-bold text-accent mb-6 border-b border-accent/10 pb-2">What to expect:</p>
                             {consultationFeatures.map((feature: string) => (
                                 <div key={feature} className="flex items-start gap-4 text-sm font-body text-foreground/80">
                                     <Check size={18} className="text-accent mt-0.5 shrink-0" />
@@ -76,7 +76,7 @@ const PricingClient = ({ siteSettings, pricingData }: PricingClientProps) => {
 
                         <Link
                             href="/booking"
-                            className="w-full py-5 px-8 rounded-full text-center text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase transition-all shadow-xl flex items-center justify-center gap-3 bg-accent text-white hover:bg-foreground border border-accent hover:border-foreground"
+                            className="w-full py-5 px-8 rounded-full text-center text-xs font-bold tracking-[0.2em] uppercase transition-all shadow-xl flex items-center justify-center gap-3 bg-accent text-white hover:bg-foreground border border-accent hover:border-foreground"
                         >
                             <span className="hidden md:inline">Book Your Free Consultation</span>
                             <span className="md:hidden">Free Consultation</span>
@@ -91,10 +91,10 @@ const PricingClient = ({ siteSettings, pricingData }: PricingClientProps) => {
                     viewport={{ once: true }}
                     className="mt-24 text-center max-w-3xl mx-auto py-16 border-t border-foreground/10"
                 >
-                    <p className="text-foreground/80 text-xl md:text-2xl italic font-heading mb-10 leading-relaxed">
+                    <p className="text-foreground/80 text-xl md:text-2xl italic font-body mb-10 leading-relaxed">
                         After your discovery call, we&rsquo;ll prepare a custom proposal with transparent pricing tailored to your project scope, location, and material selections. No surprises.
                     </p>
-                    <p className="text-[11px] uppercase tracking-[0.4em] font-bold text-accent">
+                    <p className="text-xs uppercase tracking-[0.3em] font-bold text-accent">
                         Your bespoke journey starts with a single conversation
                     </p>
                 </motion.div>

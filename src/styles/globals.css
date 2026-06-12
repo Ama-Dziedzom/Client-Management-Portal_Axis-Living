@@ -1,4 +1,5 @@
 @import url('https://fonts.cdnfonts.com/css/quinsi');
+@import url('https://fonts.cdnfonts.com/css/neue-haas-grotesk-display-pro');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import "tailwindcss";
 
@@ -11,7 +12,7 @@
   --color-gold: #2F402C;
 
   --font-heading: "Quinsi", serif;
-  --font-body: var(--font-manrope), sans-serif;
+  --font-body: "Neue Haas Grotesk Display Pro", sans-serif;
   --font-playfair: "Playfair Display", serif;
 }
 
@@ -49,15 +50,31 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Quinsi only at display scale — h1 and h2 */
 h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h2 {
   font-family: var(--font-heading);
   letter-spacing: 0.02em;
   line-height: 1.15;
+}
+
+/* Smaller headings default to body font — inside @layer base so font-heading utility can override */
+@layer base {
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-body);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+}
+
+/* WCAG 2.4.11 — visible focus indicator for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 @utility btn-gold {

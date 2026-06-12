@@ -6,7 +6,7 @@ import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { ArrowRight, Quote } from "lucide-react";
 import { Project } from "@/types/project";
 import { Post } from "@/types/journal";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import LookbookSection from "@/components/EmailCapture/LookbookSection";
 
 interface HomeClientProps {
@@ -132,6 +132,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
 
     const [heroElement, setHeroElement] = useState<HTMLElement | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [marqueesPaused, setMarqueesPaused] = useState(false);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -177,7 +178,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         initial={{ opacity: 0, letterSpacing: "0.2em" }}
                         animate={{ opacity: 1, letterSpacing: "0.5em" }}
                         transition={{ duration: 1 }}
-                        className="text-white uppercase text-xs md:text-sm font-bold tracking-[0.5em] mb-6 drop-shadow-md"
+                        className="text-white uppercase text-xs md:text-sm font-bold tracking-[0.4em] mb-6 drop-shadow-md"
                     >
                         {studioName}
                     </motion.p>
@@ -245,13 +246,13 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         viewport={{ once: true, margin: "-100px" }}
                         className="md:w-1/2"
                     >
-                        <span className="text-tan font-bold tracking-widest uppercase text-xs mb-4 block">
+                        <span className="text-[#705D4E] font-bold tracking-widest uppercase text-xs mb-4 block">
                             {siteSettings?.aboutSection?.subtitle || "About Us"}
                         </span>
                         <h2 className="text-4xl md:text-6xl font-heading mb-8 leading-[1.2] tracking-wide">
                             {siteSettings?.aboutSection?.title || "A Lusaka-based studio for deliberate living."}
                         </h2>
-                        <p className="text-foreground/70 text-lg leading-relaxed mb-8 max-w-xl">
+                        <p className="text-foreground/80 text-lg leading-relaxed mb-8 max-w-xl">
                             {siteSettings?.aboutSection?.body || "We believe that your home should be a reflection of your soul. Our approach combines functional design with timeless aesthetics to create spaces that feel both elevated and lived-in."}
                         </p>
                         <Link href="/about" className="inline-flex items-center text-accent font-bold tracking-widest uppercase text-xs group">
@@ -289,14 +290,14 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8 text-center md:text-left"
                     >
                         <div>
-                            <span className="text-tan font-bold tracking-widest uppercase text-xs mb-4 block">
+                            <span className="text-[#705D4E] font-bold tracking-widest uppercase text-xs mb-4 block">
                                 {siteSettings?.projectsSection?.subtitle || "Selected Works"}
                             </span>
                             <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2] max-w-2xl">
                                 {siteSettings?.projectsSection?.title || "The Portfolio"}
                             </h2>
                         </div>
-                        <Link href="/portfolio" className="bg-accent text-white px-10 py-4 rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-xl">
+                        <Link href="/portfolio" className="bg-accent text-white px-10 py-4 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-xl">
                             {siteSettings?.projectsSection?.buttonText || "Explore All Projects"}
                         </Link>
                     </motion.div>
@@ -325,7 +326,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                                         <h4 className="text-white text-2xl font-heading mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">{project.title}</h4>
                                         <Link
                                             href={`/portfolio/${project.slug}`}
-                                            className="text-white border border-white px-8 py-3 text-[10px] tracking-widest uppercase hover:bg-white hover:text-accent transition-all opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                                            className="text-white border border-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-white hover:text-accent transition-all opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                                         >
                                             View Project
                                         </Link>
@@ -333,8 +334,8 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                                 </div>
                                 <div className="mt-6 flex justify-between items-end">
                                     <div>
-                                        <p className="text-accent text-[10px] font-bold uppercase tracking-widest mb-1">{project.category} · {project.style}</p>
-                                        <p className="text-foreground/50 text-[10px] uppercase tracking-widest">{project.location}</p>
+                                        <p className="text-accent text-xs font-bold uppercase tracking-widest mb-1">{project.category} · {project.style}</p>
+                                        <p className="text-foreground/65 text-xs uppercase tracking-widest">{project.location}</p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -354,7 +355,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                         className="text-center"
                     >
                         <Quote className="mx-auto text-white/15 mb-8" size={32} />
-                        <span className="text-white/30 text-[10px] uppercase tracking-[0.4em] font-bold mb-6 block">
+                        <span className="text-white/55 text-xs uppercase tracking-[0.4em] font-bold mb-6 block">
                             {siteSettings?.testimonialsSection?.subtitle || "Client Stories"}
                         </span>
                         <h2 className="text-3xl md:text-5xl font-heading font-light text-white leading-[1.3] max-w-4xl mx-auto">
@@ -365,12 +366,23 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
 
                 {/* Marquee Container */}
                 <div className="relative">
+                    {/* Accessible pause control */}
+                    <div className="flex justify-center mb-6">
+                        <button
+                            onClick={() => setMarqueesPaused(p => !p)}
+                            className="text-white/60 hover:text-white text-xs uppercase tracking-widest font-bold px-4 py-2 border border-white/20 rounded-full transition-colors focus-visible:outline-white"
+                            aria-label={marqueesPaused ? "Play testimonials" : "Pause testimonials"}
+                        >
+                            {marqueesPaused ? "▶ Play" : "⏸ Pause"}
+                        </button>
+                    </div>
+
                     {/* Gradient masks */}
                     <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-foreground to-transparent z-10 pointer-events-none" />
                     <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-foreground to-transparent z-10 pointer-events-none" />
 
                     {/* Ticker row 1 */}
-                    <div className="flex animate-marquee hover:[animation-play-state:paused] mb-6">
+                    <div className={`flex animate-marquee mb-6 ${marqueesPaused ? '[animation-play-state:paused]' : 'hover:[animation-play-state:paused]'}`}>
                         {(testimonials || []).flatMap((t, idx) => [t, t].map((item, dupIdx) => (
                             <div
                                 key={`${idx}-${dupIdx}`}
@@ -381,12 +393,12 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                                     &ldquo;{item.quote}&rdquo;
                                 </p>
                                 <div className="flex items-center gap-3 pt-4 border-t border-white/10">
-                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/60">
+                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white/75">
                                         {item.clientName.charAt(0)}
                                     </div>
                                     <div>
                                         <p className="font-bold text-xs uppercase tracking-widest text-white/90">{item.clientName}</p>
-                                        <p className="text-white/40 text-[10px] uppercase tracking-wider">{item.location}</p>
+                                        <p className="text-white/60 text-xs uppercase tracking-wider">{item.location}</p>
                                     </div>
                                 </div>
                             </div>
@@ -408,7 +420,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                             viewport={{ once: true }}
                             className="max-w-4xl"
                         >
-                            <span className="text-tan font-bold tracking-widest uppercase text-xs mb-4 block">
+                            <span className="text-[#705D4E] font-bold tracking-widest uppercase text-xs mb-4 block">
                                 {siteSettings?.journalSection?.subtitle || "From the Studio"}
                             </span>
                             <h2 className="text-4xl md:text-6xl font-heading tracking-wide leading-[1.2]">
@@ -421,7 +433,7 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                             whileInView="animate"
                             viewport={{ once: true }}
                         >
-                            <Link href="/journal" className="bg-accent text-white px-8 py-4 rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-lg flex items-center gap-2 whitespace-nowrap">
+                            <Link href="/journal" className="bg-accent text-white px-8 py-4 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-accent/90 transition-all shadow-lg flex items-center gap-2 whitespace-nowrap">
                                 {siteSettings?.journalSection?.buttonText || "Read All Articles"} <ArrowRight size={14} />
                             </Link>
                         </motion.div>
@@ -451,11 +463,11 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                                     </div>
                                 </div>
                                 <div className="p-8 md:p-10 md:w-[55%] flex flex-col justify-center">
-                                    <p className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mb-4">{post.readTime} · {new Date(post.publishedAt).toLocaleDateString('en-ZM', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                    <h3 className="text-2xl md:text-3xl font-heading mb-6 group-hover:text-accent transition-colors leading-tight">{post.title}</h3>
-                                    <p className="text-foreground/50 text-sm line-clamp-3 mb-8 leading-relaxed font-light">{post.excerpt}</p>
+                                    <p className="text-xs uppercase tracking-widest text-foreground/65 font-bold mb-4">{post.readTime} · {new Date(post.publishedAt).toLocaleDateString('en-ZM', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                    <h3 className="text-2xl md:text-3xl mb-6 group-hover:text-accent transition-colors leading-snug font-heading">{post.title}</h3>
+                                    <p className="text-foreground/70 text-sm line-clamp-3 mb-8 leading-relaxed">{post.excerpt}</p>
                                     <div className="pt-2">
-                                        <Link href={`/journal/${post.slug}`} className="text-[10px] font-bold uppercase tracking-widest text-accent hover:gap-4 transition-all flex items-center gap-2 group-hover:gap-4">
+                                        <Link href={`/journal/${post.slug}`} className="text-xs font-bold uppercase tracking-widest text-accent hover:gap-4 transition-all flex items-center gap-2 group-hover:gap-4">
                                             Read Entry <ArrowRight size={14} />
                                         </Link>
                                     </div>
@@ -484,18 +496,18 @@ export default function HomeClient({ featuredProjects, featuredPosts, siteSettin
                     viewport={{ once: true }}
                     className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl"
                 >
-                    <span className="text-white/40 text-[10px] uppercase tracking-[0.5em] font-bold mb-8 block">
+                    <span className="text-white/60 text-xs uppercase tracking-[0.4em] font-bold mb-8 block">
                         {siteSettings?.preFooterSection?.subtitle || "Start Your Journey"}
                     </span>
                     <h2 className="text-4xl md:text-8xl font-heading text-white mb-8 leading-[1.15] tracking-wide">
                         {siteSettings?.preFooterSection?.title || "Let's Talk About Your Space."}
                     </h2>
-                    <p className="text-white/50 text-sm md:text-base max-w-lg mb-12 leading-relaxed font-body">
+                    <p className="text-white/75 text-sm md:text-base max-w-lg mb-12 leading-relaxed font-body">
                         {siteSettings?.preFooterSection?.body || "Begin your design journey with a complimentary consultation. Tell us about your vision, and we'll help you bring it to life."}
                     </p>
                     <Link
                         href="/booking"
-                        className="bg-white text-foreground px-8 md:px-16 py-5 md:py-6 rounded-full text-[10px] md:text-sm font-bold tracking-[0.3em] uppercase hover:bg-accent hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95"
+                        className="bg-white text-foreground px-8 md:px-16 py-5 md:py-6 rounded-full text-xs md:text-sm font-bold tracking-[0.2em] uppercase hover:bg-accent hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95"
                     >
                         {siteSettings?.preFooterSection?.buttonText || "Book a Free Consultation"}
                     </Link>

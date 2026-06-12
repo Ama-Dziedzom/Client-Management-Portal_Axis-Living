@@ -20,7 +20,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
         <footer className="relative z-10 bg-foreground text-white/80 min-h-[70vh] flex flex-col px-6 lg:px-24 pb-12">
             {/* Brand Statement */}
             <div className="flex-1 flex flex-col items-center justify-center py-16 text-center">
-                <span className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-bold mb-6 block">
+                <span className="text-white/55 text-xs uppercase tracking-[0.4em] font-bold mb-6 block">
                     {siteSettings?.footerTagline || "DELIBERATE INTERIORS FOR MODERN LIVING"}
                 </span>
                 <h3 className="text-4xl md:text-9xl font-heading text-white/[0.15] tracking-wide leading-tight select-none">
@@ -38,7 +38,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
                                 alt={siteSettings?.studioName || "Axis Living"}
                                 width={160}
                                 height={70}
-                                className="h-14 w-auto object-contain"
+                                className="h-24 w-auto object-contain"
                             />
                         ) : (
                             <div className="text-2xl font-heading tracking-widest text-white/40 uppercase">Axis Living</div>
@@ -67,7 +67,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
                 </div>
 
                 <div className="flex flex-col items-center">
-                    <h4 className="text-white font-heading text-xl mb-6 tracking-wide">Explore</h4>
+                    <h4 className="text-white text-xl mb-6 tracking-wide font-semibold">Explore</h4>
                     <ul className="space-y-4 text-sm font-medium tracking-wide font-body">
                         <li><Link href="/portfolio" className="hover:text-accent transition-colors uppercase">Portfolio</Link></li>
                         <li><Link href="/pricing" className="hover:text-accent transition-colors uppercase">Services &amp; Pricing</Link></li>
@@ -77,7 +77,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
                 </div>
 
                 <div className="flex flex-col items-center">
-                    <h4 className="text-white font-heading text-xl mb-6 tracking-wide">Connect</h4>
+                    <h4 className="text-white text-xl mb-6 tracking-wide font-semibold">Connect</h4>
                     <ul className="space-y-4 text-sm font-body">
                         <li><a href={`mailto:${siteSettings?.email || "hello@axisliving.co.zm"}`} className="hover:text-accent transition-colors">{siteSettings?.email || "hello@axisliving.co.zm"}</a></li>
                         <li><Link href={siteSettings?.instagram || "https://instagram.com/axisliving.zm"} target="_blank" className="hover:text-accent transition-colors">Instagram</Link></li>
@@ -87,7 +87,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto w-full pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-widest uppercase font-medium opacity-50">
+            <div className="max-w-7xl mx-auto w-full pt-8 flex flex-col md:flex-row justify-between items-center text-xs tracking-widest uppercase font-medium opacity-70">
                 <p>{siteSettings?.copyrightText || `© ${new Date().getFullYear()} Axis Living Studio. All rights reserved.`}</p>
                 <div className="mt-4 md:mt-0 flex gap-4">
                     {siteSettings?.email && <a href={`mailto:${siteSettings.email}`}>{siteSettings.email}</a>}

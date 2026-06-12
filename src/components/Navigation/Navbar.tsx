@@ -65,9 +65,9 @@ const Navbar = ({ siteSettings }: NavbarProps) => {
                     <Image
                         src={siteSettings.headerLogo}
                         alt={`${siteSettings?.studioName || "Axis Living"} - Bespoke Interiors`}
-                        width={180}
-                        height={80}
-                        className="h-12 md:h-16 w-auto object-contain transition-all duration-500"
+                        width={240}
+                        height={100}
+                        className="h-12 md:h-20 w-auto object-contain transition-all duration-500"
                         style={{
                             filter: isDarkHero && !scrolled
                                 ? "brightness(0) invert(1)"

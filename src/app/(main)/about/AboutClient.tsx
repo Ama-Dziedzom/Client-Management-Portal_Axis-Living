@@ -146,7 +146,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-12">
                                 <p className="text-white font-heading text-4xl italic leading-none border-l-4 border-accent pl-6">
-                                    Ama <br />
+                                    Kas <br />
                                     <span className="text-sm font-body uppercase font-bold tracking-[0.3em] opacity-70">Founder & Creative Director</span>
                                 </p>
                             </div>
@@ -169,7 +169,7 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                                 <p>
                                     Our approach is highly collaborative. We work closely with our clients to understand their vision and translate it into a reality that exceeds expectations. From contemporary Minimalist villas to eclectic heritage homes, we bring a refined aesthetic and professional rigour to every project.
                                 </p>
-                                <p className="font-heading italic text-foreground text-2xl py-8 border-y border-foreground/5 leading-relaxed">
+                                <p className="font-body italic text-foreground text-2xl py-8 border-y border-foreground/5 leading-relaxed">
                                     &ldquo;{aboutData?.philosophy?.body || "We believe in the power of deliberate living—where design serves both function and the human spirit."}&rdquo;
                                 </p>
                                 <Link
@@ -211,8 +211,8 @@ const AboutClient = ({ aboutData }: AboutClientProps) => {
                                 variants={fadeInUp}
                                 className="flex flex-col border-t border-white/10 pt-8 group"
                             >
-                                <span className="text-white/30 text-4xl font-heading mb-8 italic group-hover:text-white/70 transition-all">{proc.step}</span>
-                                <h3 className="text-white text-2xl font-heading mb-6 group-hover:text-white/60 transition-colors">{proc.title}</h3>
+                                <span className="text-white/30 text-4xl font-body mb-8 italic group-hover:text-white/70 transition-all">{proc.step}</span>
+                                <h3 className="text-white text-2xl font-body mb-6 group-hover:text-white/60 transition-colors">{proc.title}</h3>
                                 <p className="text-sm font-body leading-relaxed text-white/70">
                                     {proc.description}
                                 </p>

@@ -344,7 +344,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                         >
                                             <ChevronLeft size={20} />
                                         </button>
-                                        <h3 className="text-xl font-heading tracking-wide">
+                                        <h3 className="text-xl font-body tracking-wide">
                                             {MONTH_NAMES[currentMonth]} {currentYear}
                                         </h3>
                                         <button
@@ -545,7 +545,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, name: e.target.value })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all"
                                             />
                                         </div>
 
@@ -563,7 +563,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, email: e.target.value })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all"
                                             />
                                         </div>
 
@@ -580,7 +580,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, phone: e.target.value })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all"
                                             />
                                         </div>
 
@@ -599,7 +599,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                                         projectType: e.target.value,
                                                     })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm font-body text-neutral-800 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all appearance-none cursor-pointer"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm font-body text-neutral-800 focus:outline-none focus:border-accent transition-all appearance-none cursor-pointer"
                                             >
                                                 <option value="" disabled>
                                                     Project Type
@@ -636,7 +636,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                                         message: e.target.value,
                                                     })
                                                 }
-                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all resize-none"
+                                                className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all resize-none"
                                             />
                                         </div>
 
@@ -772,7 +772,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                             <p className="text-sm opacity-60 uppercase tracking-widest mb-4 font-bold">
                                 What&apos;s Next?
                             </p>
-                            <p className="max-w-md mx-auto italic text-lg opacity-90 leading-relaxed font-heading">
+                            <p className="max-w-md mx-auto italic text-lg opacity-90 leading-relaxed font-body">
                                 &ldquo;You&apos;re booked! Check your inbox, you&apos;ll
                                 find a calendar invite with your meeting link. We&apos;re looking
                                 forward to hearing about your space.&rdquo;
@@ -837,7 +837,7 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full py-8 flex items-center justify-between text-left group"
             >
-                <h4 className={`text-lg md:text-xl font-heading transition-colors duration-300 ${isOpen ? 'text-accent' : 'text-foreground/80 group-hover:text-foreground'}`}>
+                <h4 className={`text-lg md:text-xl font-body transition-colors duration-300 ${isOpen ? 'text-accent' : 'text-foreground/80 group-hover:text-foreground'}`}>
                     {question}
                 </h4>
                 <motion.div
