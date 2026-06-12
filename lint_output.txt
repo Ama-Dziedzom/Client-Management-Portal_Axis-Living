@@ -1,0 +1,42 @@
+
+> interior-portfolio@1.0.0 lint
+> eslint src
+
+
+/Users/ama/Axis-Living/src/app/HomeClient.tsx
+  9:10  warning  'useRef' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/about/AboutClient.tsx
+  6:10  warning  'useRef' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/admin/email-sequence/page.tsx
+  5:10  warning  'motion' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/api/book/route.tsx
+  21:23  warning  'clientEmail' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  38:23  warning  'adminEmail' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/api/subscribe/route.ts
+  32:17  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/portfolio/[slug]/ProjectDetailClient.tsx
+  8:10  warning  'useRef' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/preview-emails/page.tsx
+  16:11  warning  'booking' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/app/pricing/PricingClient.tsx
+  19:26  warning  'siteSettings' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/components/EmailCapture/EmailForm.tsx
+  62:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ama/Axis-Living/src/components/Emails/BookingConfirmation.tsx
+  25:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+/Users/ama/Axis-Living/src/lib/data.ts
+  24:65  warning  'limit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  42:62  warning  'limit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 13 problems (0 errors, 13 warnings)
+

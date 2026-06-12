@@ -8,7 +8,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 
-const Navbar = () => {
+interface NavbarProps {
+    siteSettings?: {
+        headerLogo?: string;
+        studioName?: string;
+        navbarLinks?: { name: string; href: string }[];
+    };
+}
+
+const Navbar = ({ siteSettings }: NavbarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [scrollAmount, setScrollAmount] = useState(0);
@@ -21,16 +29,20 @@ const Navbar = () => {
         };
         window.addEventListener("scroll", handleScroll);
         // Set initial state
-        setScrolled(window.scrollY > 20);
-        setScrollAmount(window.scrollY);
+        handleScroll();
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navLinks = [
+    const defaultLinks = [
         { name: "Portfolio", href: "/portfolio" },
-        { name: "Pricing", href: "/pricing" },
         { name: "About", href: "/about" },
+        { name: "Journal", href: "/journal" },
+        { name: "Pricing", href: "/pricing" },
     ];
+
+    const navLinks = (siteSettings?.navbarLinks && siteSettings.navbarLinks.length > 0)
+        ? siteSettings.navbarLinks.filter((link: { name?: string; href?: string }) => link.href)
+        : defaultLinks;
 
     const isProjectDetail = pathname.startsWith("/portfolio/") && pathname !== "/portfolio";
     const isDarkHero = pathname === "/" || pathname === "/about" || isProjectDetail;
@@ -49,23 +61,27 @@ const Navbar = () => {
             )}
         >
             <Link href="/" className="relative block">
-                <Image
-                    src="/logo.jpg"
-                    alt="Axis Living - Bespoke Interiors"
-                    width={180}
-                    height={80}
-                    className="h-12 md:h-16 w-auto object-contain"
-                    priority
-                />
+                {siteSettings?.headerLogo ? (
+                    <Image
+                        src={siteSettings.headerLogo}
+                        alt={`${siteSettings?.studioName || "Axis Living"} - Bespoke Interiors`}
+                        width={180}
+                        height={80}
+                        className="h-12 md:h-16 w-auto object-contain"
+                        priority
+                    />
+                ) : (
+                    <span className="text-xl font-heading tracking-widest text-accent uppercase">Axis Living</span>
+                )}
             </Link>
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-10 text-sm font-medium tracking-wide uppercase">
-                {navLinks.map((link) => {
+                {navLinks.map((link: { name: string; href: string }, index: number) => {
                     const isActive = pathname === link.href;
                     return (
                         <Link
-                            key={link.href}
+                            key={`${link.href}-${index}`}
                             href={link.href}
                             className={cn(
                                 "transition-all duration-300 relative py-1",
@@ -85,6 +101,7 @@ const Navbar = () => {
                     );
                 })}
                 <Link
+                    key="desktop-booking"
                     href="/booking"
                     className="bg-accent text-white px-6 py-2 rounded-full hover:bg-accent/90 transition-all shadow-md hover:scale-105 active:scale-95"
                 >
@@ -105,6 +122,7 @@ const Navbar = () => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
+                        key="mobile-menu-overlay"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -121,6 +139,7 @@ const Navbar = () => {
                             animate="open"
                         >
                             <motion.div
+                                key="mobile-home"
                                 variants={{
                                     open: { opacity: 1, y: 0 },
                                     closed: { opacity: 0, y: 20 }
@@ -134,9 +153,9 @@ const Navbar = () => {
                                     Home
                                 </Link>
                             </motion.div>
-                            {navLinks.map((link) => (
+                            {navLinks.map((link: { name: string; href: string }, index: number) => (
                                 <motion.div
-                                    key={link.href}
+                                    key={`${link.href}-${index}`}
                                     variants={{
                                         open: { opacity: 1, y: 0 },
                                         closed: { opacity: 0, y: 20 }
@@ -152,6 +171,7 @@ const Navbar = () => {
                                 </motion.div>
                             ))}
                             <motion.div
+                                key="mobile-booking"
                                 variants={{
                                     open: { opacity: 1, y: 0 },
                                     closed: { opacity: 0, y: 20 }
