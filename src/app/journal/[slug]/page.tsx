@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             description: post.excerpt,
             images: [
                 {
-                    url: post.coverImage ?? "/logo.jpg",
+                    url: post.coverImage ?? "/axis-living.png",
                     width: 1200,
                     height: 630,
                     alt: post.title,
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             card: 'summary_large_image',
             title: post.title,
             description: post.excerpt,
-            images: [post.coverImage ?? "/logo.jpg"],
+            images: [post.coverImage ?? "/axis-living.png"],
         }
     };
 }
