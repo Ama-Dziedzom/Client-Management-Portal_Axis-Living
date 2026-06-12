@@ -1,5 +1,5 @@
 import HomeClient from "./HomeClient";
-import { fetchFeaturedProjects, fetchFeaturedPosts, fetchSiteSettings, fetchTestimonials, fetchHomeData } from "../lib/data";
+import { fetchFeaturedProjects, fetchFeaturedPosts, fetchSiteSettings, fetchTestimonials, fetchHomeData } from "@/lib/data";
 
 export default async function HomePage() {
     const featuredProjects = await fetchFeaturedProjects();

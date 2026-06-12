@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import JournalClient from "./JournalClient";
-import { fetchPosts, fetchFeaturedPosts } from "../../lib/data";
+import { fetchPosts, fetchFeaturedPosts } from "@/lib/data";
 
 export const metadata: Metadata = {
     title: "Journal | Axis Living - Design Thinking & Stories",

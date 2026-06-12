@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import PortfolioClient from "./PortfolioClient";
-import { fetchProjects } from "../../lib/data";
+import { fetchProjects } from "@/lib/data";
 
 export const metadata: Metadata = {
     title: "Portfolio | Axis Living - Bespoke Interiors",

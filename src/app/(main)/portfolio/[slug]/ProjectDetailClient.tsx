@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, MapPin, Tag, ChevronDown, Quote } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import LinkNext from "next/link";
-import { Project } from "../../../types/project";
+import { Project } from "@/types/project";
 import { useRef, useState } from "react";
 
 interface ProjectDetailClientProps {

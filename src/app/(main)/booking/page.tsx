@@ -1,4 +1,4 @@
-import { fetchSiteSettings } from "../../lib/data";
+import { fetchSiteSettings } from "@/lib/data";
 import BookingClient from "./BookingClient";
 import { Metadata } from "next";
 

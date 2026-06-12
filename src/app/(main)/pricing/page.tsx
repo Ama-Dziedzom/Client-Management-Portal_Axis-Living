@@ -1,4 +1,4 @@
-import { fetchSiteSettings, fetchPricing } from "../../lib/data";
+import { fetchSiteSettings, fetchPricing } from "@/lib/data";
 import PricingClient from "./PricingClient";
 import { Metadata } from "next";
 

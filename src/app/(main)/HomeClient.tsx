@@ -4,10 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { ArrowRight, Quote } from "lucide-react";
-import { Project } from "../types/project";
-import { Post } from "../types/journal";
+import { Project } from "@/types/project";
+import { Post } from "@/types/journal";
 import { useRef, useState, useEffect } from "react";
-import LookbookSection from "../components/EmailCapture/LookbookSection";
+import LookbookSection from "@/components/EmailCapture/LookbookSection";
 
 interface HomeClientProps {
     featuredProjects: Project[];

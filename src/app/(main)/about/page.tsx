@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import AboutClient from "./AboutClient";
-import { fetchAboutData } from "../../lib/data";
+import { fetchAboutData } from "@/lib/data";
 
 export const metadata: Metadata = {
     title: "Our Story | Axis Living - Bespoke Interiors",

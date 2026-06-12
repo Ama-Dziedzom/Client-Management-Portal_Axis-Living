@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fetchPostBySlug, fetchRelatedPosts } from "../../../lib/data";
+import { fetchPostBySlug, fetchRelatedPosts } from "@/lib/data";
 import PostDetailClient from "./PostDetailClient";
 
 type Props = {

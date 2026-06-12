@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import ProjectDetailClient from "./ProjectDetailClient";
-import { fetchProjectBySlug, fetchRelatedProjects } from "../../../lib/data";
+import { fetchProjectBySlug, fetchRelatedProjects } from "@/lib/data";
 import { notFound } from "next/navigation";
 
 type Props = {
