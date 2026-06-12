@@ -70,8 +70,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
                     <h4 className="text-white text-xl mb-6 tracking-wide font-semibold">Explore</h4>
                     <ul className="space-y-4 text-sm font-medium tracking-wide font-body">
                         <li><Link href="/portfolio" className="hover:text-accent transition-colors uppercase">Portfolio</Link></li>
-                        <li><Link href="/pricing" className="hover:text-accent transition-colors uppercase">Services &amp; Pricing</Link></li>
-                        <li><Link href="/about" className="hover:text-accent transition-colors uppercase">About the Studio</Link></li>
+<li><Link href="/about" className="hover:text-accent transition-colors uppercase">About the Studio</Link></li>
                         <li><Link href="/booking" className="hover:text-accent transition-colors uppercase">Book Consultation</Link></li>
                     </ul>
                 </div>

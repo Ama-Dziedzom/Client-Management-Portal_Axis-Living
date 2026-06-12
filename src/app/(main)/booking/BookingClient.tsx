@@ -17,7 +17,18 @@ import {
     ArrowRight,
     ArrowLeft,
     Sparkles,
+    CreditCard,
 } from "lucide-react";
+
+// ───── Currency Config ─────
+const CURRENCIES = [
+    { code: "ZMW", symbol: "K",  name: "Zambian Kwacha", amount: 250  },
+    { code: "USD", symbol: "$",  name: "US Dollar",       amount: 20   },
+    { code: "EUR", symbol: "€",  name: "Euro",            amount: 18   },
+    { code: "GBP", symbol: "£",  name: "British Pound",   amount: 15   },
+] as const;
+
+type CurrencyConfig = typeof CURRENCIES[number];
 
 // ───── Helpers ─────
 const MONTH_NAMES = [
@@ -104,6 +115,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
         projectType: "",
         message: "",
     });
+    const [currency, setCurrency] = useState<CurrencyConfig>(CURRENCIES[0]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -181,6 +193,8 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                     time: selectedTime,
                     projectType: formData.projectType,
                     message: formData.message,
+                    currency: currency.code,
+                    amount: currency.amount,
                 }),
             });
 
@@ -204,6 +218,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
         setSelectedTime(null);
         setStep("date");
         setFormData({ name: "", email: "", phone: "", projectType: "", message: "" });
+        setCurrency(CURRENCIES[0]);
     };
 
 
@@ -640,6 +655,37 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                             />
                                         </div>
 
+                                        {/* Consultation Fee */}
+                                        <div>
+                                            <p className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mb-3">
+                                                Consultation Fee
+                                            </p>
+                                            <div className="flex rounded-sm overflow-hidden border border-foreground/10">
+                                                {CURRENCIES.map((c) => (
+                                                    <button
+                                                        key={c.code}
+                                                        type="button"
+                                                        onClick={() => setCurrency(c)}
+                                                        className={`flex-1 py-3 text-xs font-bold tracking-wider transition-all ${
+                                                            currency.code === c.code
+                                                                ? "bg-accent text-white"
+                                                                : "bg-white text-foreground/40 hover:bg-accent/5 hover:text-accent"
+                                                        }`}
+                                                    >
+                                                        {c.code}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="mt-3 flex items-baseline justify-center gap-2">
+                                                <span className="text-3xl font-heading text-foreground">
+                                                    {currency.symbol}{currency.amount.toLocaleString()}
+                                                </span>
+                                                <span className="text-foreground/40 text-sm font-body">
+                                                    {currency.name}
+                                                </span>
+                                            </div>
+                                        </div>
+
                                         {/* Submit */}
                                         <motion.button
                                             type="submit"
@@ -665,15 +711,14 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                                 </>
                                             ) : (
                                                 <>
-                                                    Confirm Booking
-                                                    <ArrowRight size={16} />
+                                                    Pay {currency.symbol}{currency.amount.toLocaleString()} &amp; Confirm
+                                                    <CreditCard size={16} />
                                                 </>
                                             )}
                                         </motion.button>
 
-                                        <p className="text-center text-foreground/60 text-[10px] mt-2">
-                                            By booking, you agree to a free, no-obligation discovery
-                                            call.
+                                        <p className="text-center text-foreground/40 text-[10px] mt-2">
+                                            Secure payment via Flutterwave. Your slot is reserved once payment is complete.
                                         </p>
                                     </form>
                                 </motion.div>
