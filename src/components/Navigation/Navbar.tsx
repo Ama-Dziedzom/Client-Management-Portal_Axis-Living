@@ -67,7 +67,12 @@ const Navbar = ({ siteSettings }: NavbarProps) => {
                         alt={`${siteSettings?.studioName || "Axis Living"} - Bespoke Interiors`}
                         width={180}
                         height={80}
-                        className="h-12 md:h-16 w-auto object-contain"
+                        className="h-12 md:h-16 w-auto object-contain transition-all duration-500"
+                        style={{
+                            filter: isDarkHero && !scrolled
+                                ? "brightness(0) invert(1)"
+                                : "brightness(0)"
+                        }}
                         priority
                     />
                 ) : (
