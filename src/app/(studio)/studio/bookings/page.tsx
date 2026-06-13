@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { studioSupabase as supabase } from '@/lib/supabase'
 import { Booking } from '@/types/database'
 import { CalendarDays, Clock, Mail, Phone, Search, CreditCard, Tag } from 'lucide-react'
 
@@ -44,12 +43,9 @@ export default function BookingsPage() {
 
     const fetchBookings = async () => {
         try {
-            const { data, error } = await supabase
-                .from('bookings')
-                .select('*')
-                .order('created_at', { ascending: false })
-            if (error) throw error
-            setBookings(data || [])
+            const res = await fetch('/api/studio/bookings')
+            const result = await res.json()
+            setBookings(result.data || [])
         } catch (err) {
             console.error('Failed to fetch bookings:', err)
         } finally {
@@ -58,7 +54,11 @@ export default function BookingsPage() {
     }
 
     const updateStatus = async (id: string, status: Booking['status']) => {
-        await supabase.from('bookings').update({ status }).eq('id', id)
+        await fetch('/api/studio/bookings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, status }),
+        })
         setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b))
     }
 
@@ -67,17 +67,18 @@ export default function BookingsPage() {
 
     const filtered = bookings.filter(b => {
         const bookingDate = new Date(b.date)
+        const isPast = bookingDate < today || b.status === 'completed' || b.status === 'cancelled' || b.status === 'no_show'
         const matchesFilter =
             filter === 'all'      ? true :
-            filter === 'upcoming' ? bookingDate >= today :
-                                    bookingDate < today
+            filter === 'upcoming' ? !isPast :
+                                    isPast
 
         const q = search.toLowerCase()
         const matchesSearch = !q || b.name.toLowerCase().includes(q) || b.email.toLowerCase().includes(q)
         return matchesFilter && matchesSearch
     })
 
-    const upcomingCount  = bookings.filter(b => new Date(b.date) >= today && b.status === 'confirmed').length
+    const upcomingCount  = bookings.filter(b => new Date(b.date) >= today && b.status === 'confirmed' && !['completed', 'cancelled', 'no_show'].includes(b.status)).length
     const thisMonthCount = bookings.filter(b => {
         const d = new Date(b.created_at)
         return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()
