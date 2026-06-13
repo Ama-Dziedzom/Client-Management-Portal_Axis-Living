@@ -37,7 +37,6 @@ const Navbar = ({ siteSettings }: NavbarProps) => {
         { name: "Portfolio", href: "/portfolio" },
         { name: "About", href: "/about" },
         { name: "Journal", href: "/journal" },
-        { name: "Pricing", href: "/pricing" },
     ];
 
     const navLinks = (siteSettings?.navbarLinks && siteSettings.navbarLinks.length > 0)

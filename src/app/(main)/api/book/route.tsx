@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getResend, FROM, AUDIENCE_ID } from '@/lib/resend';
 import { emailTemplates } from '@/lib/emailTemplates';
+import { getSupabase } from '@/lib/supabase';
 
 // Generates an RFC 5545 .ics calendar event for the consultation
 function generateICS(name: string, email: string, date: string, time: string, meetingLink: string): string {
@@ -34,7 +35,7 @@ function generateICS(name: string, email: string, date: string, time: string, me
 
 export async function POST(req: Request) {
     try {
-        const { name, email, phone, date, time, projectType, message } = await req.json();
+        const { name, email, phone, date, time, projectType, message, currency, amount, paymentReference } = await req.json();
 
         if (!name || !email || !date || !time) {
             return NextResponse.json(
@@ -46,8 +47,41 @@ export async function POST(req: Request) {
         const meetingLink = process.env.MEETING_LINK || 'https://meet.google.com/owu-zhiz-bns';
         const icsContent = generateICS(name, email, date, time, meetingLink);
 
-        // 1. Confirmation email to client with lookbook and .ics attachment
-        const { subject, html } = emailTemplates.bookingConfirmation(name, date, time, meetingLink);
+        // 1. Persist booking to Supabase first to get the ID for the cancellation link
+        let cancellationUrl: string | null = null;
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const db = getSupabase() as any;
+            const { data: booking, error: dbError } = await db
+                .from('bookings')
+                .insert({
+                    name,
+                    email,
+                    phone: phone || null,
+                    date,
+                    time,
+                    project_type: projectType || null,
+                    message: message || null,
+                    currency: currency || 'ZMW',
+                    amount: amount || null,
+                    payment_reference: paymentReference || null,
+                    status: 'confirmed',
+                })
+                .select('id')
+                .single();
+            if (dbError) {
+                console.error('Supabase insert error:', dbError);
+            } else if (booking?.id) {
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://axisliving.co.zm';
+                cancellationUrl = `${siteUrl}/booking/cancel?id=${booking.id}`;
+            }
+        } catch (dbError) {
+            console.error('Supabase error:', dbError);
+        }
+
+        // 2. Confirmation email to client with .ics attachment and cancellation link
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { subject, html } = (emailTemplates as any).bookingConfirmation(name, date, time, meetingLink, cancellationUrl);
         const { error: clientError } = await getResend().emails.send({
             from: FROM,
             to: [email],
@@ -65,7 +99,7 @@ export async function POST(req: Request) {
             console.error('Client email error:', clientError);
         }
 
-        // 2. Admin notification with full booking details
+        // 3. Admin notification with full booking details
         const adminLines = [
             'New booking received!',
             '',
@@ -76,7 +110,8 @@ export async function POST(req: Request) {
             `Time:         ${time} (CAT)`,
             `Project Type: ${projectType || 'Not specified'}`,
             `Message:      ${message || 'No message provided'}`,
-        ].filter(Boolean).join('\n');
+            cancellationUrl ? `Cancel link:  ${cancellationUrl}` : null,
+        ].filter((l): l is string => l !== null).join('\n');
 
         const { error: adminError } = await getResend().emails.send({
             from: FROM,
@@ -89,7 +124,7 @@ export async function POST(req: Request) {
             console.error('Admin email error:', adminError);
         }
 
-        // 3. Add to Resend audience (non-blocking)
+        // 4. Add to Resend audience (non-blocking)
         if (AUDIENCE_ID) {
             try {
                 const [firstName, ...rest] = name.split(' ');

@@ -137,10 +137,8 @@ export async function fetchSiteSettings() {
         address: "Lusaka, Zambia",
         headerLogo: "/axis-living.png",
         footerLogo: "/axis-living.png",
-        socialLinks: [
-            { platform: "Instagram", url: "https://instagram.com/axisliving.zm" },
-            { platform: "Pinterest", url: "https://pinterest.com/axisliving" }
-        ]
+        instagram: "https://instagram.com/axisliving.zm",
+        pinterest: "https://pinterest.com/axisliving",
     };
 }
 
