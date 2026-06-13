@@ -2,23 +2,17 @@ import { createServerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-    let res = NextResponse.next({
-        request: req,
-    })
+type Zone = 'studio' | 'portal' | 'local'
 
-    const pathname = req.nextUrl.pathname
-    const isStudioRoute = pathname === '/studio' || pathname.startsWith('/studio/')
-    const isStudioLogin = pathname === '/studio-login'
+function getZone(req: NextRequest): Zone {
+    const host = req.headers.get('host') ?? ''
+    if (host.startsWith('studio.')) return 'studio'
+    if (host.startsWith('portal.')) return 'portal'
+    return 'local' // localhost / dev
+}
 
-    // IMPORTANT: /studio-login must use the studio cookie so that when we check
-    // if the user is already authenticated for studio, we look at the correct session.
-    // Previously this used the client cookie, which caused infinite redirect loops when
-    // the user had a valid client session + was in studio_users table.
-    const isStudioDomain = isStudioRoute || isStudioLogin
-    const cookieName = isStudioDomain ? 'sb-axis-studio-token' : 'sb-axis-client-token'
-
-    const supabase = createServerClient(
+function makeSupabase(req: NextRequest, res: NextResponse, cookieName: string) {
+    return createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
@@ -33,127 +27,121 @@ export async function middleware(req: NextRequest) {
                     })
                 },
             },
-            cookieOptions: {
-                name: cookieName,
-            },
+            cookieOptions: { name: cookieName },
         }
     )
+}
 
-    const { data: { user }, error } = await supabase.auth.getUser()
+export async function middleware(req: NextRequest) {
+    const res = NextResponse.next({ request: req })
+    const pathname = req.nextUrl.pathname
+    const zone = getZone(req)
 
-    // Define route zones with precise matching logic
-    const clientProtectedPaths = ['/dashboard', '/projects', '/documents', '/invoices', '/messages', '/settings']
-    const isClientRoute = clientProtectedPaths.some(path => pathname === path || pathname.startsWith(path + '/'))
+    // ── STUDIO SUBDOMAIN ── studio.axis-living.com
+    if (zone === 'studio') {
+        const supabase = makeSupabase(req, res, 'sb-axis-studio-token')
+        const { data: { user }, error } = await supabase.auth.getUser()
 
-    // ── Not logged in ──
-    if (!user || error) {
-        if (isClientRoute) {
-            return NextResponse.redirect(new URL('/login', req.url))
+        if (!user || error) {
+            // Not logged in — send everything except /studio-login to the login page
+            if (pathname !== '/studio-login') {
+                return NextResponse.redirect(new URL('/studio-login', req.url))
+            }
+            return res
         }
-        if (isStudioRoute) {
-            return NextResponse.redirect(new URL('/studio-login', req.url))
-        }
-        if (pathname === '/') {
-            return NextResponse.redirect(new URL('/login', req.url))
-        }
-        // Not logged in + on /studio-login or /login → let them see the page
-        return res
-    }
 
-    // ── Logged in: Role-based Protection ──
-
-    // 1. Redirect logged-in studio users away from /studio-login
-    if (isStudioLogin) {
-        const { data: studioUser } = await supabase.from('studio_users').select('id').eq('id', user.id).maybeSingle()
-        if (studioUser) {
-            return NextResponse.redirect(new URL('/studio', req.url))
-        }
-        // They have a studio session but are NOT in studio_users.
-        // Let them stay on the login page (they might need to log in with different credentials).
-        return res
-    }
-
-    // 2. Protect Studio Routes (only allow if in studio_users)
-    if (isStudioRoute) {
+        // Logged in — verify this is actually a studio user
         const { data: studioUser } = await supabase
-            .from('studio_users')
-            .select('id')
-            .eq('id', user.id)
-            .maybeSingle()
+            .from('studio_users').select('id').eq('id', user.id).maybeSingle()
 
         if (!studioUser) {
-            // Not a studio user → redirect to studio-login (don't try to cross-redirect to /dashboard
-            // because we're using the studio cookie here, not the client cookie)
             return NextResponse.redirect(new URL('/studio-login', req.url))
         }
-        // Is a valid studio user → let through
+
+        // Already authenticated studio user hitting / or /studio-login → send to /studio
+        if (pathname === '/' || pathname === '/studio-login') {
+            return NextResponse.redirect(new URL('/studio', req.url))
+        }
+
         return res
     }
 
-    // 3. Protect Client Routes (only allow if in clients table)
-    if (isClientRoute) {
+    // ── PORTAL SUBDOMAIN ── portal.axis-living.com
+    if (zone === 'portal') {
+        const supabase = makeSupabase(req, res, 'sb-axis-client-token')
+        const { data: { user }, error } = await supabase.auth.getUser()
+
+        if (!user || error) {
+            // Not logged in — send everything except /login to the login page
+            if (pathname !== '/login') {
+                return NextResponse.redirect(new URL('/login', req.url))
+            }
+            return res
+        }
+
+        // Logged in — verify this is a client
         const { data: clientUser } = await supabase
-            .from('clients')
-            .select('id')
-            .eq('id', user.id)
-            .maybeSingle()
+            .from('clients').select('id').eq('id', user.id).maybeSingle()
 
         if (!clientUser) {
-            // Not a client. Check if they are a studio user.
-            const { data: studioUser } = await supabase
-                .from('studio_users')
-                .select('id')
-                .eq('id', user.id)
-                .maybeSingle()
+            return NextResponse.redirect(new URL('/login', req.url))
+        }
 
-            if (studioUser) {
-                // They are a studio user, send them to the studio panel
-                return NextResponse.redirect(new URL('/studio', req.url))
-            }
-            
-            // Neither? Allow to avoid infinite loops.
+        // Already authenticated client hitting / or /login → send to /dashboard
+        if (pathname === '/' || pathname === '/login') {
+            return NextResponse.redirect(new URL('/dashboard', req.url))
+        }
+
+        return res
+    }
+
+    // ── LOCAL DEVELOPMENT ── localhost (path-based fallback)
+    const isStudioRoute = pathname === '/studio' || pathname.startsWith('/studio/')
+    const isStudioLogin = pathname === '/studio-login'
+    const isStudioContext = isStudioRoute || isStudioLogin
+    const clientProtectedPaths = ['/dashboard', '/projects', '/documents', '/invoices', '/messages', '/settings']
+    const isClientRoute = clientProtectedPaths.some(p => pathname === p || pathname.startsWith(p + '/'))
+
+    const supabase = makeSupabase(req, res, isStudioContext ? 'sb-axis-studio-token' : 'sb-axis-client-token')
+    const { data: { user }, error } = await supabase.auth.getUser()
+
+    if (!user || error) {
+        if (isClientRoute || pathname === '/') return NextResponse.redirect(new URL('/login', req.url))
+        if (isStudioRoute) return NextResponse.redirect(new URL('/studio-login', req.url))
+        return res
+    }
+
+    if (isStudioLogin) {
+        const { data: studioUser } = await supabase.from('studio_users').select('id').eq('id', user.id).maybeSingle()
+        if (studioUser) return NextResponse.redirect(new URL('/studio', req.url))
+        return res
+    }
+
+    if (isStudioRoute) {
+        const { data: studioUser } = await supabase.from('studio_users').select('id').eq('id', user.id).maybeSingle()
+        if (!studioUser) return NextResponse.redirect(new URL('/studio-login', req.url))
+        return res
+    }
+
+    if (isClientRoute) {
+        const { data: clientUser } = await supabase.from('clients').select('id').eq('id', user.id).maybeSingle()
+        if (!clientUser) {
+            const { data: studioUser } = await supabase.from('studio_users').select('id').eq('id', user.id).maybeSingle()
+            if (studioUser) return NextResponse.redirect(new URL('/studio', req.url))
             return res
         }
     }
 
-    // 4. Redirect logged-in users away from /
-    if (pathname === '/') {
+    if (pathname === '/' || pathname === '/login') {
         const { data: studioUser } = await supabase.from('studio_users').select('id').eq('id', user.id).maybeSingle()
         if (studioUser) return NextResponse.redirect(new URL('/studio', req.url))
         return NextResponse.redirect(new URL('/dashboard', req.url))
-    }
-
-    // 5. Redirect logged-in users away from /login
-    if (pathname === '/login') {
-        const { data: clientUser } = await supabase.from('clients').select('id').eq('id', user.id).maybeSingle()
-        if (clientUser) return NextResponse.redirect(new URL('/dashboard', req.url))
-        
-        // They have a client cookie session but aren't in clients table.
-        // Let them stay on /login.
-        return res
     }
 
     return res
 }
 
 export const config = {
-    matcher: [
-        '/',
-        '/dashboard',
-        '/dashboard/:path*',
-        '/projects',
-        '/projects/:path*',
-        '/documents',
-        '/documents/:path*',
-        '/invoices',
-        '/invoices/:path*',
-        '/messages',
-        '/messages/:path*',
-        '/settings',
-        '/settings/:path*',
-        '/studio',
-        '/studio/:path*',
-        '/studio-login',
-        '/login',
-    ]
+    // Run on all routes except Next.js internals and static assets
+    matcher: ['/((?!_next/static|_next/image|favicon\\.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.webp|.*\\.pdf).*)'],
 }
