@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { Client, ProjectStatus } from '@/types/database'
@@ -16,13 +16,14 @@ const item = {
 
 export default function NewProjectPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [clients, setClients] = useState<Client[]>([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
 
     // Form state
     const [title, setTitle] = useState('')
-    const [clientId, setClientId] = useState('')
+    const [clientId, setClientId] = useState(searchParams.get('client') ?? '')
     const [location, setLocation] = useState('')
     const [status, setStatus] = useState<ProjectStatus>('planning')
     const [description, setDescription] = useState('')
