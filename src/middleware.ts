@@ -53,6 +53,9 @@ export async function middleware(req: NextRequest) {
         if (isStudioRoute) {
             return NextResponse.redirect(new URL('/studio-login', req.url))
         }
+        if (pathname === '/') {
+            return NextResponse.redirect(new URL('/login', req.url))
+        }
         // Not logged in + on /studio-login or /login → let them see the page
         return res
     }
@@ -113,7 +116,14 @@ export async function middleware(req: NextRequest) {
         }
     }
 
-    // 4. Redirect logged-in users away from /login
+    // 4. Redirect logged-in users away from /
+    if (pathname === '/') {
+        const { data: studioUser } = await supabase.from('studio_users').select('id').eq('id', user.id).maybeSingle()
+        if (studioUser) return NextResponse.redirect(new URL('/studio', req.url))
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+
+    // 5. Redirect logged-in users away from /login
     if (pathname === '/login') {
         const { data: clientUser } = await supabase.from('clients').select('id').eq('id', user.id).maybeSingle()
         if (clientUser) return NextResponse.redirect(new URL('/dashboard', req.url))
@@ -128,6 +138,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
+        '/',
         '/dashboard',
         '/dashboard/:path*',
         '/projects',
