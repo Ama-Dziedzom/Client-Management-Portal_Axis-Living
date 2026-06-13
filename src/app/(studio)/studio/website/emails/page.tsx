@@ -1,11 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { emailTemplates } from '@/lib/emailTemplates'
-import { Copy, Check, Clock } from 'lucide-react'
+import {
+    Copy, Check, Plus, Pencil, Trash2, ChevronUp, ChevronDown,
+    ToggleLeft, ToggleRight, X, Save, Clock, Mail,
+} from 'lucide-react'
 
-// ───── Email Preview ─────
+// ───── Types ─────
+
+interface NurtureEmail {
+    id: string
+    sequence_order: number
+    delay_days: number
+    subject: string
+    body: string
+    active: boolean
+    created_at: string
+    updated_at: string
+}
+
+// ───── Template Preview Tab ─────
 
 const SAMPLE = {
     name: 'Ama Dziedzom',
@@ -18,36 +34,37 @@ const SAMPLE = {
     messagePreview: "Your moodboard for the living room is ready — I've included two directions for you to review before our next check-in.",
 }
 
-const templates = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const templates: { id: string; label: string; timing: string; generate: () => any }[] = [
     {
         id: 'lookbook',
         label: 'Lookbook Delivery',
         timing: 'On lookbook sign-up',
-        generate: () => emailTemplates.lookbookDelivery(SAMPLE.name.split(' ')[0]),
+        generate: () => (emailTemplates as any).lookbookDelivery(SAMPLE.name.split(' ')[0]),
     },
     {
         id: 'booking',
         label: 'Booking Confirmation',
         timing: 'On consultation booked',
-        generate: () => emailTemplates.bookingConfirmation(SAMPLE.name, SAMPLE.date, SAMPLE.time, SAMPLE.meetingLink),
+        generate: () => (emailTemplates as any).bookingConfirmation(SAMPLE.name, SAMPLE.date, SAMPLE.time, SAMPLE.meetingLink),
     },
     {
         id: 'cancelled',
         label: 'Booking Cancelled',
         timing: 'On client self-cancellation',
-        generate: () => emailTemplates.bookingCancelled(SAMPLE.name, SAMPLE.date, SAMPLE.time),
+        generate: () => (emailTemplates as any).bookingCancelled?.(SAMPLE.name, SAMPLE.date, SAMPLE.time) ?? { subject: 'N/A', html: '<p>Template not found</p>' },
     },
     {
         id: 'portal',
         label: 'Portal Welcome',
         timing: 'On client portal created',
-        generate: () => emailTemplates.portalWelcome(SAMPLE.name, SAMPLE.email, SAMPLE.password, SAMPLE.portalUrl),
+        generate: () => (emailTemplates as any).portalWelcome(SAMPLE.name, SAMPLE.email, SAMPLE.password, SAMPLE.portalUrl),
     },
     {
         id: 'message',
         label: 'New Message',
         timing: 'On designer message sent',
-        generate: () => emailTemplates.newPortalMessage(SAMPLE.name, SAMPLE.messagePreview, SAMPLE.portalUrl),
+        generate: () => (emailTemplates as any).newPortalMessage(SAMPLE.name, SAMPLE.messagePreview, SAMPLE.portalUrl),
     },
 ]
 
@@ -60,20 +77,12 @@ function EmailPreviewTab() {
         <div>
             <div className="flex flex-wrap gap-2 mb-6">
                 {templates.map(t => (
-                    <button
-                        key={t.id}
-                        onClick={() => setActive(t.id)}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
-                            active === t.id
-                                ? 'bg-accent/20 text-primary border-accent/30'
-                                : 'bg-surface text-text-secondary border-border hover:text-text-primary'
-                        }`}
-                    >
+                    <button key={t.id} onClick={() => setActive(t.id)}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${active === t.id ? 'bg-accent/20 text-primary border-accent/30' : 'bg-surface text-text-secondary border-border hover:text-text-primary'}`}>
                         {t.label}
                     </button>
                 ))}
             </div>
-
             <div className="card-flat mb-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
                 <div className="flex items-center gap-3 text-sm">
                     <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Trigger</span>
@@ -84,7 +93,6 @@ function EmailPreviewTab() {
                     <span className="text-text-primary">{subject}</span>
                 </div>
             </div>
-
             <div className="rounded-2xl overflow-hidden border border-border shadow-card">
                 <div className="bg-surface border-b border-border px-4 py-2.5 flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-red-400" />
@@ -92,238 +100,289 @@ function EmailPreviewTab() {
                     <span className="w-3 h-3 rounded-full bg-green-400" />
                     <span className="ml-3 text-xs text-text-secondary font-mono truncate">{subject}</span>
                 </div>
-                <iframe
-                    key={active}
-                    srcDoc={html}
-                    title={`Preview: ${current.label}`}
-                    className="w-full bg-white"
-                    style={{ height: '780px', border: 'none' }}
-                    sandbox="allow-same-origin"
-                />
+                <iframe key={active} srcDoc={html} title={`Preview: ${current.label}`}
+                    className="w-full bg-white" style={{ height: '780px', border: 'none' }} sandbox="allow-same-origin" />
             </div>
         </div>
     )
 }
 
-// ───── Nurture Sequence ─────
+// ───── Nurture Sequence Editor ─────
 
-const nurture = [
-    {
-        number: 1,
-        timing: 'Immediate',
-        subject: 'Your Behind the Design Lookbook is here ✦',
-        body: `Hi [First Name],
+const EMPTY_FORM = { subject: '', body: '', delay_days: 0 }
 
-Thank you for downloading Behind the Design — I put a lot of care into this one and I hope it gives you a real sense of how we think about spaces.
+function delayLabel(days: number) {
+    if (days === 0) return 'Immediate'
+    if (days === 1) return 'Day 1'
+    return `Day ${days}`
+}
 
-Inside you'll find material palettes from our recent projects, a few spatial planning principles we return to again and again, and some thoughts on what makes a room feel genuinely finished versus just furnished.
+function NurtureTab() {
+    const [emails, setEmails] = useState<NurtureEmail[]>([])
+    const [loading, setLoading] = useState(true)
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editForm, setEditForm] = useState(EMPTY_FORM)
+    const [addingNew, setAddingNew] = useState(false)
+    const [newForm, setNewForm] = useState(EMPTY_FORM)
+    const [saving, setSaving] = useState(false)
+    const [copiedId, setCopiedId] = useState<string | null>(null)
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
-[BUTTON: Download Your Lookbook]
+    useEffect(() => { fetchEmails() }, [])
 
-If anything in there resonates — or if you're already thinking about a space you want to transform — I'd love to hear about it. Hit reply anytime.
-
-Warmly,
-Kas
-Axis Living
-
-P.S. Next week I'll share something we rarely talk about publicly — the mistakes we made on one of our most ambitious projects, and what we learned from them.`,
-    },
-    {
-        number: 2,
-        timing: 'Day 4',
-        subject: 'The mistake that almost ruined our best project',
-        body: `Hi [First Name],
-
-A few years ago we were deep into what should have been our most beautiful project — a penthouse with an incredible art collection, a generous budget, and a client who trusted us completely.
-
-Three weeks before completion, we realised we'd made a significant error in the spatial flow between the living and dining areas. The furniture had been ordered. The walls were finished. And the room felt... stuck.
-
-We fixed it. It cost us two weeks and some uncomfortable conversations. But the result became one of our most celebrated projects — and the lesson became part of how we work today.
-
-Every project now includes a spatial flow review at concept stage before a single item is ordered. It sounds simple. Most studios skip it.
-
-I share this because working with a designer isn't just about taste. It's about having someone in your corner who has already made the expensive mistakes so you don't have to.
-
-[BUTTON: Book a Discovery Call]
-
-Kas`,
-    },
-    {
-        number: 3,
-        timing: 'Day 9',
-        subject: '"What\'s your budget?" (and why we ask differently)',
-        body: `Hi [First Name],
-
-Most designers ask for your budget upfront and then design to fill it. We don't.
-
-We ask a different question first: what do you want this space to *do* for you?
-
-A bedroom that helps you wind down properly. A living room that makes you want to host again. A home office that makes remote work feel intentional rather than accidental.
-
-When we understand that, the budget conversation becomes much more straightforward — because we're scoping toward an outcome, not a number.
-
-The best way to understand what's right for your project is a 30-minute call where we can ask the right questions and give you a realistic picture.
-
-[BUTTON: Book a Discovery Call]
-
-No obligation, no sales pitch. Just a conversation.
-
-Kas`,
-    },
-    {
-        number: 4,
-        timing: 'Day 14',
-        subject: 'Last thing — then I\'ll leave you alone',
-        body: `Hi [First Name],
-
-This is my last email in this little series — I don't believe in filling inboxes.
-
-I just wanted to leave you with one thought:
-
-The spaces we live and work in shape how we feel every single day. Not in a grand, philosophical way — in the small, practical way that a room that works makes mornings easier, makes evenings more restorative, makes the people inside it feel more like themselves.
-
-That's what we build.
-
-If you ever want to explore what that could look like for your space — whether that's next month or next year — my calendar is always open for a first conversation.
-
-[BUTTON: Book a Free Consultation]
-
-And if the timing isn't right, no worries at all. I hope the lookbook was useful.
-
-Kas
-Axis Living`,
-    },
-]
-
-const RESEND_STEPS = [
-    {
-        step: 1,
-        title: 'Create an Audience',
-        detail: 'Resend → Audiences → Create audience. Name it "Axis Living Website". Copy the Audience ID into your RESEND_AUDIENCE_ID env var — this is what makes the website add subscribers automatically.',
-    },
-    {
-        step: 2,
-        title: 'Create an Automation',
-        detail: 'Resend → Automations → Create automation. Set the trigger to "Contact event". Create a new event called lookbook_downloaded with a single Date property named subscribed_at.',
-    },
-    {
-        step: 3,
-        title: 'Add the 4 email steps',
-        detail: 'Inside the automation, add 4 "Send email" nodes. Set delays: Email 1 → immediately, Email 2 → wait 4 days, Email 3 → wait 5 more days, Email 4 → wait 5 more days. Copy each subject and body from the templates below.',
-    },
-    {
-        step: 4,
-        title: 'Fire the event from code',
-        detail: 'The subscribe route already adds contacts to the audience. You also need to fire the lookbook_downloaded event so the automation triggers. Add the event call to the subscribe API route — see note below.',
-    },
-]
-
-function NurtureSequenceTab() {
-    const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
-    const [copiedSnippet, setCopiedSnippet] = useState(false)
-
-    const handleCopy = (text: string, index: number) => {
-        navigator.clipboard.writeText(text)
-        setCopiedIndex(index)
-        setTimeout(() => setCopiedIndex(null), 2000)
+    const fetchEmails = async () => {
+        setLoading(true)
+        const res = await fetch('/api/studio/nurture-emails')
+        const result = await res.json()
+        setEmails(result.data ?? [])
+        setLoading(false)
     }
 
-    const eventSnippet = `// Add this after the contact.create() call in /api/subscribe/route.ts
-await resend.contacts.createEvent({
-    audienceId: AUDIENCE_ID,
-    email: email,
-    eventName: 'lookbook_downloaded',
-    properties: {
-        subscribed_at: new Date().toISOString(),
-    },
-})`
+    const startEdit = (email: NurtureEmail) => {
+        setEditingId(email.id)
+        setEditForm({ subject: email.subject, body: email.body, delay_days: email.delay_days })
+        setAddingNew(false)
+    }
+
+    const cancelEdit = () => { setEditingId(null); setEditForm(EMPTY_FORM) }
+
+    const saveEdit = async () => {
+        if (!editingId) return
+        setSaving(true)
+        await fetch(`/api/studio/nurture-emails/${editingId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(editForm),
+        })
+        await fetchEmails()
+        setEditingId(null)
+        setSaving(false)
+    }
+
+    const toggleActive = async (email: NurtureEmail) => {
+        await fetch(`/api/studio/nurture-emails/${email.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active: !email.active }),
+        })
+        setEmails(prev => prev.map(e => e.id === email.id ? { ...e, active: !e.active } : e))
+    }
+
+    const deleteEmail = async (id: string) => {
+        await fetch(`/api/studio/nurture-emails/${id}`, { method: 'DELETE' })
+        setEmails(prev => prev.filter(e => e.id !== id))
+        setDeleteConfirmId(null)
+    }
+
+    const reorder = async (index: number, direction: 'up' | 'down') => {
+        const swapIndex = direction === 'up' ? index - 1 : index + 1
+        if (swapIndex < 0 || swapIndex >= emails.length) return
+
+        const updated = [...emails]
+        const aOrder = updated[index].sequence_order
+        const bOrder = updated[swapIndex].sequence_order
+        updated[index] = { ...updated[index], sequence_order: bOrder }
+        updated[swapIndex] = { ...updated[swapIndex], sequence_order: aOrder }
+        updated.sort((a, b) => a.sequence_order - b.sequence_order)
+        setEmails(updated)
+
+        await Promise.all([
+            fetch(`/api/studio/nurture-emails/${updated[index].id}`, {
+                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sequence_order: updated[index].sequence_order }),
+            }),
+            fetch(`/api/studio/nurture-emails/${updated[swapIndex].id}`, {
+                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sequence_order: updated[swapIndex].sequence_order }),
+            }),
+        ])
+    }
+
+    const addNew = async () => {
+        if (!newForm.subject || !newForm.body) return
+        setSaving(true)
+        await fetch('/api/studio/nurture-emails', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newForm),
+        })
+        await fetchEmails()
+        setNewForm(EMPTY_FORM)
+        setAddingNew(false)
+        setSaving(false)
+    }
+
+    const copyEmail = (email: NurtureEmail) => {
+        navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`)
+        setCopiedId(email.id)
+        setTimeout(() => setCopiedId(null), 2000)
+    }
+
+    if (loading) return (
+        <div className="space-y-4">{[1, 2, 3].map(i => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
+    )
 
     return (
-        <div className="space-y-8">
-            {/* Resend setup guide */}
-            <div className="card-flat">
-                <h2 className="text-text-primary font-semibold text-base mb-1">Resend Setup Guide</h2>
-                <p className="text-text-secondary text-sm mb-6">Follow these steps once to wire up the 4-email nurture sequence in Resend.</p>
-                <div className="space-y-4">
-                    {RESEND_STEPS.map(({ step, title, detail }) => (
-                        <div key={step} className="flex gap-4">
-                            <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0 mt-0.5">
-                                {step}
-                            </span>
-                            <div>
-                                <p className="text-text-primary font-semibold text-sm mb-1">{title}</p>
-                                <p className="text-text-secondary text-sm leading-relaxed">{detail}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Code snippet for step 4 */}
-                <div className="mt-6 pt-6 border-t border-border">
-                    <div className="flex items-center justify-between mb-2">
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Code change needed — subscribe route</p>
-                        <button
-                            onClick={() => { navigator.clipboard.writeText(eventSnippet); setCopiedSnippet(true); setTimeout(() => setCopiedSnippet(false), 2000) }}
-                            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors"
-                        >
-                            {copiedSnippet ? <><Check className="w-3.5 h-3.5 text-emerald-600" /> Copied</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
-                        </button>
-                    </div>
-                    <pre className="bg-background border border-border rounded-xl p-4 text-xs text-text-secondary overflow-x-auto leading-relaxed font-mono">
-                        {eventSnippet}
-                    </pre>
-                </div>
+        <div className="space-y-4">
+            {/* Hint */}
+            <div className="card-flat bg-accent/5 border-accent/20">
+                <p className="text-sm text-text-secondary leading-relaxed">
+                    These emails are sent automatically to everyone who downloads the lookbook. Use <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">{'{{name}}'}</code> to personalise, and <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">{'[BUTTON: Label | https://url.com]'}</code> to add a call-to-action button.
+                </p>
             </div>
 
-            <div>
-                <h2 className="text-text-primary font-semibold text-base mb-1">Email Templates</h2>
-                <p className="text-text-secondary text-sm mb-6">Copy each subject and body into the corresponding step in Resend.</p>
-            </div>
+            {/* Email cards */}
+            <AnimatePresence>
+                {emails.map((email, idx) => (
+                    <motion.div key={email.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                        className={`card-flat transition-opacity ${!email.active ? 'opacity-50' : ''}`}>
 
-            {nurture.map((email, idx) => (
-                <div key={idx} className="card-flat">
-                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
-                        <div className="flex items-center gap-3">
-                            <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
-                                {email.number}
-                            </span>
-                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-wider">
-                                <Clock className="w-3 h-3" />
-                                {email.timing}
+                        {editingId === email.id ? (
+                            /* ── Edit form ── */
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Editing Email {email.sequence_order}</span>
+                                    <button onClick={cancelEdit} className="text-text-secondary hover:text-text-primary"><X className="w-4 h-4" /></button>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Subject</label>
+                                    <input value={editForm.subject} onChange={e => setEditForm(f => ({ ...f, subject: e.target.value }))}
+                                        className="input-field w-full" placeholder="Email subject line" />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Send after (days from sign-up)</label>
+                                    <input type="number" min={0} value={editForm.delay_days} onChange={e => setEditForm(f => ({ ...f, delay_days: parseInt(e.target.value) || 0 }))}
+                                        className="input-field w-32" />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Body</label>
+                                    <textarea value={editForm.body} onChange={e => setEditForm(f => ({ ...f, body: e.target.value }))}
+                                        rows={12} className="input-field w-full resize-y font-mono text-sm" placeholder="Write your email..." />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button onClick={saveEdit} disabled={saving}
+                                        className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">
+                                        <Save className="w-4 h-4" /> {saving ? 'Saving…' : 'Save'}
+                                    </button>
+                                    <button onClick={cancelEdit} className="px-5 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary border border-border">
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <button
-                            onClick={() => handleCopy(`${email.subject}\n\n${email.body}`, idx)}
-                            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors"
-                        >
-                            {copiedIndex === idx ? (
-                                <><Check className="w-3.5 h-3.5 text-emerald-600" /> Copied</>
-                            ) : (
-                                <><Copy className="w-3.5 h-3.5" /> Copy</>
-                            )}
-                        </button>
-                    </div>
+                        ) : (
+                            /* ── Read view ── */
+                            <>
+                                <div className="flex items-start gap-4">
+                                    {/* Sequence + reorder */}
+                                    <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                                        <button onClick={() => reorder(idx, 'up')} disabled={idx === 0}
+                                            className="p-1 rounded-lg hover:bg-surface disabled:opacity-20 transition-colors">
+                                            <ChevronUp className="w-3.5 h-3.5 text-text-secondary" />
+                                        </button>
+                                        <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
+                                            {email.sequence_order}
+                                        </span>
+                                        <button onClick={() => reorder(idx, 'down')} disabled={idx === emails.length - 1}
+                                            className="p-1 rounded-lg hover:bg-surface disabled:opacity-20 transition-colors">
+                                            <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
+                                        </button>
+                                    </div>
 
-                    <div className="mb-4">
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1.5">Subject</p>
-                        <p className="text-text-primary font-medium text-sm">{email.subject}</p>
-                    </div>
+                                    {/* Content */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+                                                <Clock className="w-3 h-3" /> {delayLabel(email.delay_days)}
+                                            </span>
+                                            {!email.active && (
+                                                <span className="px-2.5 py-1 rounded-full bg-border text-text-secondary text-[10px] font-bold uppercase tracking-wider">Paused</span>
+                                            )}
+                                        </div>
+                                        <p className="text-text-primary font-semibold text-sm mb-1">{email.subject}</p>
+                                        <p className="text-text-secondary text-sm line-clamp-2 leading-relaxed">{email.body.split('\n')[0]}</p>
+                                    </div>
 
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                        <button onClick={() => toggleActive(email)} title={email.active ? 'Pause' : 'Activate'}
+                                            className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
+                                            {email.active ? <ToggleRight className="w-5 h-5 text-primary" /> : <ToggleLeft className="w-5 h-5" />}
+                                        </button>
+                                        <button onClick={() => copyEmail(email)} title="Copy"
+                                            className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
+                                            {copiedId === email.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                                        </button>
+                                        <button onClick={() => startEdit(email)} title="Edit"
+                                            className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
+                                            <Pencil className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={() => setDeleteConfirmId(email.id)} title="Delete"
+                                            className="p-2 rounded-lg hover:bg-red-50 transition-colors text-text-secondary hover:text-red-500">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Delete confirm */}
+                                {deleteConfirmId === email.id && (
+                                    <div className="mt-4 pt-4 border-t border-border flex items-center gap-3">
+                                        <p className="text-sm text-text-secondary flex-1">Delete this email? This cannot be undone.</p>
+                                        <button onClick={() => deleteEmail(email.id)}
+                                            className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600">Delete</button>
+                                        <button onClick={() => setDeleteConfirmId(null)}
+                                            className="px-4 py-2 border border-border rounded-xl text-sm text-text-secondary hover:text-text-primary">Cancel</button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </motion.div>
+                ))}
+            </AnimatePresence>
+
+            {/* Add new email */}
+            {addingNew ? (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card-flat space-y-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary flex items-center gap-2"><Mail className="w-3.5 h-3.5" /> New Email</span>
+                        <button onClick={() => { setAddingNew(false); setNewForm(EMPTY_FORM) }} className="text-text-secondary hover:text-text-primary"><X className="w-4 h-4" /></button>
+                    </div>
                     <div>
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1.5">Body</p>
-                        <div className="bg-background rounded-xl p-4 whitespace-pre-wrap text-text-secondary text-sm leading-relaxed border border-border">
-                            {email.body}
-                        </div>
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Subject</label>
+                        <input value={newForm.subject} onChange={e => setNewForm(f => ({ ...f, subject: e.target.value }))}
+                            className="input-field w-full" placeholder="Email subject line" />
                     </div>
-                </div>
-            ))}
+                    <div>
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Send after (days from sign-up)</label>
+                        <input type="number" min={0} value={newForm.delay_days} onChange={e => setNewForm(f => ({ ...f, delay_days: parseInt(e.target.value) || 0 }))}
+                            className="input-field w-32" />
+                    </div>
+                    <div>
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Body</label>
+                        <textarea value={newForm.body} onChange={e => setNewForm(f => ({ ...f, body: e.target.value }))}
+                            rows={12} className="input-field w-full resize-y font-mono text-sm" placeholder="Write your email..." />
+                    </div>
+                    <div className="flex gap-3">
+                        <button onClick={addNew} disabled={saving || !newForm.subject || !newForm.body}
+                            className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">
+                            <Save className="w-4 h-4" /> {saving ? 'Saving…' : 'Add Email'}
+                        </button>
+                        <button onClick={() => { setAddingNew(false); setNewForm(EMPTY_FORM) }}
+                            className="px-5 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary border border-border">Cancel</button>
+                    </div>
+                </motion.div>
+            ) : (
+                <button onClick={() => { setAddingNew(true); setEditingId(null) }}
+                    className="w-full py-4 rounded-2xl border-2 border-dashed border-border text-text-secondary hover:text-text-primary hover:border-primary/30 transition-all flex items-center justify-center gap-2 text-sm font-medium">
+                    <Plus className="w-4 h-4" /> Add Email to Sequence
+                </button>
+            )}
         </div>
     )
 }
 
 // ───── Page ─────
 
-type Tab = 'preview' | 'sequence'
+type Tab = 'preview' | 'nurture'
 
 export default function EmailsPage() {
     const [tab, setTab] = useState<Tab>('preview')
@@ -332,26 +391,19 @@ export default function EmailsPage() {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             <div className="mb-8">
                 <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Emails</h1>
-                <p className="text-text-secondary font-body text-lg">Preview templates and manage your nurture sequence</p>
+                <p className="text-text-secondary font-body text-lg">Preview system templates and manage your nurture sequence</p>
             </div>
 
             <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 w-fit mb-8">
-                {([['preview', 'Template Preview'], ['sequence', 'Nurture Sequence']] as [Tab, string][]).map(([key, label]) => (
-                    <button
-                        key={key}
-                        onClick={() => setTab(key)}
-                        className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                            tab === key
-                                ? 'bg-accent/20 text-primary border border-accent/30'
-                                : 'text-text-secondary hover:text-text-primary'
-                        }`}
-                    >
+                {([['preview', 'Template Preview'], ['nurture', 'Nurture Sequence']] as [Tab, string][]).map(([key, label]) => (
+                    <button key={key} onClick={() => setTab(key)}
+                        className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === key ? 'bg-accent/20 text-primary border border-accent/30' : 'text-text-secondary hover:text-text-primary'}`}>
                         {label}
                     </button>
                 ))}
             </div>
 
-            {tab === 'preview' ? <EmailPreviewTab /> : <NurtureSequenceTab />}
+            {tab === 'preview' ? <EmailPreviewTab /> : <NurtureTab />}
         </motion.div>
     )
 }
