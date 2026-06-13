@@ -18,6 +18,8 @@ import {
     ArrowLeft,
     Sparkles,
     CreditCard,
+    Lock,
+    Smartphone,
 } from "lucide-react";
 
 // ───── Currency Config ─────
@@ -82,8 +84,17 @@ function getBookedSlots(date: Date): string[] {
     return booked;
 }
 
+// ───── Mobile Money Config ─────
+const MOBILE_NETWORKS = [
+    { code: "AIRTEL", label: "Airtel Money" },
+    { code: "MTN",    label: "MTN MoMo"    },
+    { code: "ZAMTEL", label: "Zamtel Kwacha" },
+] as const;
+
+type NetworkCode = typeof MOBILE_NETWORKS[number]["code"];
+
 // ───── Types ─────
-type BookingStep = "date" | "time" | "details" | "confirmed";
+type BookingStep = "date" | "time" | "details" | "payment" | "confirmed";
 
 interface BookingFormData {
     name: string;
@@ -118,6 +129,26 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
     const [currency, setCurrency] = useState<CurrencyConfig>(CURRENCIES[0]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    // Payment state — shared
+    const [paymentMethod, setPaymentMethod] = useState<"mobile_money" | "card">("mobile_money");
+    const [chargeId, setChargeId] = useState<string | null>(null);
+    const [paymentReference, setPaymentReference] = useState<string | null>(null);
+    const [paymentStatus, setPaymentStatus] = useState<"idle" | "initiating" | "pending" | "failed">("idle");
+
+    // Mobile money
+    const [mobileNetwork, setMobileNetwork] = useState<NetworkCode>("AIRTEL");
+    const [mobilePhone, setMobilePhone] = useState("");
+
+    // Card
+    const [cardNumber, setCardNumber] = useState("");
+    const [cardName, setCardName] = useState("");
+    const [cardExpiry, setCardExpiry] = useState("");
+    const [cardCvv, setCardCvv] = useState("");
+    const [cardStep, setCardStep] = useState<"form" | "pin" | "otp" | "redirect" | "processing">("form");
+    const [cardPinInput, setCardPinInput] = useState("");
+    const [cardOtpInput, setCardOtpInput] = useState("");
+    const [cardRedirectUrl, setCardRedirectUrl] = useState<string | null>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -175,16 +206,187 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
         setStep("details");
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        setMobilePhone(formData.phone || "");
+        setStep("payment");
+    };
+
+    const handlePaymentInitiate = async () => {
+        if (!mobilePhone) return;
+        setPaymentStatus("initiating");
 
         try {
-            const response = await fetch('/api/book', {
+            const res = await fetch('/api/payment/initiate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: mobilePhone,
+                    network: mobileNetwork,
+                    amount: currency.amount,
+                    currency: currency.code,
+                }),
+            });
+
+            const result = await res.json();
+            if (!result.success) throw new Error(result.message);
+
+            setChargeId(result.chargeId);
+            setPaymentReference(result.reference);
+            setPaymentStatus("pending");
+            pollForPayment(result.chargeId, result.reference);
+        } catch (error) {
+            console.error("Payment initiation error:", error);
+            setPaymentStatus("failed");
+        }
+    };
+
+    const pollForPayment = (cId: string, reference: string) => {
+        let attempts = 0;
+        const maxAttempts = 24; // 2 minutes at 5s intervals
+
+        const poll = async () => {
+            attempts++;
+            try {
+                const res = await fetch(`/api/payment/verify?charge_id=${cId}`);
+                const result = await res.json();
+
+                if (result.status === "succeeded") {
+                    await confirmBooking(reference);
+                    return;
+                }
+
+                if (result.status === "failed" || result.status === "voided") {
+                    setPaymentStatus("failed");
+                    return;
+                }
+
+                if (attempts < maxAttempts) {
+                    setTimeout(poll, 5000);
+                } else {
+                    setPaymentStatus("failed");
+                }
+            } catch {
+                if (attempts < maxAttempts) setTimeout(poll, 5000);
+                else setPaymentStatus("failed");
+            }
+        };
+
+        setTimeout(poll, 5000);
+    };
+
+    const formatCardNumber = (val: string) =>
+        val.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+
+    const formatExpiry = (val: string) => {
+        const digits = val.replace(/\D/g, '').slice(0, 4);
+        return digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+    };
+
+    const handleCardPaymentInitiate = async () => {
+        setPaymentStatus("initiating");
+        setCardStep("processing");
+
+        const [expiryMonth, expiryYear] = cardExpiry.split('/');
+
+        try {
+            const res = await fetch('/api/payment/card/initiate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    cardNumber: cardNumber.replace(/\s/g, ''),
+                    expiryMonth: expiryMonth?.trim(),
+                    expiryYear: expiryYear?.trim(),
+                    cvv: cardCvv,
+                    amount: currency.amount,
+                    currency: currency.code,
+                }),
+            });
+
+            const result = await res.json();
+            if (!result.success) throw new Error(result.message);
+
+            setChargeId(result.chargeId);
+            setPaymentReference(result.reference);
+            handleCardNextAction(result.chargeId, result.reference, result.nextAction, result.status);
+        } catch (error) {
+            console.error('Card payment error:', error);
+            setPaymentStatus("failed");
+            setCardStep("form");
+        }
+    };
+
+    const handleCardNextAction = (
+        cId: string,
+        reference: string,
+        nextAction: { type: string; redirect_url?: { url: string } } | null,
+        status: string,
+    ) => {
+        if (status === 'succeeded' || nextAction === null) {
+            confirmBooking(reference);
+            return;
+        }
+
+        switch (nextAction?.type) {
+            case 'requires_pin':
+                setCardStep("pin");
+                setPaymentStatus("idle");
+                break;
+            case 'requires_otp':
+                setCardStep("otp");
+                setPaymentStatus("idle");
+                break;
+            case 'redirect_url':
+                setCardRedirectUrl(nextAction.redirect_url?.url ?? null);
+                setCardStep("redirect");
+                setPaymentStatus("pending");
+                pollForPayment(cId, reference);
+                break;
+            default:
+                setPaymentStatus("failed");
+                setCardStep("form");
+        }
+    };
+
+    const handleCardAuthorize = async (type: 'pin' | 'otp') => {
+        if (!chargeId || !paymentReference) return;
+        setPaymentStatus("initiating");
+        setCardStep("processing");
+
+        try {
+            const res = await fetch('/api/payment/card/authorize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chargeId,
+                    type,
+                    pin: type === 'pin' ? cardPinInput : undefined,
+                    otp: type === 'otp' ? cardOtpInput : undefined,
+                }),
+            });
+
+            const result = await res.json();
+            if (!result.success) throw new Error(result.message);
+
+            handleCardNextAction(chargeId, paymentReference, result.nextAction, result.status);
+        } catch (error) {
+            console.error('Card authorization error:', error);
+            setPaymentStatus("failed");
+            setCardStep("form");
+        }
+    };
+
+    const confirmBooking = async (reference: string) => {
+        setIsSubmitting(true);
+        try {
+            const res = await fetch('/api/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: formData.name,
                     email: formData.email,
@@ -195,19 +397,14 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                     message: formData.message,
                     currency: currency.code,
                     amount: currency.amount,
+                    paymentReference: reference,
                 }),
             });
-
-            const result = await response.json();
-
-            if (result.success) {
-                setStep("confirmed");
-            } else {
-                alert(result.message || "Something went wrong. Please try again.");
-            }
-        } catch (error) {
-            console.error("Booking error:", error);
-            alert("Failed to connect to the booking service. Please try again later.");
+            const result = await res.json();
+            if (result.success) setStep("confirmed");
+            else setPaymentStatus("failed");
+        } catch {
+            setPaymentStatus("failed");
         } finally {
             setIsSubmitting(false);
         }
@@ -219,6 +416,20 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
         setStep("date");
         setFormData({ name: "", email: "", phone: "", projectType: "", message: "" });
         setCurrency(CURRENCIES[0]);
+        setPaymentMethod("mobile_money");
+        setMobilePhone("");
+        setMobileNetwork("AIRTEL");
+        setChargeId(null);
+        setPaymentReference(null);
+        setPaymentStatus("idle");
+        setCardNumber("");
+        setCardName("");
+        setCardExpiry("");
+        setCardCvv("");
+        setCardStep("form");
+        setCardPinInput("");
+        setCardOtpInput("");
+        setCardRedirectUrl(null);
     };
 
 
@@ -308,7 +519,7 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                             {step !== "confirmed" && (
                                 <span className="text-white/70 text-[10px] uppercase tracking-[0.2em]">
                                     Step{" "}
-                                    {step === "date" ? "1" : step === "time" ? "2" : "3"} of 3
+                                    {step === "date" ? "1" : step === "time" ? "2" : step === "details" ? "3" : "4"} of 4
                                 </span>
                             )}
                         </div>
@@ -321,10 +532,12 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                     animate={{
                                         width:
                                             step === "date"
-                                                ? "33%"
+                                                ? "25%"
                                                 : step === "time"
-                                                    ? "66%"
-                                                    : "100%",
+                                                    ? "50%"
+                                                    : step === "details"
+                                                        ? "75%"
+                                                        : "100%",
                                     }}
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
                                 />
@@ -724,7 +937,330 @@ const BookingClient = ({ siteSettings }: BookingClientProps) => {
                                 </motion.div>
                             )}
 
-                            {/* ─── STEP 4: Confirmation ─── */}
+                            {/* ─── STEP 4: Payment ─── */}
+                            {step === "payment" && (
+                                <motion.div
+                                    key="payment"
+                                    initial={{ opacity: 0, x: 30 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -30 }}
+                                    transition={{ duration: 0.35 }}
+                                    className="p-8 md:p-12"
+                                >
+                                    {/* ── Processing / Pending spinner ── */}
+                                    {(paymentStatus === "initiating" || (paymentStatus === "pending" && cardStep === "redirect") || (paymentStatus === "pending" && paymentMethod === "mobile_money")) ? (
+                                        <div className="flex flex-col items-center justify-center py-16 text-center">
+                                            <motion.div
+                                                animate={{ scale: [1, 1.15, 1] }}
+                                                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                                                className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-8"
+                                            >
+                                                {paymentMethod === "mobile_money"
+                                                    ? <Smartphone size={32} className="text-accent" />
+                                                    : <CreditCard size={32} className="text-accent" />
+                                                }
+                                            </motion.div>
+                                            <p className="text-foreground/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-3">
+                                                {paymentStatus === "initiating" ? "Processing..." : "Waiting for approval"}
+                                            </p>
+                                            <p className="text-xl font-heading mb-4">
+                                                {paymentMethod === "mobile_money" ? "Check your phone" : cardStep === "redirect" ? "Complete bank verification" : "Processing your card..."}
+                                            </p>
+                                            {paymentMethod === "mobile_money" && paymentStatus === "pending" && (
+                                                <p className="text-foreground/50 text-sm max-w-xs leading-relaxed mb-8">
+                                                    A payment request of <strong>{currency.symbol}{currency.amount.toLocaleString()}</strong> has been sent to <strong>{mobilePhone}</strong> via {MOBILE_NETWORKS.find(n => n.code === mobileNetwork)?.label}. Enter your PIN to confirm.
+                                                </p>
+                                            )}
+                                            {cardStep === "redirect" && cardRedirectUrl && (
+                                                <div className="space-y-4 mb-8">
+                                                    <p className="text-foreground/50 text-sm max-w-xs leading-relaxed">
+                                                        Your bank requires additional verification. Complete it in the new tab, then return here.
+                                                    </p>
+                                                    <a
+                                                        href={cardRedirectUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 bg-accent text-white px-6 py-3 rounded-full text-xs font-bold tracking-[0.2em] uppercase hover:shadow-lg transition-shadow"
+                                                    >
+                                                        Open Bank Page <ArrowRight size={14} />
+                                                    </a>
+                                                </div>
+                                            )}
+                                            <div className="flex gap-1 mb-8">
+                                                {[0, 1, 2].map(i => (
+                                                    <motion.span
+                                                        key={i}
+                                                        className="w-2 h-2 bg-accent rounded-full"
+                                                        animate={{ opacity: [0.3, 1, 0.3] }}
+                                                        transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.2 }}
+                                                    />
+                                                ))}
+                                            </div>
+                                            {process.env.NEXT_PUBLIC_FLUTTERWAVE_SANDBOX === 'true' && paymentReference && (
+                                                <button
+                                                    onClick={() => confirmBooking(paymentReference)}
+                                                    className="text-[10px] uppercase tracking-widest text-foreground/30 border border-dashed border-foreground/20 px-4 py-2 rounded-full hover:text-accent hover:border-accent transition-colors"
+                                                >
+                                                    Simulate Success (Sandbox Only)
+                                                </button>
+                                            )}
+                                        </div>
+
+                                    ) : paymentStatus === "failed" ? (
+                                        /* ── Failed ── */
+                                        <div className="flex flex-col items-center justify-center py-16 text-center">
+                                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-8">
+                                                <span className="text-3xl">✕</span>
+                                            </div>
+                                            <p className="text-xl font-heading mb-4">Payment failed</p>
+                                            <p className="text-foreground/50 text-sm max-w-xs leading-relaxed mb-8">
+                                                The payment was not completed. Please try again or use a different method.
+                                            </p>
+                                            <button
+                                                onClick={() => { setPaymentStatus("idle"); setCardStep("form"); }}
+                                                className="bg-accent text-white px-8 py-3 rounded-full text-xs font-bold tracking-[0.2em] uppercase hover:shadow-lg transition-shadow"
+                                            >
+                                                Try Again
+                                            </button>
+                                        </div>
+
+                                    ) : cardStep === "pin" ? (
+                                        /* ── PIN entry ── */
+                                        <div className="flex flex-col items-center justify-center py-8 text-center max-w-sm mx-auto">
+                                            <Lock size={32} className="text-accent mb-6" />
+                                            <p className="text-foreground/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-2">Card PIN Required</p>
+                                            <p className="text-xl font-heading mb-8">Enter your card PIN</p>
+                                            <input
+                                                type="password"
+                                                inputMode="numeric"
+                                                maxLength={6}
+                                                placeholder="••••"
+                                                value={cardPinInput}
+                                                onChange={(e) => setCardPinInput(e.target.value.replace(/\D/g, ''))}
+                                                className="w-full text-center text-2xl tracking-[0.5em] py-4 border border-foreground/10 rounded-sm focus:outline-none focus:border-accent mb-6"
+                                            />
+                                            <motion.button
+                                                onClick={() => handleCardAuthorize('pin')}
+                                                disabled={cardPinInput.length < 4}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-accent text-white py-4 rounded-full text-xs font-bold tracking-[0.3em] uppercase disabled:opacity-50"
+                                            >
+                                                Confirm PIN
+                                            </motion.button>
+                                        </div>
+
+                                    ) : cardStep === "otp" ? (
+                                        /* ── OTP entry ── */
+                                        <div className="flex flex-col items-center justify-center py-8 text-center max-w-sm mx-auto">
+                                            <Mail size={32} className="text-accent mb-6" />
+                                            <p className="text-foreground/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-2">OTP Verification</p>
+                                            <p className="text-xl font-heading mb-3">Enter the OTP sent to you</p>
+                                            <p className="text-foreground/40 text-sm mb-8">Check your phone or email for a one-time code from your bank.</p>
+                                            <input
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength={8}
+                                                placeholder="123456"
+                                                value={cardOtpInput}
+                                                onChange={(e) => setCardOtpInput(e.target.value.replace(/\D/g, ''))}
+                                                className="w-full text-center text-2xl tracking-[0.5em] py-4 border border-foreground/10 rounded-sm focus:outline-none focus:border-accent mb-6"
+                                            />
+                                            <motion.button
+                                                onClick={() => handleCardAuthorize('otp')}
+                                                disabled={cardOtpInput.length < 4}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-accent text-white py-4 rounded-full text-xs font-bold tracking-[0.3em] uppercase disabled:opacity-50"
+                                            >
+                                                Verify OTP
+                                            </motion.button>
+                                        </div>
+
+                                    ) : (
+                                        /* ── Idle: payment method selector + forms ── */
+                                        <>
+                                            <button
+                                                onClick={() => { setStep("details"); setPaymentStatus("idle"); setCardStep("form"); }}
+                                                className="flex items-center gap-2 text-foreground/40 hover:text-accent text-xs uppercase tracking-widest mb-8 transition-colors"
+                                            >
+                                                <ArrowLeft size={14} />
+                                                Back to details
+                                            </button>
+
+                                            <p className="text-center text-foreground/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-2">
+                                                Payment
+                                            </p>
+                                            <p className="text-center text-3xl font-heading mb-8">
+                                                {currency.symbol}{currency.amount.toLocaleString()} <span className="text-base font-body text-foreground/40">{currency.name}</span>
+                                            </p>
+
+                                            {/* Payment method toggle */}
+                                            <div className="max-w-sm mx-auto mb-8">
+                                                <div className="flex rounded-sm overflow-hidden border border-foreground/10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPaymentMethod("mobile_money")}
+                                                        disabled={currency.code !== "ZMW"}
+                                                        className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold tracking-wider transition-all ${
+                                                            paymentMethod === "mobile_money"
+                                                                ? "bg-accent text-white"
+                                                                : currency.code !== "ZMW"
+                                                                    ? "bg-white text-foreground/20 cursor-not-allowed"
+                                                                    : "bg-white text-foreground/40 hover:bg-accent/5 hover:text-accent"
+                                                        }`}
+                                                    >
+                                                        <Smartphone size={14} /> Mobile Money
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPaymentMethod("card")}
+                                                        className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold tracking-wider transition-all ${
+                                                            paymentMethod === "card"
+                                                                ? "bg-accent text-white"
+                                                                : "bg-white text-foreground/40 hover:bg-accent/5 hover:text-accent"
+                                                        }`}
+                                                    >
+                                                        <CreditCard size={14} /> Card
+                                                    </button>
+                                                </div>
+                                                {currency.code !== "ZMW" && paymentMethod === "card" && (
+                                                    <p className="text-center text-foreground/30 text-[10px] mt-2">
+                                                        Mobile Money is only available for ZMW payments
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {/* ── Mobile Money form ── */}
+                                            {paymentMethod === "mobile_money" && (
+                                                <div className="max-w-sm mx-auto space-y-5">
+                                                    <div>
+                                                        <p className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mb-3">Network</p>
+                                                        <div className="flex rounded-sm overflow-hidden border border-foreground/10">
+                                                            {MOBILE_NETWORKS.map((n) => (
+                                                                <button
+                                                                    key={n.code}
+                                                                    type="button"
+                                                                    onClick={() => setMobileNetwork(n.code)}
+                                                                    className={`flex-1 py-3 text-xs font-bold tracking-wider transition-all ${
+                                                                        mobileNetwork === n.code
+                                                                            ? "bg-accent text-white"
+                                                                            : "bg-white text-foreground/40 hover:bg-accent/5 hover:text-accent"
+                                                                    }`}
+                                                                >
+                                                                    {n.code}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <p className="text-center text-foreground/30 text-[10px] mt-2">
+                                                            {MOBILE_NETWORKS.find(n => n.code === mobileNetwork)?.label}
+                                                        </p>
+                                                    </div>
+                                                    <div className="relative">
+                                                        <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/25" />
+                                                        <input
+                                                            type="tel"
+                                                            placeholder="Mobile Money Number (e.g. 0971234567)"
+                                                            value={mobilePhone}
+                                                            onChange={(e) => setMobilePhone(e.target.value)}
+                                                            className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all"
+                                                        />
+                                                    </div>
+                                                    <motion.button
+                                                        type="button"
+                                                        onClick={handlePaymentInitiate}
+                                                        disabled={!mobilePhone}
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        className="w-full bg-accent text-white py-5 rounded-full text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-3 hover:shadow-lg hover:shadow-accent/20 transition-shadow disabled:opacity-60"
+                                                    >
+                                                        Pay {currency.symbol}{currency.amount.toLocaleString()}
+                                                        <ArrowRight size={16} />
+                                                    </motion.button>
+                                                    <p className="text-center text-foreground/30 text-[10px]">
+                                                        A payment prompt will be sent to your phone. Enter your PIN to confirm.
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* ── Card form ── */}
+                                            {paymentMethod === "card" && (
+                                                <div className="max-w-sm mx-auto space-y-4">
+                                                    {/* Card number */}
+                                                    <div className="relative">
+                                                        <CreditCard size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/25" />
+                                                        <input
+                                                            type="text"
+                                                            inputMode="numeric"
+                                                            placeholder="Card Number"
+                                                            value={cardNumber}
+                                                            onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                                                            className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all tracking-wider"
+                                                        />
+                                                    </div>
+                                                    {/* Cardholder name */}
+                                                    <div className="relative">
+                                                        <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/25" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Cardholder Name"
+                                                            value={cardName}
+                                                            onChange={(e) => setCardName(e.target.value)}
+                                                            className="w-full pl-12 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all"
+                                                        />
+                                                    </div>
+                                                    {/* Expiry + CVV */}
+                                                    <div className="flex gap-4">
+                                                        <div className="relative flex-1">
+                                                            <input
+                                                                type="text"
+                                                                inputMode="numeric"
+                                                                placeholder="MM/YY"
+                                                                value={cardExpiry}
+                                                                onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                                                                className="w-full px-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all text-center tracking-wider"
+                                                            />
+                                                        </div>
+                                                        <div className="relative flex-1">
+                                                            <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/25" />
+                                                            <input
+                                                                type="password"
+                                                                inputMode="numeric"
+                                                                placeholder="CVV"
+                                                                maxLength={4}
+                                                                value={cardCvv}
+                                                                onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
+                                                                className="w-full pl-9 pr-4 py-4 bg-white border border-foreground/10 rounded-sm text-sm text-neutral-800 font-body placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-all"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <motion.button
+                                                        type="button"
+                                                        onClick={handleCardPaymentInitiate}
+                                                        disabled={
+                                                            cardNumber.replace(/\s/g, '').length < 16 ||
+                                                            !cardName ||
+                                                            cardExpiry.length < 5 ||
+                                                            cardCvv.length < 3
+                                                        }
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        className="w-full bg-accent text-white py-5 rounded-full text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-3 hover:shadow-lg hover:shadow-accent/20 transition-shadow disabled:opacity-50"
+                                                    >
+                                                        Pay {currency.symbol}{currency.amount.toLocaleString()}
+                                                        <Lock size={14} />
+                                                    </motion.button>
+                                                    <p className="text-center text-foreground/30 text-[10px] flex items-center justify-center gap-1">
+                                                        <Lock size={10} /> Encrypted &amp; secured by Flutterwave
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </motion.div>
+                            )}
+
+                            {/* ─── STEP 5: Confirmation ─── */}
                             {step === "confirmed" && (
                                 <motion.div
                                     key="confirmed"
