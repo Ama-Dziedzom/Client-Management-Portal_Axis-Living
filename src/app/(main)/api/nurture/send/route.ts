@@ -1,46 +1,34 @@
 import { NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
 import { getResend, FROM } from '@/lib/resend';
+import { wrap, btn, randomImage } from '@/lib/emailTemplates';
 
-// Converts plain text body + [BUTTON: Label | URL] syntax to HTML
-function renderBody(raw: string, name: string): string {
+function buildNurtureEmail(raw: string, name: string, subject: string): string {
     const replaced = raw.replace(/\{\{name\}\}/gi, name);
+    const blocks = replaced.split(/\n\n+/).map((b: string) => b.trim()).filter(Boolean);
 
-    const paragraphs = replaced.split(/\n\n+/).map(block => {
+    // Skip greeting line ("Hi Ama,")
+    let idx = 0;
+    if (blocks[0]?.match(/^(hi|hello)\b/i)) idx = 1;
+
+    const remaining = blocks.slice(idx);
+    const bodyText: string = remaining[0]?.replace(/\n/g, ' ') ?? '';
+
+    const contentParts = remaining.slice(1).map((block: string) => {
         const btnMatch = block.match(/^\[BUTTON:\s*(.+?)\s*\|\s*(.+?)\]$/);
-        if (btnMatch) {
-            return `<div style="text-align:center;margin:32px 0;">
-  <a href="${btnMatch[2].trim()}" style="display:inline-block;background:#2F402C;color:#fff;padding:16px 40px;border-radius:99px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">${btnMatch[1].trim()}</a>
-</div>`;
-        }
-        return `<p style="margin:0 0 18px;font-size:15px;line-height:1.75;color:#6B7280;">${block.replace(/\n/g, '<br/>')}</p>`;
+        if (btnMatch) return btn(btnMatch[1].trim(), btnMatch[2].trim());
+        return `<p style="margin:18px 0 0;font-size:15px;line-height:1.75;color:#6B7280;text-align:center;">${block.replace(/\n/g, '<br/>')}</p>`;
     });
 
-    return paragraphs.join('\n');
-}
+    contentParts.push(`<p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:#2F402C;text-align:center;">Kas</p>`);
 
-function wrapEmail(subject: string, bodyHtml: string): string {
-    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://axisliving.co.zm';
-    return `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${subject}</title></head>
-<body style="margin:0;padding:0;background:#F2EBE3;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F2EBE3;padding:48px 20px 64px;">
-    <tr><td align="center">
-      <div style="margin-bottom:32px;">
-        <img src="${SITE_URL}/axis-living.png" alt="Axis Living" width="120" style="height:auto;display:block;margin:0 auto;filter:brightness(0);" />
-      </div>
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(47,64,44,0.08);">
-        <tr><td style="padding:44px 52px 52px;">${bodyHtml}</td></tr>
-        <tr><td style="border-top:1px solid #E5E7EB;padding:24px 52px;text-align:center;">
-          <p style="margin:0 0 8px;font-size:11px;color:#9CA3AF;letter-spacing:1px;">© ${new Date().getFullYear()} Axis Living · Lusaka, Zambia</p>
-          <p style="margin:0;font-size:11px;"><a href="mailto:hello@axisliving.co.zm" style="color:#C6B9AA;text-decoration:none;">hello@axisliving.co.zm</a></p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+    return wrap({
+        image: randomImage(),
+        heading: subject.replace(/\{\{name\}\}/gi, name),
+        body: bodyText,
+        content: contentParts.join('\n'),
+        note: 'You received this because you signed up at axisliving.co.zm. Reply to unsubscribe.',
+    });
 }
 
 export async function POST(req: Request) {
@@ -100,9 +88,8 @@ export async function POST(req: Request) {
             if (dueDate > now) continue;
 
             const name = subscriber.name || subscriber.email.split('@')[0];
-            const bodyHtml = renderBody(email.body, name);
-            const html = wrapEmail(email.subject, bodyHtml);
             const subject = email.subject.replace(/\{\{name\}\}/gi, name);
+            const html = buildNurtureEmail(email.body, name, email.subject);
 
             try {
                 const { error: sendError } = await getResend().emails.send({

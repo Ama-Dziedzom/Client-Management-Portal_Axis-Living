@@ -27,11 +27,11 @@ const INTERIOR_IMAGES = [
   'https://images.unsplash.com/photo-1615529182904-14819c35db37?w=600&h=340&fit=crop&auto=format&q=80',
 ];
 
-function randomImage() {
+export function randomImage() {
   return INTERIOR_IMAGES[Math.floor(Math.random() * INTERIOR_IMAGES.length)];
 }
 
-function btn(label, url) {
+export function btn(label, url) {
   return `<div style="text-align:center;margin-top:32px;">
     <a href="${url}" style="display:inline-block;background:${COLORS.primary};color:#fff;padding:16px 40px;border-radius:99px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">${label}</a>
   </div>`;
@@ -46,7 +46,7 @@ function detailRow(label, value) {
   </tr>`;
 }
 
-function wrap({ image, heading, body, content = '', note = '' }) {
+export function wrap({ image, heading, body, content = '', note = '' }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
