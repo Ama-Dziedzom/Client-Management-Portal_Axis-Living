@@ -1,14 +1,14 @@
 @import url('https://fonts.cdnfonts.com/css/quinsi');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* ===== CSS Design Tokens ===== */
-:root {
+/* ===== Design Tokens (Tailwind v4 @theme) ===== */
+@theme {
   --color-primary: #2F402C;
   --color-primary-light: #3d5239;
+  --color-primary-dark: #243320;
   --color-accent: #C6B9AA;
+  --color-accent-light: #d4c9bc;
+  --color-accent-dark: #b5a798;
   --color-background: #f7f4f1;
   --color-surface: #ffffff;
   --color-text-primary: #1a1a1a;
@@ -18,12 +18,23 @@
   --color-error: #dc2626;
 
   --font-heading: 'Quinsi', Georgia, serif;
+  --font-body: var(--font-manrope), system-ui, sans-serif;
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
+
+  --shadow-card: 0 2px 16px -4px rgba(47, 64, 44, 0.08);
+  --shadow-elevated: 0 8px 32px -8px rgba(47, 64, 44, 0.16);
+
+  --animate-shimmer: shimmer 1.5s infinite;
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }
 
 /* ===== Base Layer ===== */
@@ -45,12 +56,7 @@
     min-height: 100vh;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     @apply text-text-primary;
     letter-spacing: -0.01em;
@@ -61,30 +67,16 @@
     color: #1a1a1a;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #C6B9AA;
-    border-radius: 100px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #b5a798;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #C6B9AA; border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b5a798; }
 }
 
 /* ===== Component Layer ===== */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-body font-semibold text-sm rounded-xl transition-all duration-200 ease-out hover:bg-primary-light hover:shadow-elevated active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:active:scale-100;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-body font-semibold text-sm rounded-xl transition-all duration-200 ease-out hover:bg-primary-light active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
   }
 
   .btn-secondary {
@@ -96,7 +88,13 @@
   }
 
   .card {
-    @apply bg-surface rounded-2xl border border-border p-6 shadow-card transition-shadow duration-300 hover:shadow-elevated;
+    @apply bg-surface rounded-2xl border border-border p-6;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.3s;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-elevated);
   }
 
   .card-flat {
@@ -107,71 +105,50 @@
     @apply w-full px-4 py-3 bg-background border border-border rounded-xl font-body text-sm text-text-primary placeholder:text-text-secondary/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
   }
 
-  .badge {
+  .badge,
+  .badge-planning,
+  .badge-in-progress,
+  .badge-complete,
+  .badge-on-hold,
+  .badge-draft,
+  .badge-sent,
+  .badge-paid,
+  .badge-overdue,
+  .badge-cancelled {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold font-body;
   }
 
-  .badge-planning {
-    @apply badge bg-amber-50 text-amber-700 border border-amber-200;
-  }
+  .badge-planning    { @apply bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-in-progress { @apply bg-blue-50 text-blue-700 border border-blue-200; }
+  .badge-complete    { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .badge-on-hold     { @apply bg-gray-100 text-gray-600 border border-gray-200; }
+  .badge-draft       { @apply bg-gray-100 text-gray-600 border border-gray-200; }
+  .badge-sent        { @apply bg-blue-50 text-blue-700 border border-blue-200; }
+  .badge-paid        { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .badge-overdue     { @apply bg-red-50 text-red-700 border border-red-200; }
+  .badge-cancelled   { @apply bg-gray-100 text-gray-500 border border-gray-200; }
 
-  .badge-in-progress {
-    @apply badge bg-blue-50 text-blue-700 border border-blue-200;
-  }
-
-  .badge-complete {
-    @apply badge bg-emerald-50 text-emerald-700 border border-emerald-200;
-  }
-
-  .badge-on-hold {
-    @apply badge bg-gray-100 text-gray-600 border border-gray-200;
-  }
-
-  .badge-draft {
-    @apply badge bg-gray-100 text-gray-600 border border-gray-200;
-  }
-
-  .badge-sent {
-    @apply badge bg-blue-50 text-blue-700 border border-blue-200;
-  }
-
-  .badge-paid {
-    @apply badge bg-emerald-50 text-emerald-700 border border-emerald-200;
-  }
-
-  .badge-overdue {
-    @apply badge bg-red-50 text-red-700 border border-red-200;
-  }
-
-  .badge-cancelled {
-    @apply badge bg-gray-100 text-gray-500 border border-gray-200;
-  }
-
-  /* Skeleton loading */
   .skeleton {
-    @apply bg-gradient-to-r from-border/50 via-accent/20 to-border/50 bg-[length:200%_100%] animate-shimmer rounded-lg;
+    background: linear-gradient(90deg, var(--color-border) 25%, var(--color-accent) 50%, var(--color-border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    @apply rounded-lg;
   }
 
-  /* Page container */
-  .page-container {
-    @apply max-w-7xl mx-auto px-6 py-8;
-  }
-
-  /* Section header */
-  .section-header {
-    @apply flex items-center justify-between mb-8;
-  }
+  .page-container { @apply max-w-7xl mx-auto px-6 py-8; }
+  .section-header { @apply flex items-center justify-between mb-8; }
 }
 
 /* ===== Utility Layer ===== */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  .text-balance { text-wrap: balance; }
 
   .glass {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     background: rgba(255, 255, 255, 0.85);
   }
+
+  .shadow-card     { box-shadow: var(--shadow-card); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
 }

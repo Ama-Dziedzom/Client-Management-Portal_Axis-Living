@@ -1,35 +1,17 @@
-import { createBrowserClient } from '@supabase/auth-helpers-nextjs'
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+let client: SupabaseClient | null = null;
 
-// IMPORTANT: isSingleton must be false for both clients.
-// createBrowserClient caches the first instance as a singleton by default,
-// which means the second call would return the SAME client (with the wrong
-// storageKey/cookie name). Setting isSingleton: false ensures each client
-// has its own independent auth session storage.
+export function getSupabase(): SupabaseClient {
+    if (!client) {
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-export const clientSupabase = createBrowserClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-        isSingleton: false,
-        cookieOptions: {
-            name: 'sb-axis-client-token',
+        if (!url || !key) {
+            throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
         }
-    }
-)
 
-export const studioSupabase = createBrowserClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-        isSingleton: false,
-        cookieOptions: {
-            name: 'sb-axis-studio-token',
-        }
+        client = createClient(url, key);
     }
-)
-
-// Default export for client portal compatibility
-export const supabase = clientSupabase
+    return client;
+}
