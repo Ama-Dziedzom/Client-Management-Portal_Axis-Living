@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getResend, FROM, AUDIENCE_ID } from '@/lib/resend';
 import { emailTemplates } from '@/lib/emailTemplates';
+import { getSupabase } from '@/lib/supabase';
 
 export async function POST(req: Request) {
     try {
@@ -13,17 +14,21 @@ export async function POST(req: Request) {
             );
         }
 
-        // 1. Add to Resend Audience (Newsletter List)
+        // 1. Add to Resend Audience + nurture_subscribers (non-blocking)
         try {
             if (AUDIENCE_ID) {
-                await getResend().contacts.create({
-                    email,
-                    audienceId: AUDIENCE_ID,
-                });
+                await getResend().contacts.create({ email, audienceId: AUDIENCE_ID });
             }
         } catch (contactError) {
             console.error('Resend Contact Error:', contactError);
-            // Non-blocking, still send the lookbook
+        }
+
+        try {
+            await getSupabase()
+                .from('nurture_subscribers')
+                .upsert({ email, name: email.split('@')[0] }, { onConflict: 'email', ignoreDuplicates: true });
+        } catch (dbError) {
+            console.error('Nurture subscriber insert error:', dbError);
         }
 
         // 2. Send Lookbook via Resend
