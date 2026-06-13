@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
-import { getResend, FROM } from '@/lib/resend';
-import { emailTemplates } from '@/lib/emailTemplates';
 
 interface BookingRow {
     id: string;
@@ -70,36 +68,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Failed to cancel booking' }, { status: 500 });
         }
 
-        // Send cancellation confirmation to client
-        try {
-            const { subject, html } = emailTemplates.bookingCancelled(booking.name, booking.date, booking.time);
-            await getResend().emails.send({
-                from: FROM,
-                to: [booking.email],
-                subject,
-                html,
-            });
-        } catch (emailError) {
-            console.error('Client cancellation email error:', emailError);
-        }
-
-        // Notify admin
-        try {
-            await getResend().emails.send({
-                from: FROM,
-                to: [process.env.ADMIN_EMAIL || process.env.RESEND_FROM_EMAIL || 'hello@axisliving.co.zm'],
-                subject: `Booking Cancelled: ${booking.name}`,
-                text: [
-                    'A client has cancelled their booking.',
-                    '',
-                    `Client: ${booking.name}`,
-                    `Email:  ${booking.email}`,
-                    `Date:   ${booking.date}`,
-                    `Time:   ${booking.time} (CAT)`,
-                ].join('\n'),
-            });
-        } catch (adminEmailError) {
-            console.error('Admin cancellation email error:', adminEmailError);
+        // Delegate email sending to portal (fire-and-forget)
+        const portalUrl = process.env.PORTAL_URL;
+        const emailSecret = process.env.EMAIL_SECRET;
+        if (portalUrl && emailSecret) {
+            fetch(`${portalUrl}/api/email/booking-cancellation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${emailSecret}` },
+                body: JSON.stringify({ name: booking.name, email: booking.email, date: booking.date, time: booking.time }),
+            }).catch((e) => console.error('Portal cancellation email error:', e));
         }
 
         return NextResponse.json({ success: true });
