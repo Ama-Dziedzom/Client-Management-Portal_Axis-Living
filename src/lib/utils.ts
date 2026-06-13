@@ -130,7 +130,7 @@ export function formatFileSize(bytes: number | string | null): string {
     if (bytes === null) return '0 B';
     const numBytes = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
     if (isNaN(numBytes)) return '0 B';
-    
+
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     let i = 0;
     let size = numBytes;

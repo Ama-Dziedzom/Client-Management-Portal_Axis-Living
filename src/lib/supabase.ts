@@ -33,4 +33,3 @@ export const studioSupabase = createBrowserClient(
 
 // Default export for client portal compatibility
 export const supabase = clientSupabase
-

@@ -8,6 +8,10 @@ const nextConfig = {
                 port: '',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'source.unsplash.com',
+            },
         ],
     },
     reactStrictMode: false, // Helps prevent double-initialization of Supabase in dev
@@ -18,7 +22,7 @@ const nextConfig = {
     // Security headers
     async headers() {
         if (process.env.NODE_ENV === 'development') return [];
-        
+
         return [
             {
                 source: '/(.*)',
