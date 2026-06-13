@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
-import { User, Mail, Phone, Lock, LogOut, Loader2, Shield } from 'lucide-react'
+import { User, Mail, Phone, Lock, LogOut, Loader2, Shield } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { formatPhoneInput, unformatPhone } from '@/lib/utils'
 

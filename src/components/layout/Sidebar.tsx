@@ -11,7 +11,7 @@ import {
     Receipt,
     Settings,
     LogOut
-} from 'lucide-react'
+} from '@/lib/icons'
 import { useAuth } from '@/contexts/AuthContext'
 import { useDashboard } from '@/contexts/DashboardContext'
 import { cn } from '@/lib/utils'
@@ -33,19 +33,17 @@ export default function Sidebar() {
     return (
         <aside className="hidden lg:flex w-[240px] flex-col fixed inset-y-0 left-0 bg-[#2F402C] z-50">
             {/* Top Section */}
-            <div className="p-8">
-                <Link href="/dashboard" className="block mb-1">
-                    <h1 className="text-white font-heading text-[22px] font-semibold leading-tight">
-                        Axis Living
-                    </h1>
+            <div className="px-7 pt-7 pb-5 border-b border-white/10">
+                <Link href="/dashboard" className="block">
+                    <img src="/axis-living.png" alt="Axis Living" className="h-[4.75rem] w-auto rounded-md" />
                 </Link>
-                <div className="text-[#C6B9AA] text-[10px] font-bold tracking-[0.1em] uppercase">
+                <div className="text-[#C6B9AA] text-[10px] font-bold tracking-[0.1em] uppercase mt-2.5">
                     Client Portal
                 </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 space-y-1">
+            <nav className="flex-1 px-4 pt-5 space-y-1">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
                     const Icon = item.icon

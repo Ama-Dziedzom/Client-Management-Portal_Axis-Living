@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, DragEvent, ChangeEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Upload, FileText, Image as ImageIcon, File, Loader2, CheckCircle2 } from 'lucide-react'
+import { X, Upload, FileText, Image as ImageIcon, File, Loader2, CheckCircle2 } from '@/lib/icons'
 import { formatFileSize } from '@/lib/utils'
 
 interface UploadModalProps {

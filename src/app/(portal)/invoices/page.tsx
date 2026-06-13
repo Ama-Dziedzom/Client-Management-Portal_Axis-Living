@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { Invoice } from '@/types/database'
 import { formatCurrency, formatDate, formatStatus, getStatusBadgeClass } from '@/lib/utils'
 import Link from 'next/link'
-import { Receipt, ArrowRight, Sparkles } from 'lucide-react'
+import { Receipt, ArrowRight, Sparkles } from '@/lib/icons'
 
 const container = {
     hidden: { opacity: 0 },

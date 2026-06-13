@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsitePost } from '@/types/database'
 import Link from 'next/link'
-import { BookOpen, Plus, Search, Pencil, Trash2, Eye, EyeOff } from 'lucide-react'
+import { BookOpen, Plus, Search, Pencil, Trash2, Eye, EyeOff } from '@/lib/icons'
 import { formatDate } from '@/lib/utils'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }

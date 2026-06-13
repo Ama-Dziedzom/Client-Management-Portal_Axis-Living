@@ -11,7 +11,7 @@ import {
     GalleryImage,
     Document
 } from '@/types/database'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { logger } from '@/lib/logger'
 import { UploadModal } from '@/components/shared/UploadModal'

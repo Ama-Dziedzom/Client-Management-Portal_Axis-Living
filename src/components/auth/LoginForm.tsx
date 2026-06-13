@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2 } from '@/lib/icons'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { logger } from '@/lib/logger'

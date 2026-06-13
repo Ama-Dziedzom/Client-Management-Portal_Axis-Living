@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Booking } from '@/types/database'
-import { CalendarDays, Clock, Mail, Phone, Search, CreditCard, Tag } from 'lucide-react'
+import { CalendarDays, Clock, Mail, Phone, Search, CreditCard, Tag } from '@/lib/icons'
 
 const container = {
     hidden: { opacity: 0 },

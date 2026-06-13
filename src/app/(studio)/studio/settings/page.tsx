@@ -9,7 +9,7 @@ import {
     User, Mail, Shield, Lock, LogOut, Loader2, Palette, Bell,
     Globe, DollarSign, Calendar, Building2, Check, Sun, Moon, Monitor,
     MessageSquare, Receipt, FolderKanban, Users, AlertTriangle, ChevronRight
-} from 'lucide-react'
+} from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 // ────────────────── types ──────────────────

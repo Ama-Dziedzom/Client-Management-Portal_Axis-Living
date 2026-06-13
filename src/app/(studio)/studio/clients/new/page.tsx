@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Loader2, Save, Sparkles, User, Mail, Phone, Lock, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Sparkles, User, Mail, Phone, Lock, Eye, EyeOff } from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatPhoneInput, unformatPhone } from '@/lib/utils'

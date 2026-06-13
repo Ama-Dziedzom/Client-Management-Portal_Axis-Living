@@ -1,6 +1,6 @@
 'use client'
 
-import { Upload, Image as ImageIcon, Edit2, Trash2 } from 'lucide-react'
+import { Upload, Image as ImageIcon, Edit2, Trash2 } from '@/lib/icons'
 import { GalleryImage } from '@/types/database'
 
 interface GalleryTabProps {

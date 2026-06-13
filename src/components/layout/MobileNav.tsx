@@ -12,7 +12,7 @@ import {
     Settings,
     X,
     LogOut
-} from 'lucide-react'
+} from '@/lib/icons'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { useDashboard } from '@/contexts/DashboardContext'
@@ -59,12 +59,10 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
                         className="fixed inset-y-0 left-0 w-[280px] bg-[#2F402C] z-[101] shadow-2xl flex flex-col"
                     >
                         {/* Header */}
-                        <div className="p-6 flex items-center justify-between border-b border-white/10">
+                        <div className="px-6 pt-5 pb-4 flex items-center justify-between border-b border-white/10">
                             <div>
-                                <h1 className="text-white font-heading text-xl font-semibold leading-tight">
-                                    Axis Living
-                                </h1>
-                                <div className="text-[#C6B9AA] text-[10px] font-bold tracking-[0.1em] uppercase">
+                                <img src="/axis-living.png" alt="Axis Living" className="h-10 w-auto rounded-sm" />
+                                <div className="text-[#C6B9AA] text-[10px] font-bold tracking-[0.1em] uppercase mt-2">
                                     Client Portal
                                 </div>
                             </div>

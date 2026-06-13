@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { MapPin } from 'lucide-react'
+import { MapPin } from '@/lib/icons'
 import { ProjectStatus } from '@/types/database'
 import { cn } from '@/lib/utils'
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { Globe, ImageIcon, BookOpen, Tag, Star, BookMarked, Settings, ArrowRight } from 'lucide-react'
+import { Globe, ImageIcon, BookOpen, Tag, Star, BookMarked, Settings, ArrowRight } from '@/lib/icons'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }

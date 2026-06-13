@@ -6,7 +6,7 @@ import { studioSupabase as supabase } from '@/lib/supabase'
 import { Client, Project } from '@/types/database'
 import { formatDate, getInitials } from '@/lib/utils'
 import Link from 'next/link'
-import { Users, Search, Plus, ArrowRight, FolderKanban, Mail, Phone, Sparkles } from 'lucide-react'
+import { Users, Search, Plus, ArrowRight, FolderKanban, Mail, Phone, Sparkles } from '@/lib/icons'
 
 const container = {
     hidden: { opacity: 0 },

@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, CheckCircle2, ImageIcon, FileText, LucideIcon } from 'lucide-react'
+import { LayoutDashboard, CheckCircle2, ImageIcon, FileText, LucideIcon } from '@/lib/icons'
 
 interface Tab {
     id: string

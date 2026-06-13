@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Menu, MessageSquare } from 'lucide-react'
+import { Menu, MessageSquare } from '@/lib/icons'
 import { useDashboard } from '@/contexts/DashboardContext'
 import MobileNav from '@/components/layout/MobileNav'
 
@@ -20,9 +20,7 @@ export default function TopBar() {
             </button>
 
             <Link href="/dashboard" className="absolute left-1/2 -translate-x-1/2">
-                <h1 className="font-heading text-[22px] font-semibold text-[#2F402C] leading-none">
-                    Axis Living
-                </h1>
+                <img src="/axis-living.png" alt="Axis Living" className="h-9 w-auto rounded-sm" />
             </Link>
 
             <div className="relative">

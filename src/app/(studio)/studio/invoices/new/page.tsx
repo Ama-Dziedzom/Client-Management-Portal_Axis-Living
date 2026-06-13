@@ -17,7 +17,7 @@ import {
     Calendar,
     Receipt,
     ListTodo
-} from 'lucide-react'
+} from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 

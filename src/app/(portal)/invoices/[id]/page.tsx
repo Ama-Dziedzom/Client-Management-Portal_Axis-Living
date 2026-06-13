@@ -12,7 +12,7 @@ import {
     CheckCircle2,
     Info,
     Loader2,
-} from 'lucide-react'
+} from '@/lib/icons'
 import Link from 'next/link'
 
 export default function InvoiceDetailPage() {

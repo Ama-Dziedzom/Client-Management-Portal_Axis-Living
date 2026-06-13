@@ -62,7 +62,7 @@ export function wrap({ image, heading, body, content = '', note = '' }) {
 
         <!-- Logo -->
         <div style="margin-bottom:32px;text-align:center;">
-          <img src="${LOGO_URI}" alt="${STUDIO_NAME}" width="120" style="height:auto;display:block;margin:0 auto;" />
+          <img src="${LOGO_URI}" alt="${STUDIO_NAME}" width="160" style="height:auto;display:block;margin:0 auto;filter:brightness(0.2) sepia(1) saturate(1.5) hue-rotate(85deg);" />
         </div>
 
         <!-- Card -->

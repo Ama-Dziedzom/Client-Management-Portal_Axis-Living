@@ -6,7 +6,7 @@ import { emailTemplates, wrap, btn, randomImage } from '@/lib/emailTemplates'
 import {
     Copy, Check, Plus, Pencil, Trash2, ChevronUp, ChevronDown,
     ToggleLeft, ToggleRight, X, Save, Clock, Mail, Eye, EyeOff,
-} from 'lucide-react'
+} from '@/lib/icons'
 
 // Renders a nurture email body into the standard Axis Living email layout
 function buildNurturePreview(subject: string, body: string): string {

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsitePricing } from '@/types/database'
-import { Tag, Plus, Pencil, Trash2, X, Loader2, Check } from 'lucide-react'
+import { Tag, Plus, Pencil, Trash2, X, Loader2, Check } from '@/lib/icons'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }

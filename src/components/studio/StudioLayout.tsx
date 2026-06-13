@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@/lib/icons'
 import { useStudio } from '@/contexts/StudioContext'
 import StudioSidebar from '@/components/studio/StudioSidebar'
 import StudioTopBar from '@/components/studio/StudioTopBar'

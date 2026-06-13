@@ -17,7 +17,7 @@ import {
     User, 
     Plus,
     ExternalLink
-} from 'lucide-react'
+} from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatCurrency, formatDate, getInitials, getStatusBadgeClass, formatStatus } from '@/lib/utils'

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { Client, ProjectStatus } from '@/types/database'
-import { ArrowLeft, Loader2, Save, Sparkles, User } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Sparkles, User } from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 

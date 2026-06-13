@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsiteLookbook } from '@/types/database'
-import { BookMarked, Plus, Trash2, ToggleLeft, ToggleRight, Loader2, ExternalLink } from 'lucide-react'
+import { BookMarked, Plus, Trash2, ToggleLeft, ToggleRight, Loader2, ExternalLink } from '@/lib/icons'
 import { formatDate } from '@/lib/utils'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }

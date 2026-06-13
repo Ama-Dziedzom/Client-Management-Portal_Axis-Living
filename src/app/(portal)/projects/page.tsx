@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { Project, TimelineStage } from '@/types/database'
 import { formatStatus, getStatusBadgeClass, calculateProgress } from '@/lib/utils'
 import Link from 'next/link'
-import { FolderKanban, ArrowRight, MapPin, Sparkles } from 'lucide-react'
+import { FolderKanban, ArrowRight, MapPin, Sparkles } from '@/lib/icons'
 
 const container = {
     hidden: { opacity: 0 },

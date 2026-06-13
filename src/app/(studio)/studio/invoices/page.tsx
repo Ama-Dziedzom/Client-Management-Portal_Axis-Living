@@ -17,7 +17,7 @@ import {
     CheckCircle2,
     Clock,
     DollarSign
-} from 'lucide-react'
+} from '@/lib/icons'
 
 const container = {
     hidden: { opacity: 0 },

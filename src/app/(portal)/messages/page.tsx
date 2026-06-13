@@ -7,7 +7,7 @@ import { useDashboard } from '@/contexts/DashboardContext'
 import { supabase } from '@/lib/supabase'
 import { Message, Project } from '@/types/database'
 import { formatRelativeTime, getInitials } from '@/lib/utils'
-import { MessageCircle, Send, Sparkles, Loader2 } from 'lucide-react'
+import { MessageCircle, Send, Sparkles, Loader2 } from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 export default function MessagesPage() {

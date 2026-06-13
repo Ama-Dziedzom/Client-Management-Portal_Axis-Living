@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Save, Loader2, Save as SaveIcon } from 'lucide-react'
+import { Save, Loader2, Save as SaveIcon } from '@/lib/icons'
 import { ProjectStatus } from '@/types/database'
 
 interface EditProjectDetailsProps {

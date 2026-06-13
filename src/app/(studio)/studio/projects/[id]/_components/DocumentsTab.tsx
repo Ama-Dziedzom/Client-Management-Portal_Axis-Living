@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus, FileText, Globe, Trash2, Image as ImageIcon, Table, File } from 'lucide-react'
+import { Plus, FileText, Globe, Trash2, Image as ImageIcon, Table, File } from '@/lib/icons'
 import { Document } from '@/types/database'
 import { formatFileSize, formatDate } from '@/lib/utils'
 

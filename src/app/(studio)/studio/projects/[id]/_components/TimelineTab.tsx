@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus, Clock, Edit2, Trash2 } from 'lucide-react'
+import { Plus, Clock, Edit2, Trash2 } from '@/lib/icons'
 import { TimelineStage } from '@/types/database'
 
 interface TimelineTabProps {

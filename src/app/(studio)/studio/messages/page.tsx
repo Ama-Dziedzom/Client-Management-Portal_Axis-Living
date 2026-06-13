@@ -18,7 +18,7 @@ import {
     ChevronRight,
     Search as SearchIcon,
     AlertCircle
-} from 'lucide-react'
+} from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn, getInitials } from '@/lib/utils'

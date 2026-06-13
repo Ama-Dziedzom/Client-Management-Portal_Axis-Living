@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Edit2, Trash2, MapPin } from 'lucide-react'
+import { ArrowLeft, Edit2, Trash2, MapPin } from '@/lib/icons'
 import Link from 'next/link'
 import { ProjectStatus } from '@/types/database'
 import { formatStatus, getStatusBadgeClass } from '@/lib/utils'

@@ -20,7 +20,7 @@ import {
     MessageCircle,
     Send,
     Image as ImageIcon,
-} from 'lucide-react'
+} from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 const container = {

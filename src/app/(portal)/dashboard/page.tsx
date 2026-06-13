@@ -18,7 +18,7 @@ import {
     TrendingUp,
     Calendar,
     Sparkles,
-} from 'lucide-react'
+} from '@/lib/icons'
 import { useDashboard } from '@/contexts/DashboardContext'
 import PageHeader from '@/components/dashboard/PageHeader'
 

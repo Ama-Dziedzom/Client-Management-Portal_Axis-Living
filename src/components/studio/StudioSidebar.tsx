@@ -19,7 +19,7 @@ import {
     CalendarDays,
     ChevronDown,
     Mail,
-} from 'lucide-react'
+} from '@/lib/icons'
 import { useStudio } from '@/contexts/StudioContext'
 import { cn, getInitials } from '@/lib/utils'
 
@@ -50,21 +50,19 @@ export default function StudioSidebar() {
     const [websiteOpen, setWebsiteOpen] = useState(isInWebsite)
 
     return (
-        <aside className="hidden lg:flex w-[260px] flex-col fixed inset-y-0 left-0 bg-[#111318] z-50">
-            {/* Top */}
-            <div className="p-8">
-                <Link href="/studio" className="block mb-1">
-                    <h1 className="text-white font-heading text-[22px] font-semibold leading-tight">
-                        Axis Living
-                    </h1>
+        <aside className="hidden lg:flex w-[260px] flex-col fixed inset-y-0 left-0 bg-[#1a2018] z-50">
+            {/* Branding */}
+            <div className="px-7 pt-7 pb-5 border-b border-[#C6B9AA]/10">
+                <Link href="/studio" className="block">
+                    <img src="/axis-living.png" alt="Axis Living" className="h-[4.75rem] w-auto rounded-md" />
                 </Link>
-                <div className="text-[#8b8fa3] text-[10px] font-bold tracking-[0.15em] uppercase mt-1">
+                <div className="text-[#a09489] text-[10px] font-bold tracking-[0.18em] uppercase mt-2.5">
                     Studio Panel
                 </div>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 px-4 overflow-y-auto space-y-1 pb-4">
+            {/* Main Navigation */}
+            <nav className="flex-1 px-4 overflow-y-auto pt-5 pb-4 space-y-0.5">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href ||
                         (item.href !== '/studio' && pathname.startsWith(item.href) && !pathname.startsWith('/studio/website'))
@@ -74,39 +72,51 @@ export default function StudioSidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                                "group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
                                 isActive
-                                    ? "bg-white/10 text-white"
-                                    : "text-[#8b8fa3] hover:bg-white/5 hover:text-white"
+                                    ? "bg-[#2F402C] text-white"
+                                    : "text-[#a09489] hover:bg-[#2F402C]/50 hover:text-white"
                             )}
                         >
-                            <Icon className={cn("w-5 h-5", isActive ? "text-blue-400" : "text-[#8b8fa3] group-hover:text-white")} />
+                            <Icon className={cn(
+                                "w-[18px] h-[18px] flex-shrink-0 transition-colors",
+                                isActive ? "text-[#C6B9AA]" : "text-[#a09489] group-hover:text-[#C6B9AA]"
+                            )} />
                             <span>{item.label}</span>
                         </Link>
                     )
                 })}
 
-                {/* Website section — collapsible */}
-                <div className="pt-2">
+                {/* Website Section */}
+                <div className="pt-4">
+                    <div className="px-4 mb-2">
+                        <span className="text-[9px] font-bold tracking-[0.18em] uppercase text-[#a09489]/50">
+                            Website
+                        </span>
+                    </div>
+
                     <button
                         onClick={() => setWebsiteOpen(o => !o)}
                         className={cn(
-                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
                             isInWebsite
-                                ? "bg-white/10 text-white"
-                                : "text-[#8b8fa3] hover:bg-white/5 hover:text-white"
+                                ? "bg-[#2F402C] text-white"
+                                : "text-[#a09489] hover:bg-[#2F402C]/50 hover:text-white"
                         )}
                     >
-                        <Globe className={cn("w-5 h-5", isInWebsite ? "text-emerald-400" : "text-[#8b8fa3]")} />
-                        <span className="flex-1 text-left">Website</span>
+                        <Globe className={cn(
+                            "w-[18px] h-[18px] flex-shrink-0",
+                            isInWebsite ? "text-[#C6B9AA]" : "text-[#a09489]"
+                        )} />
+                        <span className="flex-1 text-left">Manage Site</span>
                         <ChevronDown className={cn(
-                            "w-4 h-4 transition-transform duration-200",
+                            "w-4 h-4 text-[#a09489] transition-transform duration-200",
                             websiteOpen ? "rotate-180" : ""
                         )} />
                     </button>
 
                     {websiteOpen && (
-                        <div className="mt-1 ml-4 pl-4 border-l border-white/10 space-y-1">
+                        <div className="mt-1 ml-4 pl-4 border-l border-[#C6B9AA]/15 space-y-0.5">
                             {websiteNavItems.map((item) => {
                                 const isActive = item.href === '/studio/website'
                                     ? pathname === '/studio/website'
@@ -117,13 +127,16 @@ export default function StudioSidebar() {
                                         key={item.href}
                                         href={item.href}
                                         className={cn(
-                                            "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
+                                            "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
                                             isActive
-                                                ? "bg-white/10 text-white"
-                                                : "text-[#8b8fa3] hover:bg-white/5 hover:text-white"
+                                                ? "bg-[#2F402C] text-white"
+                                                : "text-[#a09489] hover:bg-[#2F402C]/50 hover:text-white"
                                         )}
                                     >
-                                        <Icon className={cn("w-4 h-4", isActive ? "text-emerald-400" : "text-[#8b8fa3] group-hover:text-white")} />
+                                        <Icon className={cn(
+                                            "w-4 h-4 flex-shrink-0 transition-colors",
+                                            isActive ? "text-[#C6B9AA]" : "text-[#a09489] group-hover:text-[#C6B9AA]"
+                                        )} />
                                         <span>{item.label}</span>
                                     </Link>
                                 )
@@ -133,24 +146,24 @@ export default function StudioSidebar() {
                 </div>
             </nav>
 
-            {/* Bottom */}
-            <div className="p-6 border-t border-white/10">
+            {/* User / Sign out */}
+            <div className="px-6 py-5 border-t border-[#C6B9AA]/10">
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-bold">
+                    <div className="w-9 h-9 rounded-xl bg-[#C6B9AA]/15 flex items-center justify-center text-[#C6B9AA] text-xs font-bold flex-shrink-0">
                         {studioUser ? getInitials(studioUser.name) : 'S'}
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="text-white text-sm font-medium truncate">
                             {studioUser?.name || 'Studio User'}
                         </div>
-                        <div className="text-[#8b8fa3] text-xs truncate">
+                        <div className="text-[#a09489] text-xs truncate">
                             {studioUser?.role === 'admin' ? 'Admin' : 'Designer'}
                         </div>
                     </div>
                 </div>
                 <button
                     onClick={() => signOut()}
-                    className="flex items-center gap-2 text-[#8b8fa3] text-sm font-medium hover:text-white transition-colors py-2"
+                    className="flex items-center gap-2 text-[#a09489] text-sm font-medium hover:text-white transition-colors py-1.5"
                 >
                     <LogOut className="w-4 h-4" />
                     <span>Sign Out</span>

@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, MessageSquare, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, ChevronRight } from '@/lib/icons'
 import Link from 'next/link'
 import { ProjectWithDetails } from '@/types/database'
 import { formatDate } from '@/lib/utils'
