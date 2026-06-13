@@ -164,10 +164,15 @@ function NurtureTab() {
 
     const fetchEmails = async () => {
         setLoading(true)
-        const res = await fetch('/api/studio/nurture-emails')
-        const result = await res.json()
-        setEmails(result.data ?? [])
-        setLoading(false)
+        try {
+            const res = await fetch('/api/studio/nurture-emails')
+            const result = await res.json()
+            setEmails(result.data ?? [])
+        } catch {
+            setEmails([])
+        } finally {
+            setLoading(false)
+        }
     }
 
     const startEdit = (email: NurtureEmail) => {
