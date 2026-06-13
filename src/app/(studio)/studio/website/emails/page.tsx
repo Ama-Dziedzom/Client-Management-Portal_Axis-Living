@@ -2,11 +2,42 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { emailTemplates } from '@/lib/emailTemplates'
+import { emailTemplates, wrap, btn, randomImage } from '@/lib/emailTemplates'
 import {
     Copy, Check, Plus, Pencil, Trash2, ChevronUp, ChevronDown,
-    ToggleLeft, ToggleRight, X, Save, Clock, Mail,
+    ToggleLeft, ToggleRight, X, Save, Clock, Mail, Eye, EyeOff,
 } from 'lucide-react'
+
+// Renders a nurture email body into the standard Axis Living email layout
+function buildNurturePreview(subject: string, body: string): string {
+    const name = 'Ama'
+    const replaced = body.replace(/\{\{name\}\}/gi, name)
+    const blocks = replaced.split(/\n\n+/).map((b: string) => b.trim()).filter(Boolean)
+
+    let idx = 0
+    if (blocks[0]?.match(/^(hi|hello)\b/i)) idx = 1
+
+    const remaining = blocks.slice(idx)
+    const bodyText: string = remaining[0]?.replace(/\n/g, ' ') ?? ''
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const contentParts = remaining.slice(1).map((block: string): string => {
+        const btnMatch = block.match(/^\[BUTTON:\s*(.+?)\s*\|\s*(.+?)\]$/)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (btnMatch) return (btn as any)(btnMatch[1].trim(), btnMatch[2].trim())
+        return `<p style="margin:18px 0 0;font-size:15px;line-height:1.75;color:#6B7280;text-align:center;">${block.replace(/\n/g, '<br/>')}</p>`
+    })
+    contentParts.push(`<p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:#2F402C;text-align:center;">Kas</p>`)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (wrap as any)({
+        image: (randomImage as any)(),
+        heading: subject.replace(/\{\{name\}\}/gi, name),
+        body: bodyText,
+        content: contentParts.join('\n'),
+        note: 'You received this because you signed up at axisliving.co.zm. Reply to unsubscribe.',
+    })
+}
 
 // ───── Types ─────
 
@@ -127,6 +158,7 @@ function NurtureTab() {
     const [saving, setSaving] = useState(false)
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+    const [previewId, setPreviewId] = useState<string | null>(null)
 
     useEffect(() => { fetchEmails() }, [])
 
@@ -312,6 +344,10 @@ function NurtureTab() {
                                             className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
                                             {copiedId === email.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                                         </button>
+                                        <button onClick={() => setPreviewId(previewId === email.id ? null : email.id)} title={previewId === email.id ? 'Close preview' : 'Preview'}
+                                            className={`p-2 rounded-lg transition-colors ${previewId === email.id ? 'bg-accent/20 text-primary' : 'hover:bg-surface text-text-secondary hover:text-text-primary'}`}>
+                                            {previewId === email.id ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
                                         <button onClick={() => startEdit(email)} title="Edit"
                                             className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
                                             <Pencil className="w-4 h-4" />
@@ -322,6 +358,28 @@ function NurtureTab() {
                                         </button>
                                     </div>
                                 </div>
+
+                                {/* Inline preview */}
+                                {previewId === email.id && (
+                                    <div className="mt-4 pt-4 border-t border-border">
+                                        <div className="rounded-2xl overflow-hidden border border-border shadow-card">
+                                            <div className="bg-surface border-b border-border px-4 py-2.5 flex items-center gap-2">
+                                                <span className="w-3 h-3 rounded-full bg-red-400" />
+                                                <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                                                <span className="w-3 h-3 rounded-full bg-green-400" />
+                                                <span className="ml-3 text-xs text-text-secondary font-mono truncate">{email.subject}</span>
+                                            </div>
+                                            <iframe
+                                                key={email.id}
+                                                srcDoc={buildNurturePreview(email.subject, email.body)}
+                                                title={`Preview: ${email.subject}`}
+                                                className="w-full bg-white"
+                                                style={{ height: '780px', border: 'none' }}
+                                                sandbox="allow-same-origin"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Delete confirm */}
                                 {deleteConfirmId === email.id && (
