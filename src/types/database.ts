@@ -125,6 +125,7 @@ export interface Booking {
     date: string;
     time: string;
     project_type: string | null;
+    consultation_type: string | null;
     message: string | null;
     currency: string;
     amount: number | null;

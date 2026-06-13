@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getResend, FROM } from '@/lib/resend';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { emailTemplates } from '@/lib/emailTemplates';
 
 export async function POST(req: Request) {
@@ -16,8 +17,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        const { data: tpl } = await getSupabaseAdmin().from('email_templates').select('*').eq('id', 'booking_cancelled').single();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { subject, html } = (emailTemplates as any).bookingCancelled(name, date, time);
+        const { subject, html } = (emailTemplates as any).bookingCancelled(name, date, time, tpl ?? {});
         const { error: clientError } = await getResend().emails.send({
             from: FROM,
             to: [email],

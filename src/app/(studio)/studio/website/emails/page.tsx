@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { emailTemplates, wrap, btn, randomImage } from '@/lib/emailTemplates'
 import {
@@ -8,7 +8,8 @@ import {
     ToggleLeft, ToggleRight, X, Save, Clock, Mail, Eye, EyeOff,
 } from '@/lib/icons'
 
-// Renders a nurture email body into the standard Axis Living email layout
+// ───── Nurture preview builder ─────
+
 function buildNurturePreview(subject: string, body: string): string {
     const name = 'Ama'
     const replaced = body.replace(/\{\{name\}\}/gi, name)
@@ -41,6 +42,16 @@ function buildNurturePreview(subject: string, body: string): string {
 
 // ───── Types ─────
 
+interface EmailTemplate {
+    id: string
+    name: string
+    subject: string
+    heading: string
+    body: string
+    note: string | null
+    updated_at: string
+}
+
 interface NurtureEmail {
     id: string
     sequence_order: number
@@ -52,93 +63,236 @@ interface NurtureEmail {
     updated_at: string
 }
 
-// ───── Template Preview Tab ─────
+// ───── Transactional Tab ─────
 
 const SAMPLE = {
     name: 'Ama Dziedzom',
     date: 'June 20, 2026',
     time: '10:00 AM',
     meetingLink: 'https://meet.google.com/owu-zhiz-bns',
-    email: 'hello@axisliving.co.zm',
-    password: 'Ax!s2026',
-    portalUrl: 'https://portal.axisliving.co.zm',
-    messagePreview: "Your moodboard for the living room is ready — I've included two directions for you to review before our next check-in.",
+    cancellationUrl: 'https://axisliving.co.zm/booking/cancel?id=example',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const templates: { id: string; label: string; timing: string; generate: () => any }[] = [
-    {
-        id: 'lookbook',
-        label: 'Lookbook Delivery',
-        timing: 'On lookbook sign-up',
-        generate: () => (emailTemplates as any).lookbookDelivery(SAMPLE.name.split(' ')[0]),
-    },
-    {
-        id: 'booking',
-        label: 'Booking Confirmation',
-        timing: 'On consultation booked',
-        generate: () => (emailTemplates as any).bookingConfirmation(SAMPLE.name, SAMPLE.date, SAMPLE.time, SAMPLE.meetingLink),
-    },
-    {
-        id: 'cancelled',
-        label: 'Booking Cancelled',
-        timing: 'On client self-cancellation',
-        generate: () => (emailTemplates as any).bookingCancelled?.(SAMPLE.name, SAMPLE.date, SAMPLE.time) ?? { subject: 'N/A', html: '<p>Template not found</p>' },
-    },
-    {
-        id: 'portal',
-        label: 'Portal Welcome',
-        timing: 'On client portal created',
-        generate: () => (emailTemplates as any).portalWelcome(SAMPLE.name, SAMPLE.email, SAMPLE.password, SAMPLE.portalUrl),
-    },
-    {
-        id: 'message',
-        label: 'New Message',
-        timing: 'On designer message sent',
-        generate: () => (emailTemplates as any).newPortalMessage(SAMPLE.name, SAMPLE.messagePreview, SAMPLE.portalUrl),
-    },
-]
+const TEMPLATE_META: Record<string, { trigger: string }> = {
+    booking_confirmation: { trigger: 'On consultation booked' },
+    booking_cancelled:    { trigger: 'On client self-cancellation' },
+    lookbook_delivery:    { trigger: 'On lookbook sign-up' },
+}
 
-function EmailPreviewTab() {
-    const [active, setActive] = useState(templates[0].id)
-    const current = templates.find(t => t.id === active)!
-    const { subject, html } = current.generate()
+function buildPreview(id: string, tpl: EmailTemplate): string {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const et = emailTemplates as any
+    if (id === 'booking_confirmation') {
+        return et.bookingConfirmation(SAMPLE.name, SAMPLE.date, SAMPLE.time, SAMPLE.meetingLink, SAMPLE.cancellationUrl, tpl).html
+    }
+    if (id === 'booking_cancelled') {
+        return et.bookingCancelled(SAMPLE.name, SAMPLE.date, SAMPLE.time, tpl).html
+    }
+    if (id === 'lookbook_delivery') {
+        return et.lookbookDelivery(SAMPLE.name.split(' ')[0], tpl).html
+    }
+    return '<p>No preview available.</p>'
+}
+
+const PLACEHOLDER_HINT: Record<string, string[]> = {
+    booking_confirmation: ['{{name}}', '{{date}}', '{{time}}', '{{cancel_link}}'],
+    booking_cancelled:    ['{{name}}', '{{date}}', '{{time}}'],
+    lookbook_delivery:    ['{{name}}'],
+}
+
+function TransactionalTab() {
+    const [templates, setTemplates] = useState<EmailTemplate[]>([])
+    const [loading, setLoading] = useState(true)
+    const [activeId, setActiveId] = useState<string>('booking_confirmation')
+    const [editing, setEditing] = useState(false)
+    const [form, setForm] = useState<Partial<EmailTemplate>>({})
+    const [saving, setSaving] = useState(false)
+    const [saved, setSaved] = useState(false)
+    const [showPreview, setShowPreview] = useState(true)
+
+    useEffect(() => {
+        fetch('/api/studio/email-templates')
+            .then(r => r.json())
+            .then(r => { setTemplates(r.data ?? []); setLoading(false) })
+            .catch(() => setLoading(false))
+    }, [])
+
+    const active = templates.find(t => t.id === activeId)
+
+    const startEdit = useCallback(() => {
+        if (!active) return
+        setForm({ subject: active.subject, heading: active.heading, body: active.body, note: active.note ?? '' })
+        setEditing(true)
+    }, [active])
+
+    const cancelEdit = () => { setEditing(false); setForm({}) }
+
+    const save = async () => {
+        if (!active) return
+        setSaving(true)
+        const res = await fetch(`/api/studio/email-templates/${active.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(form),
+        })
+        const result = await res.json()
+        if (result.data) {
+            setTemplates(prev => prev.map(t => t.id === active.id ? result.data : t))
+        }
+        setSaving(false)
+        setEditing(false)
+        setSaved(true)
+        setTimeout(() => setSaved(false), 2500)
+    }
+
+    // Merge live form values into a preview-able template object
+    const previewTpl = editing && active ? { ...active, ...form } : active
+
+    if (loading) return (
+        <div className="space-y-4">{[1, 2].map(i => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
+    )
+
+    if (templates.length === 0) return (
+        <div className="card-flat text-center py-12">
+            <p className="text-text-secondary text-sm">No templates found. Run the SQL migration in your Supabase dashboard first.</p>
+        </div>
+    )
 
     return (
-        <div>
-            <div className="flex flex-wrap gap-2 mb-6">
-                {templates.map(t => (
-                    <button key={t.id} onClick={() => setActive(t.id)}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${active === t.id ? 'bg-accent/20 text-primary border-accent/30' : 'bg-surface text-text-secondary border-border hover:text-text-primary'}`}>
-                        {t.label}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {/* Left — selector + editor */}
+            <div className="space-y-4">
+                {/* Template selector */}
+                <div className="flex flex-wrap gap-2">
+                    {templates.map(t => (
+                        <button key={t.id} onClick={() => { setActiveId(t.id); setEditing(false); setForm({}) }}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${activeId === t.id ? 'bg-accent/20 text-primary border-accent/30' : 'bg-surface text-text-secondary border-border hover:text-text-primary'}`}>
+                            {t.name}
+                        </button>
+                    ))}
+                </div>
+
+                {active && (
+                    <div className="card-flat space-y-4">
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-3">
+                            <div>
+                                <p className="text-text-primary font-semibold text-sm">{active.name}</p>
+                                <p className="text-text-secondary text-xs mt-0.5">{TEMPLATE_META[active.id]?.trigger}</p>
+                            </div>
+                            {!editing && (
+                                <div className="flex items-center gap-2">
+                                    {saved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Saved</span>}
+                                    <button onClick={startEdit}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-text-secondary hover:text-text-primary transition-colors">
+                                        <Pencil className="w-3.5 h-3.5" /> Edit
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Placeholder hint */}
+                        {PLACEHOLDER_HINT[active.id] && (
+                            <div className="bg-accent/5 border border-accent/20 rounded-xl px-3 py-2">
+                                <p className="text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1.5">Available placeholders</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {PLACEHOLDER_HINT[active.id].map(p => (
+                                        <code key={p} className="bg-surface border border-border px-2 py-0.5 rounded text-xs font-mono text-primary">{p}</code>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {editing ? (
+                            /* Edit form */
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Subject</label>
+                                    <input value={form.subject ?? ''} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                                        className="input-field w-full" />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Heading</label>
+                                    <input value={form.heading ?? ''} onChange={e => setForm(f => ({ ...f, heading: e.target.value }))}
+                                        className="input-field w-full" />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Body</label>
+                                    <textarea value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
+                                        rows={4} className="input-field w-full resize-y" />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Footer note</label>
+                                    <input value={form.note ?? ''} onChange={e => setForm(f => ({ ...f, note: e.target.value }))}
+                                        className="input-field w-full" placeholder="Optional note below the email content" />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button onClick={save} disabled={saving}
+                                        className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">
+                                        <Save className="w-4 h-4" /> {saving ? 'Saving…' : 'Save'}
+                                    </button>
+                                    <button onClick={cancelEdit}
+                                        className="px-5 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary border border-border">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            /* Read view */
+                            <div className="space-y-3 text-sm">
+                                {[
+                                    { label: 'Subject',      value: active.subject },
+                                    { label: 'Heading',      value: active.heading },
+                                    { label: 'Body',         value: active.body },
+                                    { label: 'Footer note',  value: active.note || '—' },
+                                ].map(({ label, value }) => (
+                                    <div key={label}>
+                                        <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-0.5">{label}</span>
+                                        <span className="text-text-primary leading-relaxed">{value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Right — live preview */}
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Live Preview</span>
+                    <button onClick={() => setShowPreview(p => !p)}
+                        className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors">
+                        {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        {showPreview ? 'Hide' : 'Show'}
                     </button>
-                ))}
-            </div>
-            <div className="card-flat mb-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
-                <div className="flex items-center gap-3 text-sm">
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Trigger</span>
-                    <span className="text-text-primary">{current.timing}</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm">
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Subject</span>
-                    <span className="text-text-primary">{subject}</span>
-                </div>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-border shadow-card">
-                <div className="bg-surface border-b border-border px-4 py-2.5 flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-red-400" />
-                    <span className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <span className="w-3 h-3 rounded-full bg-green-400" />
-                    <span className="ml-3 text-xs text-text-secondary font-mono truncate">{subject}</span>
-                </div>
-                <iframe key={active} srcDoc={html} title={`Preview: ${current.label}`}
-                    className="w-full bg-white" style={{ height: '780px', border: 'none' }} sandbox="allow-same-origin" />
+                {showPreview && previewTpl && (
+                    <div className="rounded-2xl overflow-hidden border border-border shadow-card">
+                        <div className="bg-surface border-b border-border px-4 py-2.5 flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full bg-red-400" />
+                            <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                            <span className="w-3 h-3 rounded-full bg-green-400" />
+                            <span className="ml-3 text-xs text-text-secondary font-mono truncate">
+                                {(form.subject || previewTpl.subject).replace('{{date}}', SAMPLE.date).replace('{{name}}', SAMPLE.name.split(' ')[0])}
+                            </span>
+                        </div>
+                        <iframe
+                            key={activeId + JSON.stringify(form)}
+                            srcDoc={buildPreview(activeId, previewTpl as EmailTemplate)}
+                            title="Email preview"
+                            className="w-full bg-white"
+                            style={{ height: '780px', border: 'none' }}
+                            sandbox="allow-same-origin"
+                        />
+                    </div>
+                )}
             </div>
         </div>
     )
 }
 
-// ───── Nurture Sequence Editor ─────
+// ───── Nurture Sequence Tab ─────
 
 const EMPTY_FORM = { subject: '', body: '', delay_days: 0 }
 
@@ -261,21 +415,18 @@ function NurtureTab() {
 
     return (
         <div className="space-y-4">
-            {/* Hint */}
             <div className="card-flat bg-accent/5 border-accent/20">
                 <p className="text-sm text-text-secondary leading-relaxed">
                     These emails are sent automatically to everyone who downloads the lookbook. Use <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">{'{{name}}'}</code> to personalise, and <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">{'[BUTTON: Label | https://url.com]'}</code> to add a call-to-action button.
                 </p>
             </div>
 
-            {/* Email cards */}
             <AnimatePresence>
                 {emails.map((email, idx) => (
                     <motion.div key={email.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                         className={`card-flat transition-opacity ${!email.active ? 'opacity-50' : ''}`}>
 
                         {editingId === email.id ? (
-                            /* ── Edit form ── */
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Editing Email {email.sequence_order}</span>
@@ -307,10 +458,8 @@ function NurtureTab() {
                                 </div>
                             </div>
                         ) : (
-                            /* ── Read view ── */
                             <>
                                 <div className="flex items-start gap-4">
-                                    {/* Sequence + reorder */}
                                     <div className="flex flex-col items-center gap-1 flex-shrink-0">
                                         <button onClick={() => reorder(idx, 'up')} disabled={idx === 0}
                                             className="p-1 rounded-lg hover:bg-surface disabled:opacity-20 transition-colors">
@@ -325,7 +474,6 @@ function NurtureTab() {
                                         </button>
                                     </div>
 
-                                    {/* Content */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                                             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-wider">
@@ -339,7 +487,6 @@ function NurtureTab() {
                                         <p className="text-text-secondary text-sm line-clamp-2 leading-relaxed">{email.body.split('\n')[0]}</p>
                                     </div>
 
-                                    {/* Actions */}
                                     <div className="flex items-center gap-1 flex-shrink-0">
                                         <button onClick={() => toggleActive(email)} title={email.active ? 'Pause' : 'Activate'}
                                             className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
@@ -364,7 +511,6 @@ function NurtureTab() {
                                     </div>
                                 </div>
 
-                                {/* Inline preview */}
                                 {previewId === email.id && (
                                     <div className="mt-4 pt-4 border-t border-border">
                                         <div className="rounded-2xl overflow-hidden border border-border shadow-card">
@@ -386,7 +532,6 @@ function NurtureTab() {
                                     </div>
                                 )}
 
-                                {/* Delete confirm */}
                                 {deleteConfirmId === email.id && (
                                     <div className="mt-4 pt-4 border-t border-border flex items-center gap-3">
                                         <p className="text-sm text-text-secondary flex-1">Delete this email? This cannot be undone.</p>
@@ -402,7 +547,6 @@ function NurtureTab() {
                 ))}
             </AnimatePresence>
 
-            {/* Add new email */}
             {addingNew ? (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card-flat space-y-4">
                     <div className="flex items-center justify-between">
@@ -445,20 +589,20 @@ function NurtureTab() {
 
 // ───── Page ─────
 
-type Tab = 'preview' | 'nurture'
+type Tab = 'transactional' | 'nurture'
 
 export default function EmailsPage() {
-    const [tab, setTab] = useState<Tab>('preview')
+    const [tab, setTab] = useState<Tab>('transactional')
 
     return (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             <div className="mb-8">
                 <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Emails</h1>
-                <p className="text-text-secondary font-body text-lg">Preview system templates and manage your nurture sequence</p>
+                <p className="text-text-secondary font-body text-lg">Edit transactional templates and manage your nurture sequence</p>
             </div>
 
             <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 w-fit mb-8">
-                {([['preview', 'Template Preview'], ['nurture', 'Nurture Sequence']] as [Tab, string][]).map(([key, label]) => (
+                {([['transactional', 'Transactional'], ['nurture', 'Nurture Sequence']] as [Tab, string][]).map(([key, label]) => (
                     <button key={key} onClick={() => setTab(key)}
                         className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === key ? 'bg-accent/20 text-primary border border-accent/30' : 'text-text-secondary hover:text-text-primary'}`}>
                         {label}
@@ -466,7 +610,7 @@ export default function EmailsPage() {
                 ))}
             </div>
 
-            {tab === 'preview' ? <EmailPreviewTab /> : <NurtureTab />}
+            {tab === 'transactional' ? <TransactionalTab /> : <NurtureTab />}
         </motion.div>
     )
 }

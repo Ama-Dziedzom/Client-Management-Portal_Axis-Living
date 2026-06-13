@@ -188,6 +188,12 @@ export default function BookingsPage() {
 
                             {/* Meta row */}
                             <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-border">
+                                {booking.consultation_type && (
+                                    <span className="flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/8 border border-primary/15 px-2 py-0.5 rounded-full">
+                                        <Tag className="w-3 h-3" />
+                                        {booking.consultation_type}
+                                    </span>
+                                )}
                                 {booking.project_type && (
                                     <span className="flex items-center gap-1 text-xs text-text-secondary">
                                         <Tag className="w-3 h-3" />

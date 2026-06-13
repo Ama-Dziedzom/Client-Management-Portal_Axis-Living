@@ -3,10 +3,10 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Loader2, Save, Sparkles, User, Mail, Phone, Lock, Eye, EyeOff } from '@/lib/icons'
+import { ArrowLeft, Loader2, Save, Sparkles, User, Mail, Lock, Eye, EyeOff } from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { formatPhoneInput, unformatPhone } from '@/lib/utils'
+import PhoneInput from '@/components/ui/PhoneInput'
 
 const item = {
     hidden: { opacity: 0, y: 12 },
@@ -37,7 +37,7 @@ export default function NewClientPage() {
             const response = await fetch('/api/studio/clients', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone: unformatPhone(phone), password }),
+                body: JSON.stringify({ name, email, phone, password }),
             })
 
             const result = await response.json()
@@ -126,17 +126,7 @@ export default function NewClientPage() {
                         {/* Phone */}
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-text-primary ml-1">Phone Number (Optional)</label>
-                            <div className="relative">
-                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
-                                <input
-                                    type="tel"
-                                    placeholder="097 045 6789"
-                                    value={phone}
-                                    onChange={(e) => setPhone(formatPhoneInput(e.target.value))}
-                                    maxLength={12}
-                                    className="input-field pl-11"
-                                />
-                            </div>
+                            <PhoneInput value={phone} onChange={setPhone} />
                         </div>
                     </div>
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getResend, FROM, AUDIENCE_ID } from '@/lib/resend';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { emailTemplates } from '@/lib/emailTemplates';
 
 function generateICS(name: string, email: string, date: string, time: string, meetingLink: string): string {
@@ -37,15 +38,16 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { name, email, date, time, meetingLink, cancellationUrl, phone, projectType, message } = await req.json();
+        const { name, email, date, time, meetingLink, cancellationUrl, phone, projectType, consultationType, message } = await req.json();
 
         if (!name || !email || !date || !time || !meetingLink) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         const icsContent = generateICS(name, email, date, time, meetingLink);
+        const { data: tpl } = await getSupabaseAdmin().from('email_templates').select('*').eq('id', 'booking_confirmation').single();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { subject, html } = (emailTemplates as any).bookingConfirmation(name, date, time, meetingLink, cancellationUrl ?? null);
+        const { subject, html } = (emailTemplates as any).bookingConfirmation(name, date, time, meetingLink, cancellationUrl ?? null, tpl ?? {});
 
         const { error: clientError } = await getResend().emails.send({
             from: FROM,
@@ -64,6 +66,7 @@ export async function POST(req: Request) {
             phone ? `Phone:        ${phone}` : null,
             `Date:         ${date}`,
             `Time:         ${time} (CAT)`,
+            consultationType ? `Consultation: ${consultationType}` : null,
             `Project Type: ${projectType || 'Not specified'}`,
             `Message:      ${message || 'No message provided'}`,
             cancellationUrl ? `Cancel link:  ${cancellationUrl}` : null,

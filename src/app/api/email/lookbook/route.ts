@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getResend, FROM, AUDIENCE_ID } from '@/lib/resend';
-import { emailTemplates } from '@/lib/emailTemplates';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { emailTemplates } from '@/lib/emailTemplates';
 
 export async function POST(req: Request) {
     const auth = req.headers.get('authorization');
@@ -35,7 +35,9 @@ export async function POST(req: Request) {
             console.error('Nurture subscriber error:', e);
         }
 
-        const { subject, html } = emailTemplates.lookbookDelivery(displayName);
+        const { data: tpl } = await getSupabaseAdmin().from('email_templates').select('*').eq('id', 'lookbook_delivery').single();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { subject, html } = (emailTemplates as any).lookbookDelivery(displayName, tpl ?? {});
         const { error } = await getResend().emails.send({ from: FROM, to: [email], subject, html });
 
         if (error) {
