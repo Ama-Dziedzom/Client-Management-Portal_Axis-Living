@@ -51,11 +51,9 @@ export async function sendEmail({ to, subject, html, replyTo }: SendEmailOptions
 
 import { EMAIL_LOGO_SRC } from './emailLogo'
 
-const LOGO_FILTER = 'brightness(0) saturate(100%) invert(22%) sepia(15%) saturate(760%) hue-rotate(73deg) brightness(90%)'
-
 function logoHtml() {
     return `<div style="text-align:center;padding:32px 32px 24px;">
-        <img src="${EMAIL_LOGO_SRC}" alt="Axis Living" width="220" style="height:auto;display:block;margin:0 auto;filter:${LOGO_FILTER};" />
+        <img src="${EMAIL_LOGO_SRC}" alt="Axis Living" width="220" style="height:auto;display:block;margin:0 auto;" />
     </div>`
 }
 
