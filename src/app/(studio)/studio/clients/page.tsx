@@ -150,7 +150,7 @@ export default function StudioClientsPage() {
                                         <FolderKanban className="w-3.5 h-3.5" />
                                         <span>{client.project_count} project{client.project_count !== 1 ? 's' : ''}</span>
                                     </div>
-                                    <span className={`badge ${client.active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-500 border border-gray-200'}`}>
+                                    <span className={`badge ${client.active ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-border/50 text-text-secondary border border-border'}`}>
                                         {client.active ? 'Active' : 'Inactive'}
                                     </span>
                                     <ArrowRight className="w-4 h-4 text-text-secondary group-hover:text-primary transition-colors hidden sm:block" />

@@ -256,8 +256,8 @@ export default function StudioInvoiceDetailPage() {
                             <div key={idx} className="invoice-row-padding flex items-center px-4 py-5 text-sm font-body">
                                 <div className="flex-1 text-text-primary font-medium">{item.description}</div>
                                 <div className="w-24 text-center text-text-secondary">{item.quantity}</div>
-                                <div className="w-32 text-right text-text-secondary">{formatCurrency(item.unit_price)}</div>
-                                <div className="w-32 text-right font-bold text-text-primary">{formatCurrency(item.amount)}</div>
+                                <div className="w-32 text-right text-text-secondary">{formatCurrency(item.unit_price, invoice.currency)}</div>
+                                <div className="w-32 text-right font-bold text-text-primary">{formatCurrency(item.amount, invoice.currency)}</div>
                             </div>
                         ))}
                     </div>
@@ -274,21 +274,21 @@ export default function StudioInvoiceDetailPage() {
                     <div className="w-full md:w-64 space-y-3">
                         <div className="flex justify-between items-center text-sm text-text-secondary font-body">
                             <span>Subtotal</span>
-                            <span>{formatCurrency(invoice.subtotal)}</span>
+                            <span>{formatCurrency(invoice.subtotal, invoice.currency)}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm text-text-secondary font-body border-b border-border pb-3">
                             <span>Tax ({invoice.tax_rate ?? 16}% VAT)</span>
-                            <span>{formatCurrency(invoice.tax_amount)}</span>
+                            <span>{formatCurrency(invoice.tax_amount, invoice.currency)}</span>
                         </div>
                         <div className="flex justify-between items-center pt-2">
                             <span className="font-heading text-lg font-bold text-text-primary">Total Amount</span>
-                            <span className="font-heading text-2xl font-bold text-primary">{formatCurrency(invoice.total)}</span>
+                            <span className="font-heading text-2xl font-bold text-primary">{formatCurrency(invoice.total, invoice.currency)}</span>
                         </div>
                     </div>
                 </div>
                 
                 {invoice.status === 'paid' && (
-                    <div className="mt-16 flex items-center justify-center gap-3 p-6 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-700">
+                    <div className="mt-16 flex items-center justify-center gap-3 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600">
                         <ShieldCheck className="w-5 h-5" />
                         <span className="text-sm font-bold uppercase tracking-[0.2em]">Full Payment Received</span>
                     </div>

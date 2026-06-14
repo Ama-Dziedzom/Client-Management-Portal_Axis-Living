@@ -31,15 +31,15 @@ export function OverviewTab({ project }: OverviewTabProps) {
                         </p>
                         <p className="text-xs text-text-secondary mt-1">Stages complete</p>
                     </div>
-                    <div className="card-flat bg-blue-50/50 border-blue-100">
-                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Documents</p>
+                    <div className="card-flat bg-blue-500/5 border-blue-500/10">
+                        <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Documents</p>
                         <p className="text-xl font-heading font-bold text-text-primary">
                             {project.documents?.length || 0}
                         </p>
                         <p className="text-xs text-text-secondary mt-1">Files shared</p>
                     </div>
-                    <div className="card-flat bg-emerald-50/50 border-emerald-100">
-                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Gallery</p>
+                    <div className="card-flat bg-emerald-500/5 border-emerald-500/10">
+                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Gallery</p>
                         <p className="text-xl font-heading font-bold text-text-primary">
                             {project.gallery?.length || 0}
                         </p>

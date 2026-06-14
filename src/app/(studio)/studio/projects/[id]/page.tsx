@@ -45,6 +45,9 @@ export default function StudioProjectDetailPage() {
     const [showDocumentUpload, setShowDocumentUpload] = useState(false)
     const [editingImage, setEditingImage] = useState<GalleryImage | null>(null)
 
+    // Caption edit modal state
+    const [captionModal, setCaptionModal] = useState<{ open: boolean; image: GalleryImage | null; value: string }>({ open: false, image: null, value: '' })
+
     useEffect(() => {
         if (id) fetchProject()
     }, [id])
@@ -215,27 +218,30 @@ export default function StudioProjectDetailPage() {
     }
 
     const handleEditPhoto = (image: GalleryImage) => {
-        const newCaption = window.prompt('Edit caption:', image.caption || '')
-        if (newCaption === null) return // cancelled
+        setCaptionModal({ open: true, image, value: image.caption || '' })
+    }
 
-        supabase
+    const handleSaveCaption = async () => {
+        if (!captionModal.image) return
+        const { error } = await supabase
             .from('gallery')
-            .update({ caption: newCaption })
-            .eq('id', image.id)
-            .then(({ error }) => {
-                if (error) {
-                    logger.error('Studio', 'Update caption error', error)
-                    toast.error('Failed to update caption')
-                    return
-                }
-                toast.success('Caption updated')
-                setProject(prev => prev ? {
-                    ...prev,
-                    gallery: (prev.gallery || []).map(img =>
-                        img.id === image.id ? { ...img, caption: newCaption } : img
-                    )
-                } : null)
-            })
+            .update({ caption: captionModal.value })
+            .eq('id', captionModal.image.id)
+        if (error) {
+            logger.error('Studio', 'Update caption error', error)
+            toast.error('Failed to update caption')
+            return
+        }
+        toast.success('Caption updated')
+        const imageId = captionModal.image.id
+        const newVal = captionModal.value
+        setProject(prev => prev ? {
+            ...prev,
+            gallery: (prev.gallery || []).map(img =>
+                img.id === imageId ? { ...img, caption: newVal } : img
+            )
+        } : null)
+        setCaptionModal({ open: false, image: null, value: '' })
     }
 
     const handleReorderPhoto = async (imageId: string, direction: 'prev' | 'next') => {
@@ -479,6 +485,48 @@ export default function StudioProjectDetailPage() {
                 maxSizeMB={25}
                 showCaption={false}
             />
+
+            {/* Caption Edit Modal */}
+            <AnimatePresence>
+                {captionModal.open && (
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
+                        onClick={e => { if (e.target === e.currentTarget) setCaptionModal(m => ({ ...m, open: false })) }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-surface rounded-2xl shadow-2xl w-full max-w-sm p-6"
+                        >
+                            <div className="flex items-center justify-between mb-5">
+                                <h2 className="text-base font-heading font-semibold text-text-primary">Edit Caption</h2>
+                                <button onClick={() => setCaptionModal(m => ({ ...m, open: false }))} className="p-1.5 rounded-lg hover:bg-border/30 text-text-secondary transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <input
+                                autoFocus
+                                value={captionModal.value}
+                                onChange={e => setCaptionModal(m => ({ ...m, value: e.target.value }))}
+                                onKeyDown={e => { if (e.key === 'Enter') handleSaveCaption() }}
+                                className="input-field w-full mb-5"
+                                placeholder="Photo caption…"
+                            />
+                            <div className="flex gap-3">
+                                <button onClick={handleSaveCaption} className="flex-1 flex items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl text-sm font-semibold">
+                                    <Save className="w-4 h-4" /> Save Caption
+                                </button>
+                                <button onClick={() => setCaptionModal(m => ({ ...m, open: false }))} className="px-4 py-2.5 rounded-xl text-sm font-medium border border-border text-text-secondary hover:text-text-primary transition-colors">
+                                    Cancel
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Timeline Stage Modal */}
             <AnimatePresence>

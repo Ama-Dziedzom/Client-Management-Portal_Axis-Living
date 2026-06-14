@@ -109,7 +109,7 @@ export default function StudioProjectsPage() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="input-field pl-11 appearance-none bg-white cursor-pointer"
+                        className="input-field pl-11 appearance-none bg-surface cursor-pointer"
                     >
                         <option value="all">All Statuses</option>
                         <option value="planning">Planning</option>
