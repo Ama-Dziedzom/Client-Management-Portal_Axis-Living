@@ -614,9 +614,6 @@ function AppearanceTab() {
                         )
                     })}
                 </div>
-                <p className="text-[10px] text-text-secondary mt-3 italic ml-1">
-                    Theme support is coming soon. Currently only Light mode is active.
-                </p>
             </section>
 
             {/* Regional */}
