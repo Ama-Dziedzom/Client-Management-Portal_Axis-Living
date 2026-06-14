@@ -3,7 +3,7 @@ import { EMAIL_LOGO_SRC } from './emailLogo';
 const STUDIO_NAME = 'Axis Living';
 const YOUR_NAME = 'Kas';
 const CONTACT_EMAIL = 'hello@axisliving.co.zm';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://client-axis-living.vercel.app';
+const SITE_URL = process.env.PORTAL_URL || 'https://client-axis-living.vercel.app';
 
 const COLORS = {
   bg: '#F2EBE3',
