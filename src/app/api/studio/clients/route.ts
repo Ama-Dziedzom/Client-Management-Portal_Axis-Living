@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         }
 
         // Send welcome email with portal credentials
-        const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://portal.axis-living.com'
+        const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://client-axis-living.vercel.app'
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { subject, html } = (emailTemplates as any).portalWelcome(name, email, password, portalUrl)
 

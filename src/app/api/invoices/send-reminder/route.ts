@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
         const formattedAmount = `${currency || 'ZMW'} ${Number(total).toLocaleString()}`
         const dueDateStr = dueDate ? new Date(dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'as soon as possible'
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://axisliving.co.zm'
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://client-axis-living.vercel.app'
 
         const { error } = await getResend().emails.send({
             from: FROM,

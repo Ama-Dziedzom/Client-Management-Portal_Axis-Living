@@ -30,7 +30,7 @@ export const serverEnv = {
     resendFromName: () => process.env.RESEND_FROM_NAME ?? 'Axis Living',
     resendFromEmail: () => getEnv('RESEND_FROM_EMAIL', false),
     paystackSecretKey: () => getEnv('PAYSTACK_SECRET_KEY', false),
-    portalUrl: () => process.env.NEXT_PUBLIC_PORTAL_URL ?? 'https://portal.axisliving.com',
+    portalUrl: () => process.env.NEXT_PUBLIC_PORTAL_URL ?? 'https://client-axis-living.vercel.app',
 } as const
 
 // Public env vars (safe for browser)

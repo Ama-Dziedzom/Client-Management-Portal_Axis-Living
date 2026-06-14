@@ -70,7 +70,7 @@ const SAMPLE = {
     date: 'June 20, 2026',
     time: '10:00 AM',
     meetingLink: 'https://meet.google.com/owu-zhiz-bns',
-    cancellationUrl: 'https://axisliving.co.zm/booking/cancel?id=example',
+    cancellationUrl: 'https://client-axis-living.vercel.app/booking/cancel?id=example',
 }
 
 const TEMPLATE_META: Record<string, { trigger: string }> = {
