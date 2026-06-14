@@ -31,7 +31,7 @@ interface SidebarProject {
 const PAGE_SIZE = 50
 
 export default function StudioMessagesPage() {
-    const { studioUser } = useStudio()
+    const { studioUser, refreshUnreadCount } = useStudio()
 
     // Sidebar state
     const [sidebarProjects, setSidebarProjects] = useState<SidebarProject[]>([])
@@ -162,6 +162,7 @@ export default function StudioMessagesPage() {
             setSidebarProjects(prev =>
                 prev.map(p => p.id === projectId ? { ...p, unread_count: 0 } : p)
             )
+            refreshUnreadCount()
         }
     }
 

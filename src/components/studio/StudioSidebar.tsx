@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -21,7 +21,7 @@ import {
     Mail,
 } from '@/lib/icons'
 import { useStudio } from '@/contexts/StudioContext'
-import { studioSupabase as supabase } from '@/lib/supabase'
+
 import { cn, getInitials } from '@/lib/utils'
 
 const navItems = [
@@ -46,30 +46,9 @@ const websiteNavItems = [
 
 export default function StudioSidebar() {
     const pathname = usePathname()
-    const { signOut, studioUser } = useStudio()
+    const { signOut, studioUser, unreadCount } = useStudio()
     const isInWebsite = pathname.startsWith('/studio/website')
     const [websiteOpen, setWebsiteOpen] = useState(isInWebsite)
-    const [unreadCount, setUnreadCount] = useState(0)
-
-    useEffect(() => {
-        const fetchUnread = async () => {
-            const { count } = await supabase
-                .from('messages')
-                .select('*', { count: 'exact', head: true })
-                .eq('sender_type', 'client')
-                .eq('read', false)
-            setUnreadCount(count || 0)
-        }
-
-        fetchUnread()
-
-        const channel = supabase
-            .channel('sidebar-unread')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchUnread)
-            .subscribe()
-
-        return () => { supabase.removeChannel(channel) }
-    }, [])
 
     return (
         <aside className="print:hidden hidden lg:flex w-[260px] flex-col fixed inset-y-0 left-0 bg-[#1a2018] z-50">

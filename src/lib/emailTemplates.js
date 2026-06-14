@@ -1,3 +1,5 @@
+import { EMAIL_LOGO_SRC } from './emailLogo';
+
 const STUDIO_NAME = 'Axis Living';
 const YOUR_NAME = 'Kas';
 const CONTACT_EMAIL = 'hello@axisliving.co.zm';
@@ -60,9 +62,7 @@ export function wrap({ image, heading, body, content = '', note = '' }) {
 
         <!-- Logo -->
         <div style="margin-bottom:32px;text-align:center;">
-          <div style="display:inline-block;background:#2F402C;padding:14px 28px;border-radius:12px;">
-            <img src="${SITE_URL}/axis-living.png" alt="${STUDIO_NAME}" width="130" style="height:auto;display:block;" />
-          </div>
+          <img src="${EMAIL_LOGO_SRC}" alt="${STUDIO_NAME}" width="220" style="height:auto;display:block;margin:0 auto;filter:brightness(0) saturate(100%) invert(22%) sepia(15%) saturate(760%) hue-rotate(73deg) brightness(90%);" />
         </div>
 
         <!-- Card -->

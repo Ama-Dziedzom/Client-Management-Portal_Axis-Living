@@ -30,12 +30,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter()
 
     const refreshUnreadCount = async () => {
-        if (!project) return
         try {
+            // Query scoped by RLS — only returns messages for this client's projects
             const { count, error } = await supabase
                 .from('messages')
                 .select('*', { count: 'exact', head: true })
-                .eq('project_id', project.id)
                 .eq('sender_type', 'studio')
                 .eq('read', false)
 
@@ -76,11 +75,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                 if (projectData) {
                     setProject(projectData)
 
-                    // Fetch unread messages count
+                    // Fetch unread messages count (RLS scopes to this client's projects)
                     const { count, error: countError } = await supabase
                         .from('messages')
                         .select('*', { count: 'exact', head: true })
-                        .eq('project_id', projectData.id)
                         .eq('sender_type', 'studio')
                         .eq('read', false)
 

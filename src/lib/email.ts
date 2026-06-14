@@ -49,6 +49,16 @@ export async function sendEmail({ to, subject, html, replyTo }: SendEmailOptions
 }
 
 
+import { EMAIL_LOGO_SRC } from './emailLogo'
+
+const LOGO_FILTER = 'brightness(0) saturate(100%) invert(22%) sepia(15%) saturate(760%) hue-rotate(73deg) brightness(90%)'
+
+function logoHtml() {
+    return `<div style="text-align:center;padding:32px 32px 24px;">
+        <img src="${EMAIL_LOGO_SRC}" alt="Axis Living" width="220" style="height:auto;display:block;margin:0 auto;filter:${LOGO_FILTER};" />
+    </div>`
+}
+
 // Email templates
 export function invoicePaidEmail(clientName: string, invoiceNumber: string, amount: string) {
     return `
@@ -58,9 +68,7 @@ export function invoicePaidEmail(clientName: string, invoiceNumber: string, amou
       <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f4f1; padding: 40px 20px; margin: 0; }
         .container { max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e0da; }
-        .header { background: #2F402C; padding: 32px; text-align: center; }
-        .header h1 { color: #ffffff; font-size: 24px; margin: 0; letter-spacing: -0.01em; }
-        .header p { color: rgba(255,255,255,0.7); font-size: 13px; margin: 8px 0 0; }
+        .header { background: #F2EBE3; padding: 0; text-align: center; border-bottom: 1px solid #E5E7EB; }
         .body { padding: 32px; }
         .body h2 { color: #1a1a1a; font-size: 20px; margin: 0 0 8px; }
         .body p { color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 16px; }
@@ -71,10 +79,7 @@ export function invoicePaidEmail(clientName: string, invoiceNumber: string, amou
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Axis Living</h1>
-          <p>Client Portal</p>
-        </div>
+        ${logoHtml()}
         <div class="body">
           <h2>Payment Received</h2>
           <p>Hi ${clientName},</p>
@@ -99,9 +104,7 @@ export function newMessageEmail(clientName: string, senderName: string, projectT
       <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f4f1; padding: 40px 20px; margin: 0; }
         .container { max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e0da; }
-        .header { background: #2F402C; padding: 32px; text-align: center; }
-        .header h1 { color: #ffffff; font-size: 24px; margin: 0; }
-        .header p { color: rgba(255,255,255,0.7); font-size: 13px; margin: 8px 0 0; }
+        .header { background: #F2EBE3; padding: 0; text-align: center; border-bottom: 1px solid #E5E7EB; }
         .body { padding: 32px; }
         .body h2 { color: #1a1a1a; font-size: 20px; margin: 0 0 8px; }
         .body p { color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 16px; }
@@ -112,10 +115,7 @@ export function newMessageEmail(clientName: string, senderName: string, projectT
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Axis Living</h1>
-          <p>Client Portal</p>
-        </div>
+        ${logoHtml()}
         <div class="body">
           <h2>New Message</h2>
           <p>Hi ${clientName},</p>
@@ -147,9 +147,7 @@ export function invoiceReminderEmail(
       <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f4f1; padding: 40px 20px; margin: 0; }
         .container { max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e0da; }
-        .header { background: #2F402C; padding: 32px; text-align: center; }
-        .header h1 { color: #ffffff; font-size: 24px; margin: 0; letter-spacing: -0.01em; }
-        .header p { color: rgba(255,255,255,0.7); font-size: 13px; margin: 8px 0 0; }
+        .header { background: #F2EBE3; padding: 0; text-align: center; border-bottom: 1px solid #E5E7EB; }
         .body { padding: 32px; }
         .body h2 { color: #1a1a1a; font-size: 20px; margin: 0 0 8px; }
         .body p { color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 16px; }
@@ -166,10 +164,7 @@ export function invoiceReminderEmail(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Axis Living</h1>
-          <p>Invoice Reminder</p>
-        </div>
+        ${logoHtml()}
         <div class="body">
           <h2>Payment Reminder</h2>
           <p>Hi ${clientName},</p>
