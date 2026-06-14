@@ -208,4 +208,5 @@ export interface ProjectWithDetails extends Project {
     messages?: Message[];
     invoices?: Invoice[];
     gallery?: GalleryImage[];
+    clients?: Client;
 }

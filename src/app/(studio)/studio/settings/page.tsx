@@ -479,10 +479,11 @@ function NotificationsTab() {
 // Appearance Tab
 // ═════════════════════════════════════════════════════
 const currencies = [
-    { code: 'GHS', symbol: '₵', label: 'Ghanaian Cedi' },
-    { code: 'USD', symbol: '$', label: 'US Dollar' },
-    { code: 'EUR', symbol: '€', label: 'Euro' },
-    { code: 'GBP', symbol: '£', label: 'British Pound' },
+    { code: 'ZMW', symbol: 'K',  label: 'Zambian Kwacha' },
+    { code: 'USD', symbol: '$',  label: 'US Dollar' },
+    { code: 'EUR', symbol: '€',  label: 'Euro' },
+    { code: 'GBP', symbol: '£',  label: 'British Pound' },
+    { code: 'GHS', symbol: '₵',  label: 'Ghanaian Cedi' },
 ]
 
 const dateFormats = [
@@ -521,6 +522,7 @@ function AppearanceTab() {
         dateFormat: 'DD/MM/YYYY',
         theme: 'light',
     })
+
 
     useEffect(() => {
         try {

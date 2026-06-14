@@ -73,6 +73,7 @@ import {
     ShieldUserIcon         as _ShieldCheck,
     Building2Icon          as _Building2,
     ChevronUpIcon          as _ChevronUp,
+    ArrowLeft02Icon        as _ChevronLeft,
     ColorsIcon             as _Palette,
     Copy01Icon             as _Copy,
     ComputerIcon           as _Monitor,
@@ -125,6 +126,7 @@ export const CalendarDays   = icon(_CalendarDays,   'CalendarDays')
 export const Check          = icon(_Check,          'Check')
 export const CheckCircle2   = icon(_CheckCircle2,   'CheckCircle2')
 export const ChevronDown    = icon(_ArrowDown,      'ChevronDown')
+export const ChevronLeft    = icon(_ChevronLeft,    'ChevronLeft')
 export const ChevronRight   = icon(_ArrowRight,     'ChevronRight')
 export const Clock          = icon(_Clock,          'Clock')
 export const CreditCard     = icon(_CreditCard,     'CreditCard')

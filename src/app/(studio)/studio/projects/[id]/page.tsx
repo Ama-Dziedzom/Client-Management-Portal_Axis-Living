@@ -53,7 +53,7 @@ export default function StudioProjectDetailPage() {
         try {
             const { data, error } = await supabase
                 .from('projects')
-                .select('*, timeline_stages(*), documents(*), gallery(*)')
+                .select('*, clients(*), timeline_stages(*), documents(*), gallery(*)')
                 .eq('id', id as string)
                 .single()
 
@@ -238,6 +238,31 @@ export default function StudioProjectDetailPage() {
             })
     }
 
+    const handleReorderPhoto = async (imageId: string, direction: 'prev' | 'next') => {
+        if (!project?.gallery) return
+        const sorted = [...project.gallery].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+        const idx = sorted.findIndex(img => img.id === imageId)
+        const swapIdx = direction === 'prev' ? idx - 1 : idx + 1
+        if (swapIdx < 0 || swapIdx >= sorted.length) return
+
+        const a = sorted[idx]
+        const b = sorted[swapIdx]
+        const [orderA, orderB] = [a.display_order, b.display_order]
+
+        await Promise.all([
+            supabase.from('gallery').update({ display_order: orderB }).eq('id', a.id),
+            supabase.from('gallery').update({ display_order: orderA }).eq('id', b.id),
+        ])
+
+        setProject(prev => prev ? {
+            ...prev,
+            gallery: (prev.gallery || []).map(img =>
+                img.id === a.id ? { ...img, display_order: orderB } :
+                img.id === b.id ? { ...img, display_order: orderA } : img
+            )
+        } : null)
+    }
+
     const handleDeletePhoto = async (imageId: string) => {
         if (!window.confirm('Delete this photo?')) return
 
@@ -413,11 +438,12 @@ export default function StudioProjectDetailPage() {
                     />
                 )}
                 {activeTab === 'gallery' && (
-                    <GalleryTab 
-                        images={project.gallery || []} 
+                    <GalleryTab
+                        images={project.gallery || []}
                         onUpload={handleUploadPhoto}
                         onEdit={handleEditPhoto}
                         onDelete={handleDeletePhoto}
+                        onReorder={handleReorderPhoto}
                     />
                 )}
                 {activeTab === 'documents' && (

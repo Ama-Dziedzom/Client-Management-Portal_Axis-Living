@@ -41,17 +41,29 @@ export default function NewInvoicePage() {
     const [invoiceNumber, setInvoiceNumber] = useState('')
     const [dueDate, setDueDate] = useState('')
     const [notes, setNotes] = useState('')
+    const [currency, setCurrency] = useState('ZMW')
+    const [taxRate, setTaxRate] = useState(16)
     const [lineItems, setLineItems] = useState<LineItem[]>([
         { description: '', quantity: 1, unit_price: 0, amount: 0 }
     ])
 
     useEffect(() => {
         fetchInitialData()
+
+        // Read currency from saved appearance settings
+        try {
+            const saved = localStorage.getItem('studio_appearance_prefs')
+            if (saved) {
+                const { currency: c } = JSON.parse(saved)
+                if (c) setCurrency(c)
+            }
+        } catch {}
+
         // Generate a random invoice number
         const now = new Date()
         const rnd = Math.floor(1000 + Math.random() * 9000)
         setInvoiceNumber(`INV-${now.getFullYear()}${String(now.getMonth()+1).padStart(2, '0')}-${rnd}`)
-        
+
         // Default due date = 14 days from now
         const due = new Date()
         due.setDate(due.getDate() + 14)
@@ -92,7 +104,6 @@ export default function NewInvoicePage() {
     }
 
     const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0)
-    const taxRate = 16 // VAT percentage
     const taxAmount = subtotal * (taxRate / 100)
     const total = subtotal + taxAmount
 
@@ -117,7 +128,7 @@ export default function NewInvoicePage() {
                     tax_rate: taxRate,
                     tax_amount: taxAmount,
                     total,
-                    currency: 'ZMW',
+                    currency,
                     status: 'draft' as InvoiceStatus,
                     line_items: lineItems,
                     notes
@@ -188,6 +199,30 @@ export default function NewInvoicePage() {
                                             className="input-field pl-11"
                                         />
                                     </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-text-primary">Currency</label>
+                                    <select
+                                        value={currency}
+                                        onChange={e => setCurrency(e.target.value)}
+                                        className="input-field appearance-none"
+                                    >
+                                        {['ZMW','USD','EUR','GBP','GHS'].map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-text-primary">Tax Rate (%)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={taxRate}
+                                        onChange={e => setTaxRate(Number(e.target.value) || 0)}
+                                        className="input-field"
+                                        placeholder="16"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -327,15 +362,15 @@ export default function NewInvoicePage() {
                             <div className="space-y-4 font-body">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-white/60">Subtotal</span>
-                                    <span className="font-semibold">{new Intl.NumberFormat('en-ZM', { style: 'currency', currency: 'ZMW' }).format(subtotal)}</span>
+                                    <span className="font-semibold">{new Intl.NumberFormat('en', { style: 'currency', currency }).format(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm border-b border-white/10 pb-4">
-                                    <span className="text-white/60">Tax (16% VAT)</span>
-                                    <span className="font-semibold">{new Intl.NumberFormat('en-ZM', { style: 'currency', currency: 'ZMW' }).format(taxAmount)}</span>
+                                    <span className="text-white/60">Tax ({taxRate}% VAT)</span>
+                                    <span className="font-semibold">{new Intl.NumberFormat('en', { style: 'currency', currency }).format(taxAmount)}</span>
                                 </div>
                                 <div className="flex justify-between items-end pt-2">
                                     <span className="font-heading text-lg font-bold">Total Due</span>
-                                    <span className="font-heading text-3xl font-bold text-accent">{new Intl.NumberFormat('en-ZM', { style: 'currency', currency: 'ZMW' }).format(total)}</span>
+                                    <span className="font-heading text-3xl font-bold text-accent">{new Intl.NumberFormat('en', { style: 'currency', currency }).format(total)}</span>
                                 </div>
                             </div>
 
