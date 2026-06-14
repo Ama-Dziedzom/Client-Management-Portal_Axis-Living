@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Routes:
-//   portal.axis-living.com/client  → client login
+//   client.axis-living.com/client  → client login
 //   studio.axis-living.com/login   → studio login
 //   localhost uses path-based fallback (same routes)
 
@@ -12,7 +12,7 @@ type Zone = 'studio' | 'portal' | 'local'
 function getZone(req: NextRequest): Zone {
     const host = req.headers.get('host') ?? ''
     if (host.startsWith('studio.')) return 'studio'
-    if (host.startsWith('portal.')) return 'portal'
+    if (host.startsWith('client.') || host.startsWith('portal.')) return 'portal'
     return 'local'
 }
 
