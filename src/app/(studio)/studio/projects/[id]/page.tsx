@@ -467,7 +467,7 @@ export default function StudioProjectDetailPage() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.96, y: 8 }}
                             transition={{ duration: 0.2 }}
-                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+                            className="bg-surface rounded-2xl shadow-2xl w-full max-w-md p-6"
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-lg font-heading font-semibold text-text-primary">

@@ -596,7 +596,7 @@ function AppearanceTab() {
                                 className={`relative flex flex-col items-center gap-2.5 px-4 py-5 rounded-2xl border-2 transition-all ${
                                     active
                                         ? 'border-primary bg-primary/5 shadow-sm'
-                                        : 'border-border bg-white hover:border-primary/30'
+                                        : 'border-border bg-surface hover:border-primary/30'
                                 }`}
                             >
                                 {active && (
@@ -639,7 +639,7 @@ function AppearanceTab() {
                                         className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${
                                             active
                                                 ? 'border-primary bg-primary/5 text-primary'
-                                                : 'border-border bg-white text-text-secondary hover:border-primary/30'
+                                                : 'border-border bg-surface text-text-secondary hover:border-primary/30'
                                         }`}
                                     >
                                         <span className="text-base font-semibold">{c.symbol}</span>

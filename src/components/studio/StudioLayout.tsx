@@ -33,7 +33,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
     }
 
     return (
-        <div className="min-h-screen bg-[#f7f4f1]">
+        <div className="min-h-screen bg-background transition-colors duration-200">
             <StudioSidebar />
             <StudioTopBar />
 

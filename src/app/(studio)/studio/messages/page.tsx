@@ -232,7 +232,7 @@ export default function StudioMessagesPage() {
     return (
         <div className="h-[calc(100vh-140px)] min-h-[600px] flex flex-col md:flex-row gap-6">
             {/* Sidebar */}
-            <div className="w-full md:w-[350px] flex flex-col bg-white rounded-2xl border border-border overflow-hidden">
+            <div className="w-full md:w-[350px] flex flex-col bg-surface rounded-2xl border border-border overflow-hidden">
                 <div className="p-5 border-b border-border">
                     <h2 className="text-xl font-heading font-semibold text-text-primary mb-4">Messages</h2>
                     <div className="relative">
@@ -300,11 +300,11 @@ export default function StudioMessagesPage() {
             </div>
 
             {/* Chat area */}
-            <div className="flex-1 flex flex-col bg-white rounded-2xl border border-border overflow-hidden">
+            <div className="flex-1 flex flex-col bg-surface rounded-2xl border border-border overflow-hidden">
                 {selectedProject ? (
                     <>
                         {/* Chat Header */}
-                        <div className="px-6 py-4 border-b border-border bg-white flex items-center justify-between">
+                        <div className="px-6 py-4 border-b border-border bg-surface flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                                     {getInitials(selectedProject.client_name)}
@@ -338,7 +338,7 @@ export default function StudioMessagesPage() {
                                     <button
                                         onClick={() => loadConversation(selectedProject.id, chatOffset)}
                                         disabled={loadingMore}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-border rounded-full text-xs font-semibold text-text-secondary hover:text-primary hover:border-primary/30 transition-all shadow-sm"
+                                        className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-full text-xs font-semibold text-text-secondary hover:text-primary hover:border-primary/30 transition-all shadow-sm"
                                     >
                                         {loadingMore
                                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -371,7 +371,7 @@ export default function StudioMessagesPage() {
                                         <div key={msg.id} className="space-y-4">
                                             {showDate && (
                                                 <div className="flex justify-center my-4">
-                                                    <span className="px-3 py-1 bg-white border border-border rounded-full text-[10px] font-bold text-text-secondary uppercase">
+                                                    <span className="px-3 py-1 bg-surface border border-border rounded-full text-[10px] font-bold text-text-secondary uppercase">
                                                         {formatDate(msg.created_at, { month: 'long', day: 'numeric', year: 'numeric' })}
                                                     </span>
                                                 </div>
@@ -384,7 +384,7 @@ export default function StudioMessagesPage() {
                                                     "px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm font-body",
                                                     isStudio
                                                         ? "bg-primary text-white rounded-tr-none"
-                                                        : "bg-white text-text-primary rounded-tl-none border border-border"
+                                                        : "bg-surface text-text-primary rounded-tl-none border border-border"
                                                 )}>
                                                     {msg.body}
                                                 </div>
@@ -408,7 +408,7 @@ export default function StudioMessagesPage() {
                         </div>
 
                         {/* Compose */}
-                        <form onSubmit={handleSendMessage} className="p-6 border-t border-border bg-white flex items-end gap-3">
+                        <form onSubmit={handleSendMessage} className="p-6 border-t border-border bg-surface flex items-end gap-3">
                             <textarea
                                 rows={1}
                                 value={newMessage}

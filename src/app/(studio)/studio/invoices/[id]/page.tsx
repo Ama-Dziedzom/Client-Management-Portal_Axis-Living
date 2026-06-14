@@ -157,7 +157,7 @@ export default function StudioInvoiceDetailPage() {
     const canSendReminder = invoice.status === 'sent' || invoice.status === 'overdue'
 
     return (
-        <div className="max-w-4xl mx-auto pb-20">
+        <div className="max-w-4xl mx-auto pb-20 print:pb-0 print:max-w-full">
             {/* Header */}
             <div className="print:hidden mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
@@ -199,13 +199,13 @@ export default function StudioInvoiceDetailPage() {
             </div>
 
             {/* Invoice Document Look */}
-            <div className="card-flat bg-white shadow-2xl shadow-black/5 p-8 md:p-12 border-border overflow-hidden relative">
+            <div className="invoice-document card-flat bg-surface shadow-2xl shadow-black/5 p-8 md:p-12 border-border overflow-hidden relative">
                 {/* Branding watermark or corner label */}
                 <div className="absolute top-0 right-0 px-6 py-2 bg-primary text-white text-[10px] font-bold uppercase tracking-[0.3em] rounded-bl-xl">
                     Internal Billing Record
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between gap-10 mb-16">
+                <div className="invoice-section-gap flex flex-col md:flex-row justify-between gap-10 mb-16">
                     <div>
                         <h2 className="text-2xl font-heading font-bold text-text-primary mb-6">AXIS LIVING</h2>
                         <div className="space-y-1 text-sm text-text-secondary font-body">
@@ -224,7 +224,7 @@ export default function StudioInvoiceDetailPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 py-8 border-y border-border">
+                <div className="invoice-section-gap invoice-meta-padding grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 py-8 border-y border-border">
                     <div>
                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.1em] mb-1">Invoice Date</p>
                         <p className="text-sm font-semibold text-text-primary">{formatDate(invoice.created_at)}</p>
@@ -244,7 +244,7 @@ export default function StudioInvoiceDetailPage() {
                 </div>
 
                 {/* Table */}
-                <div className="mb-16">
+                <div className="invoice-section-gap mb-16">
                     <div className="flex items-center px-4 py-3 border-b border-border text-[10px] font-bold text-text-secondary uppercase tracking-widest">
                         <div className="flex-1">Description / Service</div>
                         <div className="w-24 text-center">Qty</div>
@@ -253,7 +253,7 @@ export default function StudioInvoiceDetailPage() {
                     </div>
                     <div className="divide-y divide-border/50">
                         {lineItems.map((item, idx) => (
-                            <div key={idx} className="flex items-center px-4 py-5 text-sm font-body">
+                            <div key={idx} className="invoice-row-padding flex items-center px-4 py-5 text-sm font-body">
                                 <div className="flex-1 text-text-primary font-medium">{item.description}</div>
                                 <div className="w-24 text-center text-text-secondary">{item.quantity}</div>
                                 <div className="w-32 text-right text-text-secondary">{formatCurrency(item.unit_price)}</div>

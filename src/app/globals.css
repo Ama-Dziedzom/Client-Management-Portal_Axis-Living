@@ -37,6 +37,25 @@
   }
 }
 
+/* ===== Dark Mode Token Overrides ===== */
+.dark {
+  color-scheme: dark;
+
+  --color-background: #0e1412;
+  --color-surface: #172019;
+  --color-text-primary: #e8e4df;
+  --color-text-secondary: #7d8f86;
+  --color-border: #273329;
+  --color-accent: #c6b9aa;
+  --color-accent-light: #d4c9bc;
+  --color-accent-dark: #b5a798;
+  --color-primary: #4d7a49;
+  --color-primary-light: #5e8f5a;
+  --color-primary-dark: #3d6939;
+  --color-success: #22c55e;
+  --color-error: #f87171;
+}
+
 /* ===== Base Layer ===== */
 @layer base {
   * {
@@ -141,13 +160,22 @@
 
 /* ===== Print Styles ===== */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 1.2cm 1.5cm;
+  }
+
   /* Hide navigation chrome */
   aside,
   header,
   [data-print-hide] { display: none !important; }
 
-  /* Remove sidebar offset */
-  main { padding-left: 0 !important; }
+  /* Remove sidebar offset and outer padding */
+  main {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+  }
 
   /* White background, no shadows */
   body { background: white !important; }
@@ -157,6 +185,18 @@
   .max-w-4xl,
   .max-w-5xl,
   .max-w-7xl { max-width: 100% !important; }
+
+  /* Invoice: scale to fit A4, reduce internal spacing */
+  .invoice-document {
+    zoom: 0.78;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 24px !important;
+  }
+
+  .invoice-document .invoice-section-gap { margin-bottom: 24px !important; }
+  .invoice-document .invoice-row-padding { padding-top: 8px !important; padding-bottom: 8px !important; }
+  .invoice-document .invoice-meta-padding { padding-top: 16px !important; padding-bottom: 16px !important; }
 }
 
 /* ===== Utility Layer ===== */
