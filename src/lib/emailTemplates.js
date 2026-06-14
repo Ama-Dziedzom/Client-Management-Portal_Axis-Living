@@ -208,6 +208,69 @@ export const emailTemplates = {
     };
   },
 
+  invoiceDelivery: (name, invoiceNumber, dueDate, projectTitle, lineItems = [], subtotal, taxAmount, total, currency = 'ZMW', notes = '') => {
+    const fmt = (n) => `${currency} ${Number(n).toLocaleString('en-ZM', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const lineItemRows = lineItems.map(item => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid ${COLORS.border};font-size:14px;color:${COLORS.text};">${item.description}</td>
+        <td style="padding:10px 0;border-bottom:1px solid ${COLORS.border};text-align:center;font-size:14px;color:${COLORS.muted};">${item.quantity}</td>
+        <td style="padding:10px 0;border-bottom:1px solid ${COLORS.border};text-align:right;font-size:14px;color:${COLORS.muted};">${fmt(item.unit_price)}</td>
+        <td style="padding:10px 0;border-bottom:1px solid ${COLORS.border};text-align:right;font-size:14px;font-weight:600;color:${COLORS.primary};">${fmt(item.amount)}</td>
+      </tr>`).join('');
+
+    return {
+      subject: `Invoice ${invoiceNumber} from Axis Living`,
+      html: wrap({
+        image: randomImage(),
+        heading: 'Your invoice is ready.',
+        body: `Hi ${name}, please find your invoice for <strong>${projectTitle}</strong> below. Payment is due by ${dueDate}.`,
+        content: `
+          <!-- Invoice meta -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;background:${COLORS.bg};border-radius:10px;padding:28px;text-align:left;">
+            <tbody>
+              ${detailRow('Invoice Number', invoiceNumber)}
+              ${detailRow('Project', projectTitle)}
+              ${detailRow('Due Date', dueDate)}
+            </tbody>
+          </table>
+
+          <!-- Line items -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;text-align:left;">
+            <thead>
+              <tr>
+                <th style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:${COLORS.tan};font-weight:700;padding-bottom:10px;border-bottom:2px solid ${COLORS.border};">Description</th>
+                <th style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:${COLORS.tan};font-weight:700;padding-bottom:10px;border-bottom:2px solid ${COLORS.border};text-align:center;">Qty</th>
+                <th style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:${COLORS.tan};font-weight:700;padding-bottom:10px;border-bottom:2px solid ${COLORS.border};text-align:right;">Unit Price</th>
+                <th style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:${COLORS.tan};font-weight:700;padding-bottom:10px;border-bottom:2px solid ${COLORS.border};text-align:right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>${lineItemRows}</tbody>
+          </table>
+
+          <!-- Totals -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 32px;text-align:right;">
+            <tr>
+              <td style="padding:8px 0;font-size:13px;color:${COLORS.muted};">Subtotal</td>
+              <td style="padding:8px 0;font-size:13px;color:${COLORS.muted};width:140px;">${fmt(subtotal)}</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 0;font-size:13px;color:${COLORS.muted};border-bottom:1px solid ${COLORS.border};">Tax (16% VAT)</td>
+              <td style="padding:8px 0;font-size:13px;color:${COLORS.muted};border-bottom:1px solid ${COLORS.border};">${fmt(taxAmount)}</td>
+            </tr>
+            <tr>
+              <td style="padding:14px 0 0;font-size:16px;font-weight:700;color:${COLORS.primary};">Total Due</td>
+              <td style="padding:14px 0 0;font-size:20px;font-weight:700;color:${COLORS.primary};">${fmt(total)}</td>
+            </tr>
+          </table>
+
+          ${notes ? `<p style="font-size:13px;color:${COLORS.muted};line-height:1.7;font-style:italic;background:${COLORS.bg};padding:20px 24px;border-radius:10px;text-align:left;">${notes}</p>` : ''}
+          <p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:${COLORS.primary};">${YOUR_NAME}</p>
+        `,
+        note: `Questions about this invoice? Reply to this email or reach us at ${CONTACT_EMAIL}.`,
+      }),
+    };
+  },
+
   portalWelcome: (name, email, password, portalUrl) => ({
     subject: 'Your client portal is ready ✦',
     html: wrap({

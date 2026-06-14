@@ -62,7 +62,7 @@ export default function NewInvoicePage() {
         try {
             const [clientsRes, projectsRes] = await Promise.all([
                 supabase.from('clients').select('*').eq('active', true).order('name'),
-                supabase.from('projects').select('*').eq('status', 'in_progress').order('title')
+                supabase.from('projects').select('*').order('title')
             ])
             setClients(clientsRes.data || [])
             setProjects(projectsRes.data || [])
@@ -286,7 +286,7 @@ export default function NewInvoicePage() {
                                     <select
                                         required
                                         value={clientId}
-                                        onChange={e => setClientId(e.target.value)}
+                                        onChange={e => { setClientId(e.target.value); setProjectId('') }}
                                         className="w-full bg-accent/5 border border-border rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
                                     >
                                         <option value="">Choose Client...</option>
@@ -305,9 +305,14 @@ export default function NewInvoicePage() {
                                         className="w-full bg-accent/5 border border-border rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
                                     >
                                         <option value="">Choose Project...</option>
-                                        {projects.filter(p => !clientId || p.client_id === clientId).map(p => (
-                                            <option key={p.id} value={p.id}>{p.title}</option>
-                                        ))}
+                                        {clientId
+                                            ? projects.filter(p => p.client_id === clientId).length === 0
+                                                ? <option disabled value="">No projects for this client</option>
+                                                : projects.filter(p => p.client_id === clientId).map(p => (
+                                                    <option key={p.id} value={p.id}>{p.title} ({p.status.replace('_', ' ')})</option>
+                                                ))
+                                            : <option disabled value="">Select a client first</option>
+                                        }
                                     </select>
                                 </div>
                             </div>

@@ -2,16 +2,17 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
-import { 
+import {
     ProjectWithDetails,
     ProjectStatus,
     TimelineStage,
+    TimelineStatus,
     GalleryImage,
     Document
 } from '@/types/database'
-import { Loader2 } from '@/lib/icons'
+import { Loader2, X, Save } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { logger } from '@/lib/logger'
 import { UploadModal } from '@/components/shared/UploadModal'
@@ -32,6 +33,12 @@ export default function StudioProjectDetailPage() {
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('overview')
     const [isEditingInfo, setIsEditingInfo] = useState(false)
+
+    // Timeline modal state
+    const [showStageModal, setShowStageModal] = useState(false)
+    const [editingStage, setEditingStage] = useState<TimelineStage | null>(null)
+    const [stageForm, setStageForm] = useState({ stage_name: '', status: 'upcoming' as TimelineStatus, notes: '' })
+    const [savingStage, setSavingStage] = useState(false)
 
     // Upload modal state
     const [showGalleryUpload, setShowGalleryUpload] = useState(false)
@@ -96,10 +103,70 @@ export default function StudioProjectDetailPage() {
         }
     }
 
-    // Placeholder handlers for timeline (to be implemented)
-    const handleAddStage = () => toast('Add stage feature coming soon')
-    const handleEditStage = (stage: TimelineStage) => toast('Edit stage feature coming soon')
-    const handleDeleteStage = (stageId: string) => toast('Delete stage feature coming soon')
+    // ─── Timeline Handlers ────────────────────────────────────────────
+    const openAddStage = () => {
+        setEditingStage(null)
+        setStageForm({ stage_name: '', status: 'upcoming', notes: '' })
+        setShowStageModal(true)
+    }
+
+    const openEditStage = (stage: TimelineStage) => {
+        setEditingStage(stage)
+        setStageForm({ stage_name: stage.stage_name, status: stage.status, notes: stage.notes || '' })
+        setShowStageModal(true)
+    }
+
+    const handleDeleteStage = async (stageId: string) => {
+        if (!window.confirm('Delete this stage?')) return
+        const { error } = await supabase.from('timeline_stages').delete().eq('id', stageId)
+        if (error) { toast.error('Failed to delete stage'); return }
+        setProject(prev => prev ? {
+            ...prev,
+            timeline_stages: (prev.timeline_stages || []).filter(s => s.id !== stageId)
+        } : null)
+        toast.success('Stage deleted')
+    }
+
+    const handleSaveStage = async () => {
+        if (!stageForm.stage_name.trim() || !project) return
+        setSavingStage(true)
+        try {
+            if (editingStage) {
+                const { data, error } = await supabase
+                    .from('timeline_stages')
+                    .update({ stage_name: stageForm.stage_name, status: stageForm.status, notes: stageForm.notes || null })
+                    .eq('id', editingStage.id)
+                    .select()
+                    .single()
+                if (error) throw error
+                setProject(prev => prev ? {
+                    ...prev,
+                    timeline_stages: (prev.timeline_stages || []).map(s => s.id === editingStage.id ? data as TimelineStage : s)
+                } : null)
+                toast.success('Stage updated')
+            } else {
+                const stages = project.timeline_stages || []
+                const maxOrder = stages.reduce((m, s) => Math.max(m, s.display_order || 0), 0)
+                const { data, error } = await supabase
+                    .from('timeline_stages')
+                    .insert({ project_id: project.id, stage_name: stageForm.stage_name, status: stageForm.status, notes: stageForm.notes || null, display_order: maxOrder + 1 })
+                    .select()
+                    .single()
+                if (error) throw error
+                setProject(prev => prev ? {
+                    ...prev,
+                    timeline_stages: [...(prev.timeline_stages || []), data as TimelineStage]
+                } : null)
+                toast.success('Stage added')
+            }
+            setShowStageModal(false)
+        } catch (err) {
+            logger.error('Studio', 'Save stage error', err)
+            toast.error('Failed to save stage')
+        } finally {
+            setSavingStage(false)
+        }
+    }
 
     // ─── Gallery Handlers ─────────────────────────────────────────────
     const handleUploadPhoto = () => setShowGalleryUpload(true)
@@ -338,10 +405,10 @@ export default function StudioProjectDetailPage() {
             >
                 {activeTab === 'overview' && <OverviewTab project={project} />}
                 {activeTab === 'timeline' && (
-                    <TimelineTab 
-                        stages={project.timeline_stages || []} 
-                        onAddStage={handleAddStage}
-                        onEditStage={handleEditStage}
+                    <TimelineTab
+                        stages={project.timeline_stages || []}
+                        onAddStage={openAddStage}
+                        onEditStage={openEditStage}
                         onDeleteStage={handleDeleteStage}
                     />
                 )}
@@ -386,6 +453,85 @@ export default function StudioProjectDetailPage() {
                 maxSizeMB={25}
                 showCaption={false}
             />
+
+            {/* Timeline Stage Modal */}
+            <AnimatePresence>
+                {showStageModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
+                        onClick={e => { if (e.target === e.currentTarget) setShowStageModal(false) }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-heading font-semibold text-text-primary">
+                                    {editingStage ? 'Edit Stage' : 'Add Stage'}
+                                </h2>
+                                <button onClick={() => setShowStageModal(false)} className="p-1.5 rounded-lg hover:bg-surface text-text-secondary transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Stage Name</label>
+                                    <input
+                                        autoFocus
+                                        value={stageForm.stage_name}
+                                        onChange={e => setStageForm(f => ({ ...f, stage_name: e.target.value }))}
+                                        className="input-field w-full"
+                                        placeholder="e.g. Concept Design"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Status</label>
+                                    <select
+                                        value={stageForm.status}
+                                        onChange={e => setStageForm(f => ({ ...f, status: e.target.value as TimelineStatus }))}
+                                        className="input-field w-full"
+                                    >
+                                        <option value="upcoming">Upcoming</option>
+                                        <option value="active">Active</option>
+                                        <option value="complete">Complete</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Notes</label>
+                                    <textarea
+                                        value={stageForm.notes}
+                                        onChange={e => setStageForm(f => ({ ...f, notes: e.target.value }))}
+                                        rows={3}
+                                        className="input-field w-full resize-none"
+                                        placeholder="Optional notes for this stage…"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    onClick={handleSaveStage}
+                                    disabled={savingStage || !stageForm.stage_name.trim()}
+                                    className="flex items-center gap-2 flex-1 justify-center bg-primary text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 transition-opacity"
+                                >
+                                    <Save className="w-4 h-4" /> {savingStage ? 'Saving…' : editingStage ? 'Save Changes' : 'Add Stage'}
+                                </button>
+                                <button
+                                    onClick={() => setShowStageModal(false)}
+                                    className="px-4 py-2.5 rounded-xl text-sm font-medium border border-border text-text-secondary hover:text-text-primary transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

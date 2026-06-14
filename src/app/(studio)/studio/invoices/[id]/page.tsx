@@ -62,7 +62,35 @@ export default function StudioInvoiceDetailPage() {
                 .eq('id', id as string)
 
             if (error) throw error
-            toast.success(`Invoice marked as ${newStatus}`)
+
+            if (newStatus === 'sent' && invoice) {
+                const res = await fetch('/api/invoices/send-invoice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        clientName: invoice.client.name,
+                        clientEmail: invoice.client.email,
+                        invoiceNumber: invoice.invoice_number,
+                        dueDate: invoice.due_date,
+                        projectTitle: invoice.project.title,
+                        lineItems: invoice.line_items,
+                        subtotal: invoice.subtotal,
+                        taxAmount: invoice.tax_amount,
+                        total: invoice.total,
+                        currency: invoice.currency,
+                        notes: invoice.notes,
+                    }),
+                })
+                const data = await res.json()
+                if (!res.ok) {
+                    toast.error(`Status updated but email failed: ${data.error}`)
+                } else {
+                    toast.success(`Invoice sent to ${invoice.client.email}`)
+                }
+            } else {
+                toast.success(`Invoice marked as ${newStatus}`)
+            }
+
             setInvoice(prev => prev ? { ...prev, status: newStatus as any } : null)
         } catch (error) {
             console.error('Update error:', error)
