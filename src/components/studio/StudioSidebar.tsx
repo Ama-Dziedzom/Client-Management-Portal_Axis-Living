@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -21,6 +21,7 @@ import {
     Mail,
 } from '@/lib/icons'
 import { useStudio } from '@/contexts/StudioContext'
+import { studioSupabase as supabase } from '@/lib/supabase'
 import { cn, getInitials } from '@/lib/utils'
 
 const navItems = [
@@ -48,9 +49,30 @@ export default function StudioSidebar() {
     const { signOut, studioUser } = useStudio()
     const isInWebsite = pathname.startsWith('/studio/website')
     const [websiteOpen, setWebsiteOpen] = useState(isInWebsite)
+    const [unreadCount, setUnreadCount] = useState(0)
+
+    useEffect(() => {
+        const fetchUnread = async () => {
+            const { count } = await supabase
+                .from('messages')
+                .select('*', { count: 'exact', head: true })
+                .eq('sender_type', 'client')
+                .eq('read', false)
+            setUnreadCount(count || 0)
+        }
+
+        fetchUnread()
+
+        const channel = supabase
+            .channel('sidebar-unread')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchUnread)
+            .subscribe()
+
+        return () => { supabase.removeChannel(channel) }
+    }, [])
 
     return (
-        <aside className="hidden lg:flex w-[260px] flex-col fixed inset-y-0 left-0 bg-[#1a2018] z-50">
+        <aside className="print:hidden hidden lg:flex w-[260px] flex-col fixed inset-y-0 left-0 bg-[#1a2018] z-50">
             {/* Branding */}
             <div className="px-7 pt-7 pb-5 border-b border-[#C6B9AA]/10">
                 <Link href="/studio" className="block">
@@ -82,7 +104,12 @@ export default function StudioSidebar() {
                                 "w-[18px] h-[18px] flex-shrink-0 transition-colors",
                                 isActive ? "text-[#C6B9AA]" : "text-[#a09489] group-hover:text-[#C6B9AA]"
                             )} />
-                            <span>{item.label}</span>
+                            <span className="flex-1">{item.label}</span>
+                            {item.label === 'Messages' && unreadCount > 0 && (
+                                <span className="w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center flex-shrink-0">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
                         </Link>
                     )
                 })}

@@ -368,6 +368,8 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
     rose:    { bg: 'bg-rose-50',    text: 'text-rose-600',    border: 'border-rose-100' },
 }
 
+const NOTIF_KEY = 'studio_notif_prefs'
+
 function NotificationsTab() {
     const { studioUser } = useStudio()
     const [saving, setSaving] = useState(false)
@@ -380,16 +382,12 @@ function NotificationsTab() {
         emailOverdueInvoice: true,
     })
 
-    // Load saved prefs from localStorage on mount
     useEffect(() => {
-        const key = `studio_notif_prefs_${studioUser?.id || 'default'}`
-        const saved = localStorage.getItem(key)
-        if (saved) {
-            try {
-                setPrefs(JSON.parse(saved))
-            } catch { /* ignore */ }
-        }
-    }, [studioUser?.id])
+        try {
+            const saved = localStorage.getItem(NOTIF_KEY)
+            if (saved) setPrefs(JSON.parse(saved))
+        } catch { /* ignore */ }
+    }, [])
 
     const toggle = (key: keyof NotificationPrefs) => {
         setPrefs((prev) => ({ ...prev, [key]: !prev[key] }))
@@ -398,10 +396,8 @@ function NotificationsTab() {
     const savePrefs = async () => {
         setSaving(true)
         try {
-            const key = `studio_notif_prefs_${studioUser?.id || 'default'}`
-            localStorage.setItem(key, JSON.stringify(prefs))
-            // Simulate a quick delay so the user sees the save action
-            await new Promise((r) => setTimeout(r, 400))
+            localStorage.setItem(NOTIF_KEY, JSON.stringify(prefs))
+            await new Promise((r) => setTimeout(r, 300))
             toast.success('Notification preferences saved')
         } catch {
             toast.error('Failed to save preferences')
@@ -502,33 +498,51 @@ const themeOptions: { value: AppearancePrefs['theme']; label: string; icon: type
     { value: 'system', label: 'System', icon: Monitor },
 ]
 
+const APPEARANCE_KEY = 'studio_appearance_prefs'
+
+function applyTheme(theme: AppearancePrefs['theme']) {
+    const root = document.documentElement
+    if (theme === 'dark') {
+        root.classList.add('dark')
+    } else if (theme === 'light') {
+        root.classList.remove('dark')
+    } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (prefersDark) root.classList.add('dark')
+        else root.classList.remove('dark')
+    }
+}
+
 function AppearanceTab() {
-    const { studioUser } = useStudio()
     const [saving, setSaving] = useState(false)
     const [prefs, setPrefs] = useState<AppearancePrefs>({
         companyName: 'Axis Living',
-        currency: 'GHS',
+        currency: 'ZMW',
         dateFormat: 'DD/MM/YYYY',
         theme: 'light',
     })
 
-    // Load saved prefs on mount
     useEffect(() => {
-        const key = `studio_appearance_prefs_${studioUser?.id || 'default'}`
-        const saved = localStorage.getItem(key)
-        if (saved) {
-            try {
-                setPrefs(JSON.parse(saved))
-            } catch { /* ignore */ }
-        }
-    }, [studioUser?.id])
+        try {
+            const saved = localStorage.getItem(APPEARANCE_KEY)
+            if (saved) {
+                const parsed = JSON.parse(saved)
+                setPrefs(parsed)
+                applyTheme(parsed.theme)
+            }
+        } catch { /* ignore */ }
+    }, [])
+
+    const setTheme = (theme: AppearancePrefs['theme']) => {
+        setPrefs(p => ({ ...p, theme }))
+        applyTheme(theme)
+    }
 
     const savePrefs = async () => {
         setSaving(true)
         try {
-            const key = `studio_appearance_prefs_${studioUser?.id || 'default'}`
-            localStorage.setItem(key, JSON.stringify(prefs))
-            await new Promise((r) => setTimeout(r, 400))
+            localStorage.setItem(APPEARANCE_KEY, JSON.stringify(prefs))
+            await new Promise((r) => setTimeout(r, 300))
             toast.success('Appearance preferences saved')
         } catch {
             toast.error('Failed to save preferences')
@@ -578,7 +592,7 @@ function AppearanceTab() {
                         return (
                             <button
                                 key={opt.value}
-                                onClick={() => setPrefs((p) => ({ ...p, theme: opt.value }))}
+                                onClick={() => setTheme(opt.value)}
                                 className={`relative flex flex-col items-center gap-2.5 px-4 py-5 rounded-2xl border-2 transition-all ${
                                     active
                                         ? 'border-primary bg-primary/5 shadow-sm'

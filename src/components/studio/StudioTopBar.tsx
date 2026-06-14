@@ -29,7 +29,7 @@ export default function StudioTopBar() {
     const { signOut, studioUser } = useStudio()
 
     return (
-        <>
+        <div className="print:hidden">
             <header className="lg:hidden h-16 bg-[#1a2018] border-b border-[#C6B9AA]/10 flex items-center justify-between px-5 sticky top-0 z-40">
                 <button
                     onClick={() => setIsMenuOpen(true)}
@@ -133,6 +133,6 @@ export default function StudioTopBar() {
                     </>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     )
 }

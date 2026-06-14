@@ -159,10 +159,10 @@ export default function StudioInvoiceDetailPage() {
     return (
         <div className="max-w-4xl mx-auto pb-20">
             {/* Header */}
-            <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="print:hidden mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <Link 
-                        href="/studio/invoices" 
+                    <Link
+                        href="/studio/invoices"
                         className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors mb-6"
                     >
                         <ArrowLeft className="w-4 h-4" /> Back to Invoices
@@ -297,7 +297,7 @@ export default function StudioInvoiceDetailPage() {
 
             {/* Send Reminder Action */}
             {canSendReminder && (
-                <div className="mt-10">
+                <div className="print:hidden mt-10">
                     <div className="card-flat flex items-center gap-4">
                         <div className="p-3 bg-primary/10 rounded-xl">
                             <Mail className="w-6 h-6 text-primary" />

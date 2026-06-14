@@ -37,7 +37,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
             <StudioSidebar />
             <StudioTopBar />
 
-            <main className="lg:pl-[260px] flex-1">
+            <main className="lg:pl-[260px] print:pl-0 flex-1">
                 <div className="px-6 py-8 md:px-10 lg:px-12 max-w-7xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 12 }}
