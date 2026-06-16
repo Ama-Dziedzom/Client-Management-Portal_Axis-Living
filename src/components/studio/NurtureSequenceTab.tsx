@@ -302,7 +302,7 @@ export default function NurtureSequenceTab() {
                                             className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
                                             <Pencil className="w-4 h-4" />
                                         </button>
-                                        <button onClick={() => setSendConfirmId(email.id)} title="Send to contacts"
+                                        <button onClick={() => setSendConfirmId(email.id)} title="Send to subscribers"
                                             className={`p-2 rounded-lg transition-colors ${sendResult?.id === email.id ? 'text-emerald-600' : 'hover:bg-surface text-text-secondary hover:text-primary'}`}>
                                             {sendResult?.id === email.id ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
                                         </button>
@@ -339,8 +339,8 @@ export default function NurtureSequenceTab() {
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-medium text-text-primary">
                                                 {selectedContactIds.length
-                                                    ? `Send to ${selectedContactIds.length} selected contact${selectedContactIds.length !== 1 ? 's' : ''}`
-                                                    : `Send to all contacts (${contacts.length})`}
+                                                    ? `Send to ${selectedContactIds.length} selected subscriber${selectedContactIds.length !== 1 ? 's' : ''}`
+                                                    : `Send to all subscribers (${contacts.length})`}
                                             </p>
                                             <button onClick={closeSendPanel} className="text-text-secondary hover:text-text-primary">
                                                 <X className="w-4 h-4" />
@@ -353,7 +353,7 @@ export default function NurtureSequenceTab() {
                                                     <input
                                                         value={contactSearch}
                                                         onChange={e => setContactSearch(e.target.value)}
-                                                        placeholder="Search contacts…"
+                                                        placeholder="Search subscribers…"
                                                         className="flex-1 text-sm bg-transparent outline-none text-text-primary placeholder:text-text-secondary"
                                                     />
                                                     {selectedContactIds.length > 0 && (
@@ -407,7 +407,7 @@ export default function NurtureSequenceTab() {
 
                                 {sendResult?.id === email.id && sendConfirmId !== email.id && (
                                     <div className="mt-4 pt-4 border-t border-border flex items-center gap-2 text-sm text-emerald-600 font-medium">
-                                        <Check className="w-4 h-4" /> Sent to {sendResult.sent} contact{sendResult.sent !== 1 ? 's' : ''}
+                                        <Check className="w-4 h-4" /> Sent to {sendResult.sent} subscriber{sendResult.sent !== 1 ? 's' : ''}
                                     </div>
                                 )}
 

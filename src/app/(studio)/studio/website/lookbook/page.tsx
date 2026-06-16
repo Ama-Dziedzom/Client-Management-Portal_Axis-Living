@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsiteLookbook } from '@/types/database'
-import { BookMarked, Plus, Trash2, ToggleLeft, ToggleRight, Loader2, ExternalLink } from '@/lib/icons'
+import { BookMarked, Plus, Trash2, ToggleLeft, ToggleRight, Loader2, ExternalLink, ArrowLeft } from '@/lib/icons'
+import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
@@ -58,16 +59,24 @@ export default function LookbookPage() {
 
     return (
         <motion.div variants={container} initial="hidden" animate="show">
-            <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-                <div>
-                    <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Lookbook</h1>
-                    <p className="text-text-secondary font-body text-lg">Manage lookbook files for email campaigns</p>
+            <motion.div variants={item} className="mb-10">
+                <Link
+                    href="/studio/website"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Website
+                </Link>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Lookbook</h1>
+                        <p className="text-text-secondary font-body text-lg">Manage lookbook files for email campaigns</p>
+                    </div>
+                    {!adding && (
+                        <button onClick={() => setAdding(true)} className="btn-primary w-full sm:w-auto">
+                            <Plus className="w-4 h-4" /> Add Lookbook
+                        </button>
+                    )}
                 </div>
-                {!adding && (
-                    <button onClick={() => setAdding(true)} className="btn-primary w-full sm:w-auto">
-                        <Plus className="w-4 h-4" /> Add Lookbook
-                    </button>
-                )}
             </motion.div>
 
             {adding && (

@@ -19,27 +19,32 @@ import {
     CreditCard,
     X,
     Save,
+    ArrowRight,
 } from '@/lib/icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatCurrency, formatDate, getInitials, getStatusBadgeClass, formatStatus } from '@/lib/utils'
 
-const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.07 } } }
-const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } }
+const INVOICES_PER_PAGE = 8
+
+type ClientTab = 'projects' | 'invoices'
+
+const anim = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } }
 
 export default function StudioClientDetailPage() {
     const { id } = useParams()
-    const [client, setClient] = useState<Client | null>(null)
+    const [client, setClient]   = useState<Client | null>(null)
     const [projects, setProjects] = useState<Project[]>([])
     const [invoices, setInvoices] = useState<Invoice[]>([])
     const [loading, setLoading] = useState(true)
+    const [tab, setTab]         = useState<ClientTab>('projects')
+    const [invoicePage, setInvoicePage] = useState(0)
+
     const [editOpen, setEditOpen] = useState(false)
     const [editForm, setEditForm] = useState({ name: '', phone: '', address: '' })
-    const [saving, setSaving] = useState(false)
+    const [saving, setSaving]   = useState(false)
 
-    useEffect(() => {
-        if (id) fetchClientData()
-    }, [id])
+    useEffect(() => { if (id) fetchClientData() }, [id])
 
     const fetchClientData = async () => {
         try {
@@ -73,13 +78,11 @@ export default function StudioClientDetailPage() {
     )
 
     const openEdit = () => {
-        if (!client) return
         setEditForm({ name: client.name, phone: client.phone ?? '', address: client.address ?? '' })
         setEditOpen(true)
     }
 
     const saveEdit = async () => {
-        if (!client) return
         setSaving(true)
         const { data, error } = await supabase
             .from('clients')
@@ -95,22 +98,26 @@ export default function StudioClientDetailPage() {
     }
 
     const totalSpent = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + Number(i.total), 0)
-    const paidCount = invoices.filter(i => i.status === 'paid').length
+    const paidCount  = invoices.filter(i => i.status === 'paid').length
+
+    const totalInvoicePages = Math.ceil(invoices.length / INVOICES_PER_PAGE)
+    const pagedInvoices     = invoices.slice(invoicePage * INVOICES_PER_PAGE, (invoicePage + 1) * INVOICES_PER_PAGE)
 
     return (
-        <motion.div variants={container} initial="hidden" animate="show" className="pb-20">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="pb-20 max-w-4xl mx-auto">
 
             {/* Back */}
-            <motion.div variants={item} className="mb-8">
+            <div className="mb-8">
                 <Link href="/studio/clients"
                     className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Back to Clients
                 </Link>
-            </motion.div>
+            </div>
 
-            {/* Profile header */}
-            <motion.div variants={item} className="card-flat mb-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Profile card */}
+            <div className="card-flat mb-6">
+                {/* Top: avatar + name + actions */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-lg font-bold text-primary flex-shrink-0">
                             {getInitials(client.name)}
@@ -138,82 +145,82 @@ export default function StudioClientDetailPage() {
                         </Link>
                     </div>
                 </div>
-            </motion.div>
+
+                {/* Contact details inline */}
+                <div className="flex flex-wrap gap-6 pt-5 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                        <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span>{client.email}</span>
+                    </div>
+                    {client.phone && (
+                        <div className="flex items-center gap-2 text-sm text-text-secondary">
+                            <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span>{client.phone}</span>
+                        </div>
+                    )}
+                    {client.address && (
+                        <div className="flex items-center gap-2 text-sm text-text-secondary">
+                            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span>{client.address}</span>
+                        </div>
+                    )}
+                    {!client.phone && !client.address && (
+                        <p className="text-sm text-text-secondary/50 italic">No phone or location added.</p>
+                    )}
+                </div>
+            </div>
 
             {/* Stats row */}
-            <motion.div variants={item} className="grid grid-cols-3 gap-4 mb-6">
-                <div className="card-flat text-center">
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="card-flat text-center py-5">
                     <p className="text-2xl font-bold text-text-primary">{projects.length}</p>
                     <p className="text-[10px] uppercase tracking-widest text-text-secondary mt-0.5">Projects</p>
                 </div>
-                <div className="card-flat text-center">
+                <div className="card-flat text-center py-5">
                     <p className="text-2xl font-bold text-text-primary">{paidCount}</p>
                     <p className="text-[10px] uppercase tracking-widest text-text-secondary mt-0.5">Invoices Paid</p>
                 </div>
-                <div className="card-flat text-center">
+                <div className="card-flat text-center py-5">
                     <p className="text-2xl font-bold text-primary">{formatCurrency(totalSpent)}</p>
                     <p className="text-[10px] uppercase tracking-widest text-text-secondary mt-0.5">Lifetime Billing</p>
                 </div>
-            </motion.div>
+            </div>
 
-            {/* Main grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Pill tabs */}
+            <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 w-fit mb-6">
+                {([
+                    ['projects', 'Projects', projects.length, FolderKanban],
+                    ['invoices', 'Invoices', invoices.length, CreditCard],
+                ] as [ClientTab, string, number, any][]).map(([key, label, count, Icon]) => (
+                    <button
+                        key={key}
+                        onClick={() => { setTab(key); if (key === 'invoices') setInvoicePage(0) }}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            tab === key
+                                ? 'bg-accent/20 text-primary border border-accent/30'
+                                : 'text-text-secondary hover:text-text-primary'
+                        }`}
+                    >
+                        <Icon className="w-3.5 h-3.5" />
+                        {label}
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${tab === key ? 'bg-primary/10 text-primary' : 'bg-border text-text-secondary'}`}>
+                            {count}
+                        </span>
+                    </button>
+                ))}
+            </div>
 
-                {/* Left — contact */}
-                <motion.div variants={item} className="card-flat h-fit lg:sticky lg:top-6 self-start">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary mb-5">Contact Details</p>
-                    <div className="space-y-4">
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Mail className="w-3.5 h-3.5 text-blue-600" />
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-tight mb-0.5">Email</p>
-                                <p className="text-sm text-text-primary truncate">{client.email}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-tight mb-0.5">Phone</p>
-                                <p className="text-sm text-text-primary">{client.phone || '—'}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <MapPin className="w-3.5 h-3.5 text-amber-600" />
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-tight mb-0.5">Location</p>
-                                <p className="text-sm text-text-primary">{client.address || '—'}</p>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Right — projects + invoices */}
-                <div className="lg:col-span-2 space-y-6">
-
-                    {/* Projects */}
-                    <motion.div variants={item}>
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-base font-heading font-semibold text-text-primary flex items-center gap-2">
-                                <FolderKanban className="w-4 h-4 text-text-secondary" />
-                                Projects
-                                <span className="text-[10px] font-bold bg-surface border border-border px-2 py-0.5 rounded-full text-text-secondary">{projects.length}</span>
-                            </h2>
-                            <Link href="/studio/projects" className="text-xs font-semibold text-primary hover:underline">View all</Link>
-                        </div>
-
+            {/* Projects tab */}
+            {tab === 'projects' && (
+                <AnimatePresence mode="wait">
+                    <motion.div key="projects" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                         {projects.length === 0 ? (
-                            <div className="card-flat flex items-center gap-3 py-5 border-dashed border-2">
+                            <div className="card-flat flex items-center gap-3 py-8 border-dashed border-2">
                                 <FolderKanban className="w-5 h-5 text-text-secondary/30 flex-shrink-0" />
-                                <p className="text-sm text-text-secondary">No projects started yet.</p>
+                                <p className="text-sm text-text-secondary">No projects yet.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {projects.map(project => (
                                     <Link key={project.id} href={`/studio/projects/${project.id}`}
                                         className="card-flat group hover:border-primary/30 hover:shadow-elevated transition-all">
@@ -230,46 +237,77 @@ export default function StudioClientDetailPage() {
                             </div>
                         )}
                     </motion.div>
+                </AnimatePresence>
+            )}
 
-                    {/* Invoices */}
-                    <motion.div variants={item}>
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-base font-heading font-semibold text-text-primary flex items-center gap-2">
-                                <CreditCard className="w-4 h-4 text-text-secondary" />
-                                Invoices
-                                <span className="text-[10px] font-bold bg-surface border border-border px-2 py-0.5 rounded-full text-text-secondary">{invoices.length}</span>
-                            </h2>
-                            <Link href="/studio/invoices" className="text-xs font-semibold text-primary hover:underline">Billing Hub</Link>
-                        </div>
-
+            {/* Invoices tab */}
+            {tab === 'invoices' && (
+                <AnimatePresence mode="wait">
+                    <motion.div key="invoices" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                         {invoices.length === 0 ? (
-                            <div className="card-flat flex items-center gap-3 py-5 border-dashed border-2">
+                            <div className="card-flat flex items-center gap-3 py-8 border-dashed border-2">
                                 <Receipt className="w-5 h-5 text-text-secondary/30 flex-shrink-0" />
                                 <p className="text-sm text-text-secondary">No billing records for this client.</p>
                             </div>
                         ) : (
-                            <div className="space-y-2">
-                                {invoices.slice(0, 5).map(invoice => (
-                                    <Link key={invoice.id} href={`/studio/invoices/${invoice.id}`}
-                                        className="card-flat flex items-center justify-between gap-4 hover:border-primary/30 transition-all group">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <span className="text-xs font-mono font-bold text-text-primary group-hover:text-primary transition-colors flex-shrink-0">
+                            <div className="card-flat p-0 overflow-hidden">
+                                {/* Table header */}
+                                <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-border bg-surface">
+                                    {['Invoice', 'Date', 'Amount', 'Status'].map(h => (
+                                        <span key={h} className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">{h}</span>
+                                    ))}
+                                </div>
+
+                                {/* Rows */}
+                                <div className="divide-y divide-border">
+                                    {pagedInvoices.map(invoice => (
+                                        <Link key={invoice.id} href={`/studio/invoices/${invoice.id}`}
+                                            className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-4 hover:bg-surface/50 transition-colors group">
+                                            <span className="text-xs font-mono font-bold text-text-primary group-hover:text-primary transition-colors truncate">
                                                 {invoice.invoice_number}
                                             </span>
-                                            <span className="text-xs text-text-secondary truncate">{formatDate(invoice.created_at)}</span>
+                                            <span className="text-xs text-text-secondary whitespace-nowrap">
+                                                {formatDate(invoice.created_at, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                            </span>
+                                            <span className="text-sm font-bold text-text-primary whitespace-nowrap">
+                                                {formatCurrency(invoice.total, invoice.currency)}
+                                            </span>
+                                            <span className={getStatusBadgeClass(invoice.status)}>
+                                                {formatStatus(invoice.status)}
+                                            </span>
+                                        </Link>
+                                    ))}
+                                </div>
+
+                                {/* Pagination footer */}
+                                {totalInvoicePages > 1 && (
+                                    <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-surface">
+                                        <p className="text-xs text-text-secondary">
+                                            {invoicePage * INVOICES_PER_PAGE + 1}–{Math.min((invoicePage + 1) * INVOICES_PER_PAGE, invoices.length)} of {invoices.length} invoices
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setInvoicePage(p => p - 1)}
+                                                disabled={invoicePage === 0}
+                                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-lg hover:text-text-primary hover:border-primary/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                            >
+                                                <ArrowLeft className="w-3 h-3" /> Prev
+                                            </button>
+                                            <button
+                                                onClick={() => setInvoicePage(p => p + 1)}
+                                                disabled={invoicePage >= totalInvoicePages - 1}
+                                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-lg hover:text-text-primary hover:border-primary/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                            >
+                                                Next <ArrowRight className="w-3 h-3" />
+                                            </button>
                                         </div>
-                                        <div className="flex items-center gap-3 flex-shrink-0">
-                                            <span className="text-sm font-bold text-text-primary">{formatCurrency(invoice.total)}</span>
-                                            <span className={getStatusBadgeClass(invoice.status)}>{formatStatus(invoice.status)}</span>
-                                        </div>
-                                    </Link>
-                                ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </motion.div>
-
-                </div>
-            </div>
+                </AnimatePresence>
+            )}
 
             {/* Edit Profile Modal */}
             <AnimatePresence>
@@ -296,30 +334,18 @@ export default function StudioClientDetailPage() {
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Full Name</label>
-                                    <input
-                                        value={editForm.name}
-                                        onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                                        className="input-field w-full"
-                                        placeholder="Client name"
-                                    />
+                                    <input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                                        className="input-field w-full" placeholder="Client name" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Phone</label>
-                                    <input
-                                        value={editForm.phone}
-                                        onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
-                                        className="input-field w-full"
-                                        placeholder="+260 97 000 0000"
-                                    />
+                                    <input value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
+                                        className="input-field w-full" placeholder="+260 97 000 0000" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Location</label>
-                                    <input
-                                        value={editForm.address}
-                                        onChange={e => setEditForm(f => ({ ...f, address: e.target.value }))}
-                                        className="input-field w-full"
-                                        placeholder="e.g. Lusaka, Zambia"
-                                    />
+                                    <input value={editForm.address} onChange={e => setEditForm(f => ({ ...f, address: e.target.value }))}
+                                        className="input-field w-full" placeholder="e.g. Lusaka, Zambia" />
                                 </div>
                                 <div className="pt-1">
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Email</label>

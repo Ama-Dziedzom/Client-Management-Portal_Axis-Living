@@ -19,7 +19,7 @@ const navItems = [
     { label: 'Bookings',  icon: CalendarDays,    href: '/studio/bookings' },
     { label: 'Messages',  icon: MessageSquare,   href: '/studio/messages' },
     { label: 'Invoices',  icon: Receipt,         href: '/studio/invoices' },
-    { label: 'Contacts',  icon: Contact,         href: '/studio/contacts' },
+    { label: 'Subscribers', icon: Contact,         href: '/studio/subscribers' },
     { label: 'Website',   icon: Globe,           href: '/studio/website' },
     { label: 'Settings',  icon: Settings,        href: '/studio/settings' },
 ]

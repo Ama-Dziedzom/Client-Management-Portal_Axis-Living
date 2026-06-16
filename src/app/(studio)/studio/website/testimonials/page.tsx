@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsiteTestimonial } from '@/types/database'
-import { Star, Plus, Pencil, Trash2, Loader2 } from '@/lib/icons'
+import { Star, Plus, Pencil, Trash2, Loader2, ArrowLeft } from '@/lib/icons'
+import Link from 'next/link'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }
@@ -73,7 +74,14 @@ export default function TestimonialsPage() {
 
     return (
         <motion.div variants={container} initial="hidden" animate="show">
-            <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+            <motion.div variants={item} className="mb-10">
+                <Link
+                    href="/studio/website"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Website
+                </Link>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Testimonials</h1>
                     <p className="text-text-secondary font-body text-lg">Manage client quotes on the website</p>
@@ -83,6 +91,7 @@ export default function TestimonialsPage() {
                         <Plus className="w-4 h-4" /> Add Testimonial
                     </button>
                 )}
+                </div>
             </motion.div>
 
             {adding && (

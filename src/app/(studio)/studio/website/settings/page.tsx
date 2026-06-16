@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
-import { Settings, Loader2, Check } from '@/lib/icons'
+import { Settings, Loader2, Check, ArrowLeft } from '@/lib/icons'
+import Link from 'next/link'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }
@@ -72,13 +73,21 @@ export default function SiteSettingsPage() {
 
     return (
         <motion.div variants={container} initial="hidden" animate="show">
-            <motion.div variants={item} className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                    <Settings className="w-5 h-5 text-gray-600" />
+            <motion.div variants={item} className="mb-10">
+                <Link
+                    href="/studio/website"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Website
+                </Link>
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                        <Settings className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary">Site Settings</h1>
                 </div>
-                <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary">Site Settings</h1>
+                <p className="text-text-secondary font-body text-lg">Contact info, tagline, and social links</p>
             </motion.div>
-            <motion.p variants={item} className="text-text-secondary font-body text-lg mb-10">Contact info, tagline, and social links</motion.p>
 
             <form onSubmit={handleSave} className="max-w-lg">
                 {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6">{error}</div>}

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsitePost } from '@/types/database'
 import Link from 'next/link'
-import { BookOpen, Plus, Search, Pencil, Trash2, Eye, EyeOff } from '@/lib/icons'
+import { BookOpen, Plus, Search, Pencil, Trash2, Eye, EyeOff, ArrowLeft } from '@/lib/icons'
 import { formatDate } from '@/lib/utils'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
@@ -56,14 +56,22 @@ export default function JournalPage() {
 
     return (
         <motion.div variants={container} initial="hidden" animate="show">
-            <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-                <div>
-                    <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Journal</h1>
-                    <p className="text-text-secondary font-body text-lg">Write and manage blog posts</p>
-                </div>
-                <Link href="/studio/website/journal/new" className="btn-primary w-full sm:w-auto">
-                    <Plus className="w-4 h-4" /> New Post
+            <motion.div variants={item} className="mb-10">
+                <Link
+                    href="/studio/website"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Website
                 </Link>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Journal</h1>
+                        <p className="text-text-secondary font-body text-lg">Write and manage blog posts</p>
+                    </div>
+                    <Link href="/studio/website/journal/new" className="btn-primary w-full sm:w-auto">
+                        <Plus className="w-4 h-4" /> New Post
+                    </Link>
+                </div>
             </motion.div>
 
             {posts.length > 0 && (
