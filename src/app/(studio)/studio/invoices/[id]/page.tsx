@@ -64,6 +64,12 @@ export default function StudioInvoiceDetailPage() {
             if (error) throw error
 
             if (newStatus === 'sent' && invoice) {
+                let paymentDetails = null
+                try {
+                    const saved = localStorage.getItem('studio_payment_prefs')
+                    if (saved) paymentDetails = JSON.parse(saved)
+                } catch {}
+
                 const res = await fetch('/api/invoices/send-invoice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -76,9 +82,11 @@ export default function StudioInvoiceDetailPage() {
                         lineItems: invoice.line_items,
                         subtotal: invoice.subtotal,
                         taxAmount: invoice.tax_amount,
+                        taxRate: invoice.tax_rate,
                         total: invoice.total,
                         currency: invoice.currency,
                         notes: invoice.notes,
+                        paymentDetails,
                     }),
                 })
                 const data = await res.json()

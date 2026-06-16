@@ -208,7 +208,7 @@ export const emailTemplates = {
     };
   },
 
-  invoiceDelivery: (name, invoiceNumber, dueDate, projectTitle, lineItems = [], subtotal, taxAmount, total, currency = 'ZMW', notes = '', tpl = {}) => {
+  invoiceDelivery: (name, invoiceNumber, dueDate, projectTitle, lineItems = [], subtotal, taxAmount, total, currency = 'ZMW', notes = '', tpl = {}, paymentDetails = null) => {
     const fmt = (n) => `${currency} ${Number(n).toLocaleString('en-ZM', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     const vars = { name, invoice_number: invoiceNumber, project: projectTitle, due_date: dueDate };
 
@@ -270,7 +270,36 @@ export const emailTemplates = {
             </tr>
           </table>
 
-          ${notes ? `<p style="font-size:13px;color:${COLORS.muted};line-height:1.7;font-style:italic;background:${COLORS.bg};padding:20px 24px;border-radius:10px;text-align:left;">${notes}</p>` : ''}
+          ${(() => {
+            if (!paymentDetails) return ''
+            const { bankName, bankAccountName, bankAccountNumber, bankBranch, momoProvider, momoNumber, momoName } = paymentDetails
+            const lbl = `font-size:12px;color:${COLORS.muted};padding:7px 16px 7px 0;vertical-align:top;white-space:nowrap;width:40%;`
+            const val = `font-size:13px;color:${COLORS.text};font-weight:500;padding:7px 0;vertical-align:top;`
+            const mono = `font-size:13px;color:${COLORS.primary};font-weight:700;font-family:'Courier New',Courier,monospace;padding:7px 0;vertical-align:top;letter-spacing:0.5px;`
+            const hdg = (label) => `<tr><td colspan="2" style="padding:18px 0 8px;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:${COLORS.tan};font-weight:700;border-bottom:1px solid ${COLORS.border};">${label}</td></tr>`
+            const row = (label, value, isMono = false) => `<tr><td style="${lbl}">${label}</td><td style="${isMono ? mono : val}">${value}</td></tr>`
+            const sections = []
+            if (bankAccountNumber) {
+              const r = [hdg('Bank Transfer')]
+              if (bankName) r.push(row('Bank', bankName))
+              if (bankAccountName) r.push(row('Account Name', bankAccountName))
+              r.push(row('Account Number', bankAccountNumber, true))
+              if (bankBranch) r.push(row('Branch', bankBranch))
+              sections.push(r.join(''))
+            }
+            if (momoNumber) {
+              const r = [hdg(momoProvider || 'Mobile Money')]
+              r.push(row('Number', momoNumber, true))
+              if (momoName) r.push(row('Name', momoName))
+              sections.push(r.join(''))
+            }
+            if (!sections.length) return ''
+            return `<table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px;background:${COLORS.bg};border-radius:10px;padding:4px 24px 20px;text-align:left;">
+              <tr><td colspan="2" style="padding:20px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:2px;color:${COLORS.primary};font-weight:700;">How to Pay</td></tr>
+              ${sections.join('')}
+            </table>`
+          })()}
+          ${notes ? `<p style="font-size:13px;color:${COLORS.muted};line-height:1.7;font-style:italic;margin:16px 0 0;">${notes}</p>` : ''}
           <p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:${COLORS.primary};">${YOUR_NAME}</p>
         `,
         note,

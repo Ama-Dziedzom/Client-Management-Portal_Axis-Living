@@ -49,6 +49,7 @@ export default function BookingsPage() {
     const [search, setSearch] = useState('')
     const [filter, setFilter] = useState<Filter>('upcoming')
     const [view, setView] = useState<View>('list')
+    const [consultationType, setConsultationType] = useState<string | null>(null)
 
     useEffect(() => {
         fetchBookings()
@@ -78,6 +79,10 @@ export default function BookingsPage() {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
+    const consultationTypes = Array.from(
+        new Set(bookings.map(b => b.consultation_type).filter((t): t is string => !!t))
+    ).sort()
+
     const filtered = bookings
         .filter(b => {
             const bookingDate = new Date(b.date)
@@ -89,7 +94,8 @@ export default function BookingsPage() {
 
             const q = search.toLowerCase()
             const matchesSearch = !q || b.name.toLowerCase().includes(q) || b.email.toLowerCase().includes(q)
-            return matchesFilter && matchesSearch
+            const matchesType = !consultationType || b.consultation_type === consultationType
+            return matchesFilter && matchesSearch && matchesType
         })
         .sort((a, b) => {
             const diff = new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -123,6 +129,35 @@ export default function BookingsPage() {
                     </div>
                 ))}
             </motion.div>
+
+            {/* Consultation type chips */}
+            {consultationTypes.length > 1 && (
+                <motion.div variants={item} className="flex flex-wrap gap-2 mb-4">
+                    <button
+                        onClick={() => setConsultationType(null)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                            !consultationType
+                                ? 'bg-primary text-white border-primary'
+                                : 'bg-surface text-text-secondary border-border hover:text-text-primary hover:border-primary/30'
+                        }`}
+                    >
+                        All types
+                    </button>
+                    {consultationTypes.map(type => (
+                        <button
+                            key={type}
+                            onClick={() => setConsultationType(consultationType === type ? null : type)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                                consultationType === type
+                                    ? 'bg-primary text-white border-primary'
+                                    : 'bg-surface text-text-secondary border-border hover:text-text-primary hover:border-primary/30'
+                            }`}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                </motion.div>
+            )}
 
             {/* Toolbar */}
             <motion.div variants={item} className="flex flex-col sm:flex-row gap-3 mb-6">

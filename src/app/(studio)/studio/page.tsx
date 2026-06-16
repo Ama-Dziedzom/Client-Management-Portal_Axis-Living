@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { useStudio } from '@/contexts/StudioContext'
 import { studioSupabase as supabase } from '@/lib/supabase'
-import { Client, Project, Invoice, Message } from '@/types/database'
+import { Client, Project, Invoice, Message, Booking } from '@/types/database'
 import { formatCurrency, formatDate, formatStatus, getStatusBadgeClass } from '@/lib/utils'
 import Link from 'next/link'
 import {
@@ -19,6 +19,7 @@ import {
     FileText,
     UserPlus,
     Bell,
+    CalendarDays,
 } from '@/lib/icons'
 
 const container: Variants = {
@@ -36,22 +37,25 @@ export default function StudioDashboardPage() {
     const [projects, setProjects] = useState<Project[]>([])
     const [invoices, setInvoices] = useState<Invoice[]>([])
     const [recentMessages, setRecentMessages] = useState<Message[]>([])
+    const [bookings, setBookings] = useState<Booking[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => { fetchData() }, [])
 
     const fetchData = async () => {
         try {
-            const [clientsRes, projectsRes, invoicesRes, messagesRes] = await Promise.all([
+            const [clientsRes, projectsRes, invoicesRes, messagesRes, bookingsRes] = await Promise.all([
                 supabase.from('clients').select('*').order('created_at', { ascending: false }),
                 supabase.from('projects').select('*').order('updated_at', { ascending: false }),
                 supabase.from('invoices').select('*').order('created_at', { ascending: false }).limit(20),
                 supabase.from('messages').select('*').eq('sender_type', 'client').order('created_at', { ascending: false }).limit(10),
+                supabase.from('bookings').select('*'),
             ])
             setClients(clientsRes.data || [])
             setProjects(projectsRes.data || [])
             setInvoices(invoicesRes.data || [])
             setRecentMessages(messagesRes.data || [])
+            setBookings(bookingsRes.data || [])
         } catch (error) {
             console.error('Studio dashboard fetch error:', error)
         } finally {
@@ -69,7 +73,9 @@ export default function StudioDashboardPage() {
     const activeProjects   = projects.filter(p => p.status === 'in_progress')
     const pendingInvoices  = invoices.filter(i => i.status === 'sent' || i.status === 'overdue')
     const overdueInvoices  = invoices.filter(i => i.status === 'overdue')
-    const totalRevenue     = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.total), 0)
+    const totalRevenue          = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.total), 0)
+    const consultationRevenue   = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed').reduce((s, b) => s + Number(b.amount ?? 0), 0)
+    const bookingCurrency       = bookings.find(b => b.currency)?.currency ?? 'ZMW'
     const unreadMessages   = recentMessages.filter(m => !m.read)
     const hasAttentionItems = overdueInvoices.length > 0 || unreadMessages.length > 0
 
@@ -77,8 +83,8 @@ export default function StudioDashboardPage() {
         return (
             <div className="space-y-6">
                 <div className="skeleton h-10 w-64" />
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[1,2,3,4].map(i => <div key={i} className="skeleton h-28 rounded-2xl" />)}
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                    {[1,2,3,4,5].map(i => <div key={i} className="skeleton h-28 rounded-2xl" />)}
                 </div>
                 <div className="skeleton h-48 rounded-2xl" />
                 <div className="skeleton h-64 rounded-2xl" />
@@ -150,7 +156,7 @@ export default function StudioDashboardPage() {
             )}
 
             {/* ── Stats ── */}
-            <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 <Link href="/studio/clients" className="group card-flat flex flex-col gap-3 hover:shadow-elevated transition-all duration-300">
                     <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/15 transition-colors">
                         <Users className="w-5 h-5 text-primary" />
@@ -190,9 +196,21 @@ export default function StudioDashboardPage() {
                     </div>
                     <div>
                         <p className="text-2xl font-heading font-semibold text-text-primary">{formatCurrency(totalRevenue)}</p>
-                        <p className="text-xs text-text-secondary mt-0.5 font-medium uppercase tracking-wide">Total Revenue</p>
+                        <p className="text-xs text-text-secondary mt-0.5 font-medium uppercase tracking-wide">Invoice Revenue</p>
                     </div>
                 </div>
+
+                <Link href="/studio/bookings" className="group card-flat flex flex-col gap-3 hover:shadow-elevated transition-all duration-300">
+                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/15 transition-colors">
+                        <CalendarDays className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                        <p className="text-2xl font-heading font-semibold text-text-primary">
+                            {formatCurrency(consultationRevenue, bookingCurrency)}
+                        </p>
+                        <p className="text-xs text-text-secondary mt-0.5 font-medium uppercase tracking-wide">Consultation Revenue</p>
+                    </div>
+                </Link>
             </motion.div>
 
             {/* ── Quick Actions ── */}

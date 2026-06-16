@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getResend, FROM } from '@/lib/resend'
 import { emailTemplates } from '@/lib/emailTemplates'
+import { renderToBuffer } from '@react-pdf/renderer'
+import React from 'react'
+import { InvoicePDF } from '@/lib/invoicePdf'
 
 export async function POST(req: Request) {
     try {
@@ -13,9 +16,11 @@ export async function POST(req: Request) {
             lineItems,
             subtotal,
             taxAmount,
+            taxRate,
             total,
             currency,
             notes,
+            paymentDetails,
         } = await req.json()
 
         if (!clientEmail || !invoiceNumber) {
@@ -26,6 +31,9 @@ export async function POST(req: Request) {
             ? new Date(dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
             : 'as soon as possible'
 
+        const issueDateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+
+        // Build email HTML
         const { subject, html } = emailTemplates.invoiceDelivery(
             clientName,
             invoiceNumber,
@@ -37,6 +45,28 @@ export async function POST(req: Request) {
             total,
             currency,
             notes,
+            {},
+            paymentDetails || null,
+        )
+
+        // Generate PDF attachment
+        const pdfBuffer = await renderToBuffer(
+            <InvoicePDF
+                invoiceNumber={invoiceNumber}
+                issueDate={issueDateStr}
+                dueDate={dueDateStr}
+                clientName={clientName}
+                clientEmail={clientEmail}
+                projectTitle={projectTitle}
+                lineItems={lineItems || []}
+                subtotal={Number(subtotal)}
+                taxAmount={Number(taxAmount)}
+                taxRate={Number(taxRate ?? 16)}
+                total={Number(total)}
+                currency={currency || 'ZMW'}
+                notes={notes || ''}
+                paymentDetails={paymentDetails || null}
+            />
         )
 
         const { error } = await getResend().emails.send({
@@ -44,6 +74,12 @@ export async function POST(req: Request) {
             to: [clientEmail],
             subject,
             html,
+            attachments: [
+                {
+                    filename: `${invoiceNumber}.pdf`,
+                    content:  pdfBuffer,
+                },
+            ],
         })
 
         if (error) {

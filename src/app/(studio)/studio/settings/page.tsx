@@ -6,24 +6,18 @@ import { useStudio } from '@/contexts/StudioContext'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import {
-    User, Mail, Shield, Lock, LogOut, Loader2, Palette, Bell,
-    Globe, DollarSign, Calendar, Building2, Check, Sun, Moon, Monitor,
-    MessageSquare, Receipt, FolderKanban, Users, AlertTriangle, ChevronRight
+    User, Mail, LogOut, Loader2, Palette, Bell,
+    Check, Sun, Moon, Monitor, CreditCard,
 } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import EmailTemplatesTab from '@/components/studio/EmailTemplatesTab'
+import { getInitials } from '@/lib/utils'
 
-// ────────────────── types ──────────────────
-type SettingsTab = 'account' | 'notifications' | 'appearance' | 'email_templates'
+// ─── Types ───────────────────────────────────────────────
+type SettingsTab = 'email_templates' | 'account' | 'notifications' | 'appearance' | 'payments'
 
-interface ProfileForm {
-    name: string
-}
-
-interface PasswordForm {
-    newPassword: string
-    confirmPassword: string
-}
+interface ProfileForm    { name: string }
+interface PasswordForm   { newPassword: string; confirmPassword: string }
 
 interface NotificationPrefs {
     emailNewMessage: boolean
@@ -37,126 +31,99 @@ interface NotificationPrefs {
 interface AppearancePrefs {
     companyName: string
     currency: string
-    dateFormat: string
     theme: 'light' | 'dark' | 'system'
 }
 
-// ────────────────── tab config ──────────────────
-const tabs: { id: SettingsTab; label: string; icon: typeof User; description: string }[] = [
-    { id: 'account',         label: 'Account',         icon: User,    description: 'Profile & security' },
-    { id: 'notifications',   label: 'Notifications',   icon: Bell,    description: 'Email preferences' },
-    { id: 'appearance',      label: 'Appearance',       icon: Palette, description: 'Branding & display' },
-    { id: 'email_templates', label: 'Email Templates', icon: Mail,    description: 'Transactional templates' },
-]
-
-// ────────────────── fade variant ──────────────────
-const fadeIn = {
-    initial: { opacity: 0, y: 8 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -8 },
-    transition: { duration: 0.25 },
+export interface PaymentPrefs {
+    bankName: string
+    bankAccountName: string
+    bankAccountNumber: string
+    bankBranch: string
+    momoProvider: string
+    momoNumber: string
+    momoName: string
+    defaultTerms: string
 }
 
-// ═════════════════════════════════════════════════════
-// Main page
-// ═════════════════════════════════════════════════════
-export default function StudioSettingsPage() {
-    const [activeTab, setActiveTab] = useState<SettingsTab>('account')
+// ─── Tab config ──────────────────────────────────────────
+const tabs: { id: SettingsTab; label: string; icon: typeof User }[] = [
+    { id: 'email_templates', label: 'Email Templates', icon: Mail },
+    { id: 'account',         label: 'Account',         icon: User },
+    { id: 'notifications',   label: 'Notifications',   icon: Bell },
+    { id: 'appearance',      label: 'Appearance',      icon: Palette },
+    { id: 'payments',        label: 'Payments',        icon: CreditCard },
+]
 
-    const isWide = activeTab === 'email_templates'
+const fadeIn = {
+    initial:    { opacity: 0, y: 8 },
+    animate:    { opacity: 1, y: 0 },
+    exit:       { opacity: 0, y: -8 },
+    transition: { duration: 0.2 },
+}
+
+// ─── Page ─────────────────────────────────────────────────
+export default function StudioSettingsPage() {
+    const [activeTab, setActiveTab] = useState<SettingsTab>('email_templates')
 
     return (
-        <div className={isWide ? '' : 'max-w-4xl'}>
-            <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-            >
-                {/* Header */}
-                <div className="mb-10">
-                    <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">
-                        Studio Settings
-                    </h1>
-                    <p className="text-text-secondary font-body text-lg">
-                        Manage your team profile, notifications &amp; portal preferences
-                    </p>
-                </div>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+            <div className="mb-6">
+                <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Settings</h1>
+                <p className="text-text-secondary font-body text-lg">Manage your studio profile, notifications &amp; preferences</p>
+            </div>
 
-                <div className={`grid grid-cols-1 gap-8 ${isWide ? '' : 'lg:grid-cols-3'}`}>
-                    {/* ───── Sidebar Tabs ───── */}
-                    <div className={isWide ? 'flex flex-wrap gap-1' : 'lg:col-span-1 space-y-1'}>
-                        {tabs.map((tab) => {
-                            const Icon = tab.icon
-                            const active = activeTab === tab.id
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all group ${
-                                        isWide ? 'flex-row' : 'w-full'
-                                    } ${
-                                        active
-                                            ? 'bg-primary/8 text-primary shadow-sm'
-                                            : 'text-text-secondary hover:bg-accent/5 hover:text-text-primary'
-                                    }`}
-                                >
-                                    <Icon className={`w-[18px] h-[18px] transition-colors ${active ? 'text-primary' : 'text-text-secondary group-hover:text-text-primary'}`} />
-                                    {isWide ? (
-                                        <span>{tab.label}</span>
-                                    ) : (
-                                        <>
-                                            <div className="flex-1 text-left">
-                                                <span className="block">{tab.label}</span>
-                                                <span className={`block text-[10px] mt-0.5 font-normal ${active ? 'text-primary/60' : 'text-text-secondary/60'}`}>
-                                                    {tab.description}
-                                                </span>
-                                            </div>
-                                            <ChevronRight className={`w-3.5 h-3.5 transition-all ${active ? 'opacity-100 text-primary' : 'opacity-0 -translate-x-2 group-hover:opacity-40 group-hover:translate-x-0'}`} />
-                                        </>
-                                    )}
-                                </button>
-                            )
-                        })}
-                    </div>
+            {/* Tab bar — pill style, consistent with rest of studio */}
+            <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 w-fit mb-8 flex-wrap">
+                {tabs.map(tab => {
+                    const Icon = tab.icon
+                    const active = activeTab === tab.id
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                active
+                                    ? 'bg-accent/20 text-primary border border-accent/30'
+                                    : 'text-text-secondary hover:text-text-primary'
+                            }`}
+                        >
+                            <Icon className="w-4 h-4" />
+                            {tab.label}
+                        </button>
+                    )
+                })}
+            </div>
 
-                    {/* ───── Tab Content ───── */}
-                    <div className={isWide ? '' : 'lg:col-span-2'}>
-                        <AnimatePresence mode="wait">
-                            {activeTab === 'account'         && <AccountTab key="account" />}
-                            {activeTab === 'notifications'   && <NotificationsTab key="notifications" />}
-                            {activeTab === 'appearance'      && <AppearanceTab key="appearance" />}
-                            {activeTab === 'email_templates' && (
-                                <motion.div key="email_templates" {...fadeIn}>
-                                    <EmailTemplatesTab />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </div>
-            </motion.div>
-        </div>
+            <AnimatePresence mode="wait">
+                {activeTab === 'account'         && <AccountTab key="account" />}
+                {activeTab === 'notifications'   && <NotificationsTab key="notifications" />}
+                {activeTab === 'appearance'      && <AppearanceTab key="appearance" />}
+                {activeTab === 'payments'        && <PaymentsTab key="payments" />}
+                {activeTab === 'email_templates' && (
+                    <motion.div key="email_templates" {...fadeIn}>
+                        <EmailTemplatesTab />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     )
 }
 
-// ═════════════════════════════════════════════════════
-// Account Tab
-// ═════════════════════════════════════════════════════
+// ─── Account Tab ─────────────────────────────────────────
 function AccountTab() {
     const { studioUser, signOut } = useStudio()
-    const [updatingProfile, setUpdatingProfile] = useState(false)
+    const [updatingProfile,  setUpdatingProfile]  = useState(false)
     const [updatingPassword, setUpdatingPassword] = useState(false)
 
     const {
-        register: registerProfile,
-        handleSubmit: handleProfileSubmit,
+        register: regProfile,
+        handleSubmit: submitProfile,
         formState: { errors: profileErrors },
-    } = useForm<ProfileForm>({
-        defaultValues: { name: studioUser?.name || '' },
-    })
+    } = useForm<ProfileForm>({ defaultValues: { name: studioUser?.name || '' } })
 
     const {
-        register: registerPassword,
-        handleSubmit: handlePasswordSubmit,
+        register: regPassword,
+        handleSubmit: submitPassword,
         formState: { errors: passwordErrors },
         reset: resetPassword,
         watch,
@@ -168,14 +135,11 @@ function AccountTab() {
         if (!studioUser) return
         setUpdatingProfile(true)
         try {
-            const { error } = await supabase
-                .from('studio_users')
-                .update({ name: data.name })
-                .eq('id', studioUser.id)
+            const { error } = await supabase.from('studio_users').update({ name: data.name }).eq('id', studioUser.id)
             if (error) throw error
-            toast.success('Studio profile updated')
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to update studio profile')
+            toast.success('Profile updated')
+        } catch (e: any) {
+            toast.error(e.message || 'Failed to update profile')
         } finally {
             setUpdatingProfile(false)
         }
@@ -188,233 +152,150 @@ function AccountTab() {
             if (error) throw error
             toast.success('Password updated')
             resetPassword()
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to update password')
+        } catch (e: any) {
+            toast.error(e.message || 'Failed to update password')
         } finally {
             setUpdatingPassword(false)
         }
     }
 
     return (
-        <motion.div {...fadeIn} className="space-y-8">
-            {/* Profile */}
-            <section className="card-flat">
-                <h2 className="text-lg font-heading font-semibold text-text-primary mb-6 flex items-center gap-2">
-                    <User className="w-5 h-5 text-primary" /> Profile Details
-                </h2>
+        <motion.div {...fadeIn} className="space-y-6 max-w-2xl">
+            {/* User identity header */}
+            <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-lg font-bold font-heading flex-shrink-0 select-none">
+                    {studioUser ? getInitials(studioUser.name) : 'S'}
+                </div>
+                <div>
+                    <p className="text-base font-semibold text-text-primary font-heading leading-tight">{studioUser?.name || 'Studio User'}</p>
+                    <p className="text-sm text-text-secondary">{studioUser?.email}</p>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+                        {studioUser?.role === 'admin' ? 'Admin' : 'Designer'}
+                    </span>
+                </div>
+            </div>
 
-                <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="space-y-5">
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">Full Name</label>
-                        <input
-                            type="text"
-                            className={`input-field ${profileErrors.name ? 'border-error' : ''}`}
-                            {...registerProfile('name', { required: 'Name is required' })}
-                        />
-                        {profileErrors.name && <p className="text-error text-xs mt-1">{profileErrors.name.message}</p>}
-                    </div>
+            {/* Settings card */}
+            <div className="card-flat divide-y divide-border">
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">Email Address</label>
-                        <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
+                {/* ── Profile ── */}
+                <SettingSection label="Profile">
+                    <form onSubmit={submitProfile(onProfileSubmit)} className="space-y-0 divide-y divide-border">
+                        <SettingRow label="Full Name">
+                            <input
+                                type="text"
+                                className={`input-field flex-1 ${profileErrors.name ? 'border-error' : ''}`}
+                                {...regProfile('name', { required: 'Name is required' })}
+                            />
+                            <button type="submit" disabled={updatingProfile} className="btn-primary flex-shrink-0 min-w-[72px]">
+                                {updatingProfile ? <Loader2 className="w-4 h-4 animate-spin text-white mx-auto" /> : 'Save'}
+                            </button>
+                        </SettingRow>
+                        {profileErrors.name && <p className="text-error text-xs py-2 pl-[calc(9rem+16px)]">{profileErrors.name.message}</p>}
+
+                        <SettingRow label="Email" sub="Managed via admin dashboard">
                             <input
                                 type="email"
                                 value={studioUser?.email || ''}
                                 disabled
-                                className="input-field pl-11 bg-accent/5 cursor-not-allowed opacity-70"
+                                className="input-field flex-1 opacity-50 cursor-not-allowed"
                             />
-                        </div>
-                        <p className="text-[10px] text-text-secondary ml-1 italic">
-                            Email management is handled via the admin dashboard.
-                        </p>
-                    </div>
+                        </SettingRow>
+                    </form>
+                </SettingSection>
 
-                    <div className="pt-2">
-                        <button type="submit" disabled={updatingProfile} className="btn-primary min-w-[140px]">
-                            {updatingProfile ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : 'Save Changes'}
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-            {/* Security */}
-            <section className="card-flat">
-                <h2 className="text-lg font-heading font-semibold text-text-primary mb-6 flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-primary" /> Security
-                </h2>
-
-                <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-5">
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">New Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
+                {/* ── Security ── */}
+                <SettingSection label="Security">
+                    <form onSubmit={submitPassword(onPasswordSubmit)} className="space-y-0 divide-y divide-border">
+                        <SettingRow label="New Password">
                             <input
                                 type="password"
                                 placeholder="Min 8 characters"
-                                className={`input-field pl-11 ${passwordErrors.newPassword ? 'border-error' : ''}`}
-                                {...registerPassword('newPassword', {
+                                className={`input-field flex-1 ${passwordErrors.newPassword ? 'border-error' : ''}`}
+                                {...regPassword('newPassword', {
                                     required: 'New password is required',
-                                    minLength: { value: 8, message: 'Password must be at least 8 characters' },
+                                    minLength: { value: 8, message: 'At least 8 characters' },
                                 })}
                             />
-                        </div>
-                        {passwordErrors.newPassword && <p className="text-error text-xs mt-1">{passwordErrors.newPassword.message}</p>}
-                    </div>
+                        </SettingRow>
+                        {passwordErrors.newPassword && <p className="text-error text-xs py-2 pl-[calc(9rem+16px)]">{passwordErrors.newPassword.message}</p>}
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">Confirm Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
+                        <SettingRow label="Confirm">
                             <input
                                 type="password"
                                 placeholder="Repeat new password"
-                                className={`input-field pl-11 ${passwordErrors.confirmPassword ? 'border-error' : ''}`}
-                                {...registerPassword('confirmPassword', {
+                                className={`input-field flex-1 ${passwordErrors.confirmPassword ? 'border-error' : ''}`}
+                                {...regPassword('confirmPassword', {
                                     required: 'Please confirm your password',
-                                    validate: (v) => v === newPassword || 'Passwords do not match',
+                                    validate: v => v === newPassword || 'Passwords do not match',
                                 })}
                             />
-                        </div>
-                        {passwordErrors.confirmPassword && <p className="text-error text-xs mt-1">{passwordErrors.confirmPassword.message}</p>}
-                    </div>
+                            <button type="submit" disabled={updatingPassword} className="btn-secondary flex-shrink-0 min-w-[96px]">
+                                {updatingPassword ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Update'}
+                            </button>
+                        </SettingRow>
+                        {passwordErrors.confirmPassword && <p className="text-error text-xs py-2 pl-[calc(9rem+16px)]">{passwordErrors.confirmPassword.message}</p>}
+                    </form>
+                </SettingSection>
 
-                    <div className="pt-2">
-                        <button type="submit" disabled={updatingPassword} className="btn-secondary min-w-[140px]">
-                            {updatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Update Password'}
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-            {/* Session */}
-            <section className="card-flat border-red-100 bg-red-50/10">
-                <div className="flex items-center justify-between gap-4">
+                {/* ── Danger zone ── */}
+                <div className="flex items-center justify-between gap-4 pt-5 pb-1">
                     <div>
-                        <h3 className="text-sm font-semibold text-text-primary">Session Management</h3>
-                        <p className="text-xs text-text-secondary mt-1">End your current session across all devices</p>
+                        <p className="text-sm font-medium text-error">Sign Out</p>
+                        <p className="text-xs text-text-secondary mt-0.5">End your session on all devices</p>
                     </div>
                     <button
                         onClick={signOut}
-                        className="flex items-center gap-2 px-4 py-2 bg-white text-error border border-red-200 rounded-xl text-xs font-bold hover:bg-red-50 transition-colors shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-error border border-error/25 rounded-xl hover:bg-error/5 transition-colors flex-shrink-0"
                     >
                         <LogOut className="w-3.5 h-3.5" /> Sign Out
                     </button>
                 </div>
-            </section>
+            </div>
         </motion.div>
     )
 }
 
-// ═════════════════════════════════════════════════════
-// Notifications Tab
-// ═════════════════════════════════════════════════════
-const notificationGroups = [
-    {
-        title: 'Messages',
-        icon: MessageSquare,
-        color: 'blue',
-        items: [
-            {
-                key: 'emailNewMessage' as const,
-                label: 'New client message',
-                description: 'Get notified when a client sends you a message',
-            },
-        ],
-    },
-    {
-        title: 'Invoices',
-        icon: Receipt,
-        color: 'emerald',
-        items: [
-            {
-                key: 'emailInvoicePaid' as const,
-                label: 'Invoice paid',
-                description: 'Receive confirmation when a client pays an invoice',
-            },
-            {
-                key: 'emailOverdueInvoice' as const,
-                label: 'Overdue invoice alerts',
-                description: 'Get reminders about invoices that are past due',
-            },
-        ],
-    },
-    {
-        title: 'Projects',
-        icon: FolderKanban,
-        color: 'amber',
-        items: [
-            {
-                key: 'emailProjectUpdate' as const,
-                label: 'Project status changes',
-                description: 'Get notified when project milestones are updated',
-            },
-        ],
-    },
-    {
-        title: 'Clients',
-        icon: Users,
-        color: 'violet',
-        items: [
-            {
-                key: 'emailNewClient' as const,
-                label: 'New client registration',
-                description: 'Get notified when a new client signs up',
-            },
-        ],
-    },
-    {
-        title: 'Summaries',
-        icon: Calendar,
-        color: 'rose',
-        items: [
-            {
-                key: 'emailWeeklyDigest' as const,
-                label: 'Weekly digest',
-                description: 'Receive a summary of activity every Monday morning',
-            },
-        ],
-    },
+// ─── Notifications Tab ───────────────────────────────────
+const notificationItems: { key: keyof NotificationPrefs; label: string; description: string; group: string }[] = [
+    { key: 'emailNewMessage',     label: 'New client message',      description: 'When a client sends a message',             group: 'Activity' },
+    { key: 'emailNewClient',      label: 'New client registration', description: 'When a new client signs up to the portal',  group: 'Activity' },
+    { key: 'emailProjectUpdate',  label: 'Project status changes',  description: 'When project milestones are updated',       group: 'Activity' },
+    { key: 'emailInvoicePaid',    label: 'Invoice paid',            description: 'When a client pays an invoice',             group: 'Finance' },
+    { key: 'emailOverdueInvoice', label: 'Overdue invoice alerts',  description: 'Invoices that are past their due date',     group: 'Finance' },
+    { key: 'emailWeeklyDigest',   label: 'Weekly digest',           description: 'Summary of activity every Monday morning',  group: 'Summaries' },
 ]
-
-const colorMap: Record<string, { bg: string; text: string; border: string }> = {
-    blue:    { bg: 'bg-blue-50',    text: 'text-blue-600',    border: 'border-blue-100' },
-    emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
-    amber:   { bg: 'bg-amber-50',   text: 'text-amber-600',   border: 'border-amber-100' },
-    violet:  { bg: 'bg-violet-50',  text: 'text-violet-600',  border: 'border-violet-100' },
-    rose:    { bg: 'bg-rose-50',    text: 'text-rose-600',    border: 'border-rose-100' },
-}
 
 const NOTIF_KEY = 'studio_notif_prefs'
 
+const DEFAULT_NOTIF_PREFS: NotificationPrefs = {
+    emailNewMessage:    true,
+    emailInvoicePaid:   true,
+    emailProjectUpdate: true,
+    emailNewClient:     true,
+    emailWeeklyDigest:  false,
+    emailOverdueInvoice: true,
+}
+
 function NotificationsTab() {
     const { studioUser } = useStudio()
-    const [saving, setSaving] = useState(false)
-    const [prefs, setPrefs] = useState<NotificationPrefs>({
-        emailNewMessage: true,
-        emailInvoicePaid: true,
-        emailProjectUpdate: true,
-        emailNewClient: true,
-        emailWeeklyDigest: false,
-        emailOverdueInvoice: true,
-    })
+    const [saving, setSaving]  = useState(false)
+    const [prefs, setPrefs]    = useState<NotificationPrefs>(DEFAULT_NOTIF_PREFS)
 
     useEffect(() => {
         try {
             const saved = localStorage.getItem(NOTIF_KEY)
             if (saved) setPrefs(JSON.parse(saved))
-        } catch { /* ignore */ }
+        } catch { }
     }, [])
 
-    const toggle = (key: keyof NotificationPrefs) => {
-        setPrefs((prev) => ({ ...prev, [key]: !prev[key] }))
-    }
+    const toggle = (key: keyof NotificationPrefs) => setPrefs(p => ({ ...p, [key]: !p[key] }))
 
     const savePrefs = async () => {
         setSaving(true)
         try {
             localStorage.setItem(NOTIF_KEY, JSON.stringify(prefs))
-            await new Promise((r) => setTimeout(r, 300))
+            await new Promise(r => setTimeout(r, 300))
             toast.success('Notification preferences saved')
         } catch {
             toast.error('Failed to save preferences')
@@ -423,68 +304,37 @@ function NotificationsTab() {
         }
     }
 
-    return (
-        <motion.div {...fadeIn} className="space-y-6">
-            {/* Info banner */}
-            <div className="flex items-start gap-3 bg-blue-50/60 border border-blue-100 rounded-2xl p-4">
-                <Bell className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                <div>
-                    <p className="text-sm font-semibold text-text-primary">Email Notifications</p>
-                    <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
-                        Choose which events trigger email alerts. These are sent to <strong className="text-text-primary font-medium">{studioUser?.email}</strong>.
-                    </p>
-                </div>
-            </div>
+    const groups = Array.from(new Set(notificationItems.map(i => i.group)))
 
-            {/* Notification groups */}
-            {notificationGroups.map((group) => {
-                const Icon = group.icon
-                const colors = colorMap[group.color] || colorMap.blue
-                return (
-                    <section key={group.title} className="card-flat">
-                        <div className="flex items-center gap-3 mb-5">
-                            <div className={`w-9 h-9 ${colors.bg} rounded-xl flex items-center justify-center`}>
-                                <Icon className={`w-4 h-4 ${colors.text}`} />
-                            </div>
-                            <h3 className="text-sm font-heading font-semibold text-text-primary">{group.title}</h3>
-                        </div>
-                        <div className="space-y-4">
-                            {group.items.map((item) => (
-                                <div key={item.key} className="flex items-start justify-between gap-4">
+    return (
+        <motion.div {...fadeIn} className="space-y-6 max-w-2xl">
+            <p className="text-sm text-text-secondary">
+                Alerts sent to <span className="font-medium text-text-primary">{studioUser?.email}</span>
+            </p>
+
+            <div className="card-flat divide-y divide-border">
+                {groups.map(group => (
+                    <SettingSection key={group} label={group}>
+                        <div className="divide-y divide-border">
+                            {notificationItems.filter(i => i.group === group).map(item => (
+                                <div key={item.key} className="flex items-center justify-between gap-6 py-4 first:pt-0 last:pb-0">
                                     <div>
                                         <p className="text-sm font-medium text-text-primary">{item.label}</p>
-                                        <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">{item.description}</p>
+                                        <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
                                     </div>
-                                    <ToggleSwitch
-                                        enabled={prefs[item.key]}
-                                        onToggle={() => toggle(item.key)}
-                                    />
+                                    <ToggleSwitch enabled={prefs[item.key]} onToggle={() => toggle(item.key)} />
                                 </div>
                             ))}
                         </div>
-                    </section>
-                )
-            })}
+                    </SettingSection>
+                ))}
+            </div>
 
-            {/* Save / Reset buttons */}
-            <div className="flex items-center gap-3 pt-2">
-                <button onClick={savePrefs} disabled={saving} className="btn-primary min-w-[160px]">
+            <div className="flex items-center gap-3">
+                <button onClick={savePrefs} disabled={saving} className="btn-primary min-w-[140px]">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : 'Save Preferences'}
                 </button>
-                <button
-                    onClick={() => {
-                        setPrefs({
-                            emailNewMessage: true,
-                            emailInvoicePaid: true,
-                            emailProjectUpdate: true,
-                            emailNewClient: true,
-                            emailWeeklyDigest: false,
-                            emailOverdueInvoice: true,
-                        })
-                        toast.success('Reset to defaults')
-                    }}
-                    className="btn-ghost text-sm"
-                >
+                <button onClick={() => { setPrefs(DEFAULT_NOTIF_PREFS); toast.success('Reset to defaults') }} className="btn-ghost text-sm">
                     Reset to Defaults
                 </button>
             </div>
@@ -492,9 +342,7 @@ function NotificationsTab() {
     )
 }
 
-// ═════════════════════════════════════════════════════
-// Appearance Tab
-// ═════════════════════════════════════════════════════
+// ─── Appearance Tab ───────────────────────────────────────
 const currencies = [
     { code: 'ZMW', symbol: 'K',  label: 'Zambian Kwacha' },
     { code: 'USD', symbol: '$',  label: 'US Dollar' },
@@ -503,16 +351,9 @@ const currencies = [
     { code: 'GHS', symbol: '₵',  label: 'Ghanaian Cedi' },
 ]
 
-const dateFormats = [
-    { value: 'DD/MM/YYYY', example: '15/03/2026' },
-    { value: 'MM/DD/YYYY', example: '03/15/2026' },
-    { value: 'YYYY-MM-DD', example: '2026-03-15' },
-    { value: 'MMM DD, YYYY', example: 'Mar 15, 2026' },
-]
-
 const themeOptions: { value: AppearancePrefs['theme']; label: string; icon: typeof Sun }[] = [
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'light',  label: 'Light',  icon: Sun },
+    { value: 'dark',   label: 'Dark',   icon: Moon },
     { value: 'system', label: 'System', icon: Monitor },
 ]
 
@@ -520,48 +361,36 @@ const APPEARANCE_KEY = 'studio_appearance_prefs'
 
 function applyTheme(theme: AppearancePrefs['theme']) {
     const root = document.documentElement
-    if (theme === 'dark') {
-        root.classList.add('dark')
-    } else if (theme === 'light') {
-        root.classList.remove('dark')
-    } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        if (prefersDark) root.classList.add('dark')
+    if (theme === 'dark')   root.classList.add('dark')
+    else if (theme === 'light') root.classList.remove('dark')
+    else {
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) root.classList.add('dark')
         else root.classList.remove('dark')
     }
 }
 
 function AppearanceTab() {
     const [saving, setSaving] = useState(false)
-    const [prefs, setPrefs] = useState<AppearancePrefs>({
+    const [prefs, setPrefs]   = useState<AppearancePrefs>({
         companyName: 'Axis Living',
-        currency: 'ZMW',
-        dateFormat: 'DD/MM/YYYY',
-        theme: 'light',
+        currency:    'ZMW',
+        theme:       'light',
     })
-
 
     useEffect(() => {
         try {
             const saved = localStorage.getItem(APPEARANCE_KEY)
-            if (saved) {
-                const parsed = JSON.parse(saved)
-                setPrefs(parsed)
-                applyTheme(parsed.theme)
-            }
-        } catch { /* ignore */ }
+            if (saved) { const p = JSON.parse(saved); setPrefs(p); applyTheme(p.theme) }
+        } catch { }
     }, [])
 
-    const setTheme = (theme: AppearancePrefs['theme']) => {
-        setPrefs(p => ({ ...p, theme }))
-        applyTheme(theme)
-    }
+    const setTheme = (theme: AppearancePrefs['theme']) => { setPrefs(p => ({ ...p, theme })); applyTheme(theme) }
 
     const savePrefs = async () => {
         setSaving(true)
         try {
             localStorage.setItem(APPEARANCE_KEY, JSON.stringify(prefs))
-            await new Promise((r) => setTimeout(r, 300))
+            await new Promise(r => setTimeout(r, 300))
             toast.success('Appearance preferences saved')
         } catch {
             toast.error('Failed to save preferences')
@@ -571,142 +400,266 @@ function AppearanceTab() {
     }
 
     return (
-        <motion.div {...fadeIn} className="space-y-8">
-            {/* Company / Branding */}
-            <section className="card-flat">
-                <h2 className="text-lg font-heading font-semibold text-text-primary mb-6 flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-primary" /> Branding
-                </h2>
+        <motion.div {...fadeIn} className="space-y-6 max-w-2xl">
+            <div className="card-flat divide-y divide-border">
 
-                <div className="space-y-5">
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">Studio Name</label>
-                        <div className="relative">
-                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
-                            <input
-                                type="text"
-                                value={prefs.companyName}
-                                onChange={(e) => setPrefs((p) => ({ ...p, companyName: e.target.value }))}
-                                className="input-field pl-11"
-                                placeholder="Your studio name"
-                            />
-                        </div>
-                        <p className="text-[10px] text-text-secondary ml-1 italic">
-                            Displayed in the sidebar, emails, and invoices.
-                        </p>
-                    </div>
-                </div>
-            </section>
+                <SettingSection label="Branding">
+                    <SettingRow label="Studio Name" sub="Shown in emails & invoices">
+                        <input
+                            type="text"
+                            value={prefs.companyName}
+                            onChange={e => setPrefs(p => ({ ...p, companyName: e.target.value }))}
+                            className="input-field flex-1"
+                            placeholder="Your studio name"
+                        />
+                    </SettingRow>
+                </SettingSection>
 
-            {/* Theme */}
-            <section className="card-flat">
-                <h2 className="text-lg font-heading font-semibold text-text-primary mb-6 flex items-center gap-2">
-                    <Palette className="w-5 h-5 text-primary" /> Theme
-                </h2>
-
-                <div className="grid grid-cols-3 gap-3">
-                    {themeOptions.map((opt) => {
-                        const Icon = opt.icon
-                        const active = prefs.theme === opt.value
-                        return (
-                            <button
-                                key={opt.value}
-                                onClick={() => setTheme(opt.value)}
-                                className={`relative flex flex-col items-center gap-2.5 px-4 py-5 rounded-2xl border-2 transition-all ${
-                                    active
-                                        ? 'border-primary bg-primary/5 shadow-sm'
-                                        : 'border-border bg-surface hover:border-primary/30'
-                                }`}
-                            >
-                                {active && (
-                                    <div className="absolute top-2.5 right-2.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                                        <Check className="w-3 h-3 text-white" />
-                                    </div>
-                                )}
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${active ? 'bg-primary/10' : 'bg-accent/10'}`}>
-                                    <Icon className={`w-5 h-5 ${active ? 'text-primary' : 'text-text-secondary'}`} />
-                                </div>
-                                <span className={`text-sm font-semibold ${active ? 'text-primary' : 'text-text-primary'}`}>
-                                    {opt.label}
-                                </span>
-                            </button>
-                        )
-                    })}
-                </div>
-            </section>
-
-            {/* Regional */}
-            <section className="card-flat">
-                <h2 className="text-lg font-heading font-semibold text-text-primary mb-6 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-primary" /> Regional
-                </h2>
-
-                <div className="space-y-5">
-                    {/* Currency */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">Default Currency</label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                            {currencies.map((c) => {
-                                const active = prefs.currency === c.code
+                <SettingSection label="Theme">
+                    <SettingRow label="Colour Mode" sub="Interface appearance">
+                        <div className="flex gap-2 flex-wrap">
+                            {themeOptions.map(opt => {
+                                const Icon = opt.icon
+                                const active = prefs.theme === opt.value
                                 return (
                                     <button
-                                        key={c.code}
-                                        onClick={() => setPrefs((p) => ({ ...p, currency: c.code }))}
-                                        className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${
+                                        key={opt.value}
+                                        onClick={() => setTheme(opt.value)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
                                             active
                                                 ? 'border-primary bg-primary/5 text-primary'
-                                                : 'border-border bg-surface text-text-secondary hover:border-primary/30'
+                                                : 'border-border bg-surface text-text-secondary hover:border-primary/40 hover:text-text-primary'
                                         }`}
                                     >
-                                        <span className="text-base font-semibold">{c.symbol}</span>
-                                        <span>{c.code}</span>
+                                        <Icon className="w-3.5 h-3.5" />
+                                        {opt.label}
+                                        {active && <Check className="w-3 h-3 ml-0.5" />}
                                     </button>
                                 )
                             })}
                         </div>
-                    </div>
+                    </SettingRow>
+                </SettingSection>
 
-                    {/* Date Format */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-text-primary ml-1">Date Format</label>
-                        <div className="grid grid-cols-2 gap-2.5">
-                            {dateFormats.map((df) => {
-                                const active = prefs.dateFormat === df.value
-                                return (
-                                    <button
-                                        key={df.value}
-                                        onClick={() => setPrefs((p) => ({ ...p, dateFormat: df.value }))}
-                                        className={`flex flex-col items-start px-4 py-3 rounded-xl border-2 text-sm transition-all ${
-                                            active
-                                                ? 'border-primary bg-primary/5'
-                                                : 'border-border bg-white hover:border-primary/30'
-                                        }`}
-                                    >
-                                        <span className={`font-medium ${active ? 'text-primary' : 'text-text-primary'}`}>
-                                            {df.value}
-                                        </span>
-                                        <span className="text-[10px] text-text-secondary mt-0.5">{df.example}</span>
-                                    </button>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <SettingSection label="Regional">
+                    <div className="divide-y divide-border">
+                        <SettingRow label="Currency" sub="Default for invoices">
+                            <div className="flex flex-wrap gap-2">
+                                {currencies.map(c => {
+                                    const active = prefs.currency === c.code
+                                    return (
+                                        <button
+                                            key={c.code}
+                                            onClick={() => setPrefs(p => ({ ...p, currency: c.code }))}
+                                            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm font-medium transition-all ${
+                                                active
+                                                    ? 'border-primary bg-primary/5 text-primary'
+                                                    : 'border-border bg-surface text-text-secondary hover:border-primary/40 hover:text-text-primary'
+                                            }`}
+                                        >
+                                            <span className="font-bold">{c.symbol}</span>
+                                            {c.code}
+                                            {active && <Check className="w-3 h-3 ml-0.5" />}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        </SettingRow>
 
-            {/* Save */}
-            <div className="flex items-center gap-3 pt-2">
-                <button onClick={savePrefs} disabled={saving} className="btn-primary min-w-[160px]">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : 'Save Preferences'}
-                </button>
+                    </div>
+                </SettingSection>
             </div>
+
+            <button onClick={savePrefs} disabled={saving} className="btn-primary min-w-[140px]">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : 'Save Preferences'}
+            </button>
         </motion.div>
     )
 }
 
-// ═════════════════════════════════════════════════════
-// Toggle Switch
-// ═════════════════════════════════════════════════════
+// ─── Payments Tab ────────────────────────────────────────
+export const PAYMENT_PREFS_KEY = 'studio_payment_prefs'
+
+export const DEFAULT_PAYMENT_PREFS: PaymentPrefs = {
+    bankName:          '',
+    bankAccountName:   '',
+    bankAccountNumber: '',
+    bankBranch:        '',
+    momoProvider:      '',
+    momoNumber:        '',
+    momoName:          '',
+    defaultTerms:      '',
+}
+
+function PaymentsTab() {
+    const [saving, setSaving] = useState(false)
+    const [prefs, setPrefs]   = useState<PaymentPrefs>(DEFAULT_PAYMENT_PREFS)
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(PAYMENT_PREFS_KEY)
+            if (saved) setPrefs({ ...DEFAULT_PAYMENT_PREFS, ...JSON.parse(saved) })
+        } catch { }
+    }, [])
+
+    const set = (key: keyof PaymentPrefs, value: string) =>
+        setPrefs(p => ({ ...p, [key]: value }))
+
+    const savePrefs = async () => {
+        setSaving(true)
+        try {
+            localStorage.setItem(PAYMENT_PREFS_KEY, JSON.stringify(prefs))
+            await new Promise(r => setTimeout(r, 300))
+            toast.success('Payment details saved')
+        } catch {
+            toast.error('Failed to save payment details')
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    return (
+        <motion.div {...fadeIn} className="space-y-6 max-w-2xl">
+            <p className="text-sm text-text-secondary">
+                These details are auto-filled on every new invoice. You can still edit them per invoice if needed.
+            </p>
+
+            <div className="card-flat divide-y divide-border">
+                <SettingSection label="Bank Transfer">
+                    <div className="divide-y divide-border">
+                        <SettingRow label="Bank Name">
+                            <input
+                                type="text"
+                                value={prefs.bankName}
+                                onChange={e => set('bankName', e.target.value)}
+                                className="input-field flex-1"
+                                placeholder="e.g. Zanaco"
+                            />
+                        </SettingRow>
+                        <SettingRow label="Account Name">
+                            <input
+                                type="text"
+                                value={prefs.bankAccountName}
+                                onChange={e => set('bankAccountName', e.target.value)}
+                                className="input-field flex-1"
+                                placeholder="e.g. Axis Living Studio Ltd"
+                            />
+                        </SettingRow>
+                        <SettingRow label="Account Number">
+                            <input
+                                type="text"
+                                value={prefs.bankAccountNumber}
+                                onChange={e => set('bankAccountNumber', e.target.value)}
+                                className="input-field flex-1 font-mono tracking-wide"
+                                placeholder="e.g. 0123456789"
+                            />
+                        </SettingRow>
+                        <SettingRow label="Branch" sub="Optional">
+                            <input
+                                type="text"
+                                value={prefs.bankBranch}
+                                onChange={e => set('bankBranch', e.target.value)}
+                                className="input-field flex-1"
+                                placeholder="e.g. Cairo Road"
+                            />
+                        </SettingRow>
+                    </div>
+                </SettingSection>
+
+                <SettingSection label="Mobile Money">
+                    <div className="divide-y divide-border">
+                        <SettingRow label="Provider">
+                            <div className="flex gap-2 flex-wrap flex-1">
+                                {['MTN Money', 'Airtel Money', 'Zamtel'].map(p => (
+                                    <button
+                                        key={p}
+                                        type="button"
+                                        onClick={() => set('momoProvider', prefs.momoProvider === p ? '' : p)}
+                                        className={`px-3.5 py-2 rounded-xl border text-sm font-medium transition-all ${
+                                            prefs.momoProvider === p
+                                                ? 'border-primary bg-primary/5 text-primary'
+                                                : 'border-border bg-surface text-text-secondary hover:border-primary/40 hover:text-text-primary'
+                                        }`}
+                                    >
+                                        {p}
+                                    </button>
+                                ))}
+                                <input
+                                    type="text"
+                                    value={['MTN Money', 'Airtel Money', 'Zamtel'].includes(prefs.momoProvider) ? '' : prefs.momoProvider}
+                                    onChange={e => set('momoProvider', e.target.value)}
+                                    className="input-field flex-1 min-w-[120px]"
+                                    placeholder="Other provider"
+                                />
+                            </div>
+                        </SettingRow>
+                        <SettingRow label="Number">
+                            <input
+                                type="tel"
+                                value={prefs.momoNumber}
+                                onChange={e => set('momoNumber', e.target.value)}
+                                className="input-field flex-1 font-mono tracking-wide"
+                                placeholder="e.g. 0977 123 456"
+                            />
+                        </SettingRow>
+                        <SettingRow label="Account Name" sub="Name on mobile wallet">
+                            <input
+                                type="text"
+                                value={prefs.momoName}
+                                onChange={e => set('momoName', e.target.value)}
+                                className="input-field flex-1"
+                                placeholder="e.g. Axis Living"
+                            />
+                        </SettingRow>
+                    </div>
+                </SettingSection>
+
+                <SettingSection label="Additional Terms">
+                    <div className="space-y-1">
+                        <textarea
+                            value={prefs.defaultTerms}
+                            onChange={e => set('defaultTerms', e.target.value)}
+                            rows={3}
+                            className="input-field w-full resize-none text-sm"
+                            placeholder="e.g. Payment due within 14 days. Late payments attract a 5% monthly fee."
+                        />
+                        <p className="text-xs text-text-secondary">Appended to the payment notes on every invoice.</p>
+                    </div>
+                </SettingSection>
+            </div>
+
+            <button onClick={savePrefs} disabled={saving} className="btn-primary min-w-[140px]">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : 'Save Payment Details'}
+            </button>
+        </motion.div>
+    )
+}
+
+// ─── Shared layout primitives ────────────────────────────
+function SettingSection({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+        <div className="py-5 first:pt-0 last:pb-0 space-y-4">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{label}</p>
+            {children}
+        </div>
+    )
+}
+
+function SettingRow({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) {
+    return (
+        <div className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+            <div className="w-36 flex-shrink-0">
+                <p className="text-sm font-medium text-text-primary">{label}</p>
+                {sub && <p className="text-xs text-text-secondary mt-0.5">{sub}</p>}
+            </div>
+            <div className="flex-1 flex items-center gap-3 min-w-0">
+                {children}
+            </div>
+        </div>
+    )
+}
+
+// ─── Toggle Switch ───────────────────────────────────────
 function ToggleSwitch({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
     return (
         <button
@@ -714,15 +667,13 @@ function ToggleSwitch({ enabled, onToggle }: { enabled: boolean; onToggle: () =>
             role="switch"
             aria-checked={enabled}
             onClick={onToggle}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
-                enabled ? 'bg-primary' : 'bg-gray-200'
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 focus:outline-none ${
+                enabled ? 'bg-primary' : 'bg-border'
             }`}
         >
-            <span
-                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg transform ring-0 transition-transform duration-200 ease-in-out mt-0.5 ${
-                    enabled ? 'translate-x-[22px]' : 'translate-x-0.5'
-                }`}
-            />
+            <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform ring-0 transition-transform duration-200 mt-0.5 ${
+                enabled ? 'translate-x-[22px]' : 'translate-x-0.5'
+            }`} />
         </button>
     )
 }
