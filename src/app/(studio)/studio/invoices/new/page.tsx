@@ -14,7 +14,6 @@ import {
     Loader2,
     User,
     FolderKanban,
-    Calendar,
     Receipt,
     ListTodo,
     Eye,
@@ -23,6 +22,8 @@ import {
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { DatePicker } from '@/components/ui/DatePicker'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 interface LineItem {
     description: string
@@ -190,16 +191,15 @@ export default function NewInvoicePage() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-text-primary">Due Date</label>
-                                        <div className="relative">
-                                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-                                            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="input-field pl-11" />
-                                        </div>
+                                        <DatePicker value={dueDate} onChange={setDueDate} placeholder="Pick a due date" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-text-primary">Currency</label>
-                                        <select value={currency} onChange={e => setCurrency(e.target.value)} className="input-field appearance-none">
-                                            {['ZMW', 'USD', 'EUR', 'GBP', 'GHS'].map(c => <option key={c} value={c}>{c}</option>)}
-                                        </select>
+                                        <CustomSelect
+                                            value={currency}
+                                            onChange={setCurrency}
+                                            options={['ZMW','USD','EUR','GBP','GHS'].map(c => ({ value: c, label: c }))}
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-text-primary">Tax Rate (%)</label>
@@ -326,38 +326,34 @@ export default function NewInvoicePage() {
                             <div className="card-flat space-y-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-text-secondary uppercase tracking-widest">Select Client</label>
-                                    <div className="relative">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
-                                        <select
-                                            required value={clientId}
-                                            onChange={e => { setClientId(e.target.value); setProjectId('') }}
-                                            className="w-full bg-accent/5 border border-border rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
-                                        >
-                                            <option value="">Choose Client...</option>
-                                            {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
-                                    </div>
+                                    <CustomSelect
+                                        value={clientId}
+                                        onChange={v => { setClientId(v); setProjectId('') }}
+                                        icon={<User className="w-4 h-4" />}
+                                        placeholder="Choose Client..."
+                                        options={[
+                                            ...clients.map(c => ({ value: c.id, label: c.name }))
+                                        ]}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-text-secondary uppercase tracking-widest">Select Project</label>
-                                    <div className="relative">
-                                        <FolderKanban className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
-                                        <select
-                                            required value={projectId}
-                                            onChange={e => setProjectId(e.target.value)}
-                                            className="w-full bg-accent/5 border border-border rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none font-medium"
-                                        >
-                                            <option value="">Choose Project...</option>
-                                            {clientId
-                                                ? projects.filter(p => p.client_id === clientId).length === 0
-                                                    ? <option disabled value="">No projects for this client</option>
-                                                    : projects.filter(p => p.client_id === clientId).map(p => (
-                                                        <option key={p.id} value={p.id}>{p.title} ({p.status.replace('_', ' ')})</option>
-                                                    ))
-                                                : <option disabled value="">Select a client first</option>
-                                            }
-                                        </select>
-                                    </div>
+                                    <CustomSelect
+                                        value={projectId}
+                                        onChange={setProjectId}
+                                        icon={<FolderKanban className="w-4 h-4" />}
+                                        placeholder="Choose Project..."
+                                        options={
+                                            !clientId
+                                                ? [{ value: '', label: 'Select a client first', disabled: true }]
+                                                : projects.filter(p => p.client_id === clientId).length === 0
+                                                ? [{ value: '', label: 'No projects for this client', disabled: true }]
+                                                : projects.filter(p => p.client_id === clientId).map(p => ({
+                                                    value: p.id,
+                                                    label: `${p.title} (${p.status.replace('_', ' ')})`,
+                                                }))
+                                        }
+                                    />
                                 </div>
                             </div>
 

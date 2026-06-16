@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Booking } from '@/types/database'
 import { CalendarDays, Clock, Mail, Phone, Search, CreditCard, Tag, ChevronLeft, ChevronRight, X, Calendar, ListTodo } from '@/lib/icons'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 const container = {
     hidden: { opacity: 0 },
@@ -511,16 +512,17 @@ function BookingCard({ booking, updateStatus, compact = false }: {
                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${STATUS_STYLES[booking.status] || STATUS_STYLES.confirmed}`}>
                         {booking.status.replace('_', ' ')}
                     </span>
-                    <select
+                    <CustomSelect
+                        size="sm"
                         value={booking.status}
-                        onChange={e => updateStatus(booking.id, e.target.value as Booking['status'])}
-                        className="text-xs border border-border rounded-lg px-2 py-1.5 text-text-secondary bg-surface focus:outline-none focus:border-primary cursor-pointer"
-                    >
-                        <option value="confirmed">Confirmed</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="no_show">No Show</option>
-                    </select>
+                        onChange={v => updateStatus(booking.id, v as Booking['status'])}
+                        options={[
+                            { value: 'confirmed', label: 'Confirmed' },
+                            { value: 'completed', label: 'Completed' },
+                            { value: 'cancelled', label: 'Cancelled' },
+                            { value: 'no_show',   label: 'No Show' },
+                        ]}
+                    />
                 </div>
             </div>
         </div>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Save, Loader2, Save as SaveIcon } from '@/lib/icons'
 import { ProjectStatus } from '@/types/database'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 interface EditProjectDetailsProps {
     isOpen: boolean
@@ -64,16 +65,16 @@ export function EditProjectDetails({ isOpen, onClose, onSave, initialData }: Edi
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-text-primary">Status</label>
-                                <select 
-                                    value={form.status} 
-                                    onChange={e => setForm(prev => ({ ...prev, status: e.target.value as ProjectStatus }))}
-                                    className="input-field bg-white"
-                                >
-                                    <option value="planning">Planning</option>
-                                    <option value="in_progress">In Progress</option>
-                                    <option value="on_hold">On Hold</option>
-                                    <option value="complete">Complete</option>
-                                </select>
+                                <CustomSelect
+                                    value={form.status}
+                                    onChange={v => setForm(prev => ({ ...prev, status: v as ProjectStatus }))}
+                                    options={[
+                                        { value: 'planning',    label: 'Planning' },
+                                        { value: 'in_progress', label: 'In Progress' },
+                                        { value: 'on_hold',     label: 'On Hold' },
+                                        { value: 'complete',    label: 'Complete' },
+                                    ]}
+                                />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-text-primary">Description</label>

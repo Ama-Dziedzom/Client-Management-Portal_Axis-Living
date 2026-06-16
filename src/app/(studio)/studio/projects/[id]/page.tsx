@@ -13,6 +13,7 @@ import {
     Document
 } from '@/types/database'
 import { Loader2, X, Save } from '@/lib/icons'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 import toast from 'react-hot-toast'
 import { logger } from '@/lib/logger'
 import { UploadModal } from '@/components/shared/UploadModal'
@@ -565,15 +566,15 @@ export default function StudioProjectDetailPage() {
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Status</label>
-                                    <select
+                                    <CustomSelect
                                         value={stageForm.status}
-                                        onChange={e => setStageForm(f => ({ ...f, status: e.target.value as TimelineStatus }))}
-                                        className="input-field w-full"
-                                    >
-                                        <option value="upcoming">Upcoming</option>
-                                        <option value="active">Active</option>
-                                        <option value="complete">Complete</option>
-                                    </select>
+                                        onChange={v => setStageForm(f => ({ ...f, status: v as TimelineStatus }))}
+                                        options={[
+                                            { value: 'upcoming', label: 'Upcoming' },
+                                            { value: 'active',   label: 'Active' },
+                                            { value: 'complete', label: 'Complete' },
+                                        ]}
+                                    />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary block mb-1.5">Notes</label>

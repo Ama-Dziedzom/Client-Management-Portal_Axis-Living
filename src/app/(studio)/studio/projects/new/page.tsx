@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { Client, ProjectStatus } from '@/types/database'
 import { ArrowLeft, Loader2, Save, Sparkles, User } from '@/lib/icons'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 
@@ -127,27 +128,18 @@ export default function NewProjectPage() {
                     {/* Client Selection */}
                     <div className="space-y-2">
                         <label className="text-sm font-semibold text-text-primary ml-1">Client</label>
-                        <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
-                            <select
-                                required
-                                value={clientId}
-                                onChange={(e) => setClientId(e.target.value)}
-                                className="input-field pl-11 appearance-none bg-white font-body"
-                            >
-                                <option value="" disabled>Select a client...</option>
-                                {clients.map(client => (
-                                    <option key={client.id} value={client.id}>
-                                        {client.name} ({client.email})
-                                    </option>
-                                ))}
-                            </select>
-                            {clients.length === 0 && (
-                                <p className="text-xs text-amber-600 mt-2 ml-1">
-                                    No active clients found. Create a client first.
-                                </p>
-                            )}
-                        </div>
+                        <CustomSelect
+                            value={clientId}
+                            onChange={setClientId}
+                            icon={<User className="w-4 h-4" />}
+                            placeholder="Select a client..."
+                            options={clients.map(c => ({ value: c.id, label: `${c.name} (${c.email})` }))}
+                        />
+                        {clients.length === 0 && (
+                            <p className="text-xs text-amber-600 ml-1">
+                                No active clients found. Create a client first.
+                            </p>
+                        )}
                     </div>
 
                     {/* Location & Status Grid */}
@@ -164,16 +156,16 @@ export default function NewProjectPage() {
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-text-primary ml-1">Initial Status</label>
-                            <select
+                            <CustomSelect
                                 value={status}
-                                onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                                className="input-field appearance-none bg-white"
-                            >
-                                <option value="planning">Planning</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="on_hold">On Hold</option>
-                                <option value="complete">Complete</option>
-                            </select>
+                                onChange={v => setStatus(v as ProjectStatus)}
+                                options={[
+                                    { value: 'planning',    label: 'Planning' },
+                                    { value: 'in_progress', label: 'In Progress' },
+                                    { value: 'on_hold',     label: 'On Hold' },
+                                    { value: 'complete',    label: 'Complete' },
+                                ]}
+                            />
                         </div>
                     </div>
 

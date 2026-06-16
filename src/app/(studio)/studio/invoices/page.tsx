@@ -19,6 +19,7 @@ import {
     Loader2,
     X,
 } from '@/lib/icons'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 type InvoiceRow = Invoice & { client_name: string; client_email: string; project_title: string }
 
@@ -199,18 +200,18 @@ export default function StudioInvoicesPage() {
                     />
                 </div>
                 <div className="min-w-[180px]">
-                    <select
+                    <CustomSelect
                         value={statusFilter}
-                        onChange={e => setStatusFilter(e.target.value)}
-                        className="input-field appearance-none bg-white cursor-pointer"
-                    >
-                        <option value="all">All Billing Statuses</option>
-                        <option value="draft">Draft</option>
-                        <option value="sent">Sent / Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="overdue">Overdue</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+                        onChange={setStatusFilter}
+                        options={[
+                            { value: 'all',       label: 'All Billing Statuses' },
+                            { value: 'draft',     label: 'Draft' },
+                            { value: 'sent',      label: 'Sent / Pending' },
+                            { value: 'paid',      label: 'Paid' },
+                            { value: 'overdue',   label: 'Overdue' },
+                            { value: 'cancelled', label: 'Cancelled' },
+                        ]}
+                    />
                 </div>
             </motion.div>
 

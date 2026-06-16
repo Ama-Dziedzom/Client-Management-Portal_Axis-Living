@@ -6,15 +6,15 @@ import { studioSupabase as supabase } from '@/lib/supabase'
 import { Project, Client } from '@/types/database'
 import { formatStatus, getStatusBadgeClass, formatDate } from '@/lib/utils'
 import Link from 'next/link'
-import { 
-    FolderKanban, 
-    Search, 
-    Plus, 
-    Filter,
+import {
+    FolderKanban,
+    Search,
+    Plus,
     MapPin,
     Calendar,
     ArrowRight
 } from '@/lib/icons'
+import { CustomSelect } from '@/components/ui/CustomSelect'
 
 const container = {
     hidden: { opacity: 0 },
@@ -104,19 +104,18 @@ export default function StudioProjectsPage() {
                         className="input-field pl-11"
                     />
                 </div>
-                <div className="relative min-w-[180px]">
-                    <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
-                    <select
+                <div className="min-w-[180px]">
+                    <CustomSelect
                         value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="input-field pl-11 appearance-none bg-surface cursor-pointer"
-                    >
-                        <option value="all">All Statuses</option>
-                        <option value="planning">Planning</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="on_hold">On Hold</option>
-                        <option value="complete">Complete</option>
-                    </select>
+                        onChange={setStatusFilter}
+                        options={[
+                            { value: 'all',         label: 'All Statuses' },
+                            { value: 'planning',    label: 'Planning' },
+                            { value: 'in_progress', label: 'In Progress' },
+                            { value: 'on_hold',     label: 'On Hold' },
+                            { value: 'complete',    label: 'Complete' },
+                        ]}
+                    />
                 </div>
             </motion.div>
 
