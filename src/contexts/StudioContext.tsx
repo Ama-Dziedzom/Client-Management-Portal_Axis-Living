@@ -29,7 +29,7 @@ export function StudioProvider({ children }: { children: ReactNode }) {
     const { session, user: studioUser, loading, signOut } = useSupabaseAuth<StudioUser>(
         studioSupabase,
         'studio_users',
-        '/studio-login',
+        '/login',
         async () => {
             logger.warn('Auth', 'User not found in studio_users table')
         }

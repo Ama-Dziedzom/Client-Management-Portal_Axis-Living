@@ -508,14 +508,12 @@ function BookingCard({ booking, updateStatus, compact = false }: {
                     </span>
                 )}
 
-                <div className="ml-auto flex items-center gap-2">
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${STATUS_STYLES[booking.status] || STATUS_STYLES.confirmed}`}>
-                        {booking.status.replace('_', ' ')}
-                    </span>
+                <div className="ml-auto">
                     <CustomSelect
                         size="sm"
                         value={booking.status}
                         onChange={v => updateStatus(booking.id, v as Booking['status'])}
+                        triggerClassName={`flex items-center gap-1.5 border rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-colors focus:outline-none ${STATUS_STYLES[booking.status] || STATUS_STYLES.confirmed}`}
                         options={[
                             { value: 'confirmed', label: 'Confirmed' },
                             { value: 'completed', label: 'Completed' },
