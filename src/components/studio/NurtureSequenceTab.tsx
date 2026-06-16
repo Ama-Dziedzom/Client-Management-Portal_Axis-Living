@@ -1,14 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { emailTemplates, wrap, btn, randomImage } from '@/lib/emailTemplates'
+import { wrap, btn, randomImage } from '@/lib/emailTemplates'
 import {
     Copy, Check, Plus, Pencil, Trash2, ChevronUp, ChevronDown,
-    ToggleLeft, ToggleRight, X, Save, Clock, Mail, Eye, EyeOff,
+    ToggleLeft, ToggleRight, X, Save, Clock, Mail, Eye, EyeOff, Send,
 } from '@/lib/icons'
-
-// ───── Nurture preview builder ─────
 
 function buildNurturePreview(subject: string, body: string): string {
     const name = 'Ama'
@@ -40,18 +38,6 @@ function buildNurturePreview(subject: string, body: string): string {
     })
 }
 
-// ───── Types ─────
-
-interface EmailTemplate {
-    id: string
-    name: string
-    subject: string
-    heading: string
-    body: string
-    note: string | null
-    updated_at: string
-}
-
 interface NurtureEmail {
     id: string
     sequence_order: number
@@ -63,237 +49,6 @@ interface NurtureEmail {
     updated_at: string
 }
 
-// ───── Transactional Tab ─────
-
-const SAMPLE = {
-    name: 'Ama Dziedzom',
-    date: 'June 20, 2026',
-    time: '10:00 AM',
-    meetingLink: 'https://meet.google.com/owu-zhiz-bns',
-    cancellationUrl: 'https://client-axis-living.vercel.app/booking/cancel?id=example',
-}
-
-const TEMPLATE_META: Record<string, { trigger: string }> = {
-    booking_confirmation: { trigger: 'On consultation booked' },
-    booking_cancelled:    { trigger: 'On client self-cancellation' },
-    lookbook_delivery:    { trigger: 'On lookbook sign-up' },
-}
-
-function buildPreview(id: string, tpl: EmailTemplate): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const et = emailTemplates as any
-    if (id === 'booking_confirmation') {
-        return et.bookingConfirmation(SAMPLE.name, SAMPLE.date, SAMPLE.time, SAMPLE.meetingLink, SAMPLE.cancellationUrl, tpl).html
-    }
-    if (id === 'booking_cancelled') {
-        return et.bookingCancelled(SAMPLE.name, SAMPLE.date, SAMPLE.time, tpl).html
-    }
-    if (id === 'lookbook_delivery') {
-        return et.lookbookDelivery(SAMPLE.name.split(' ')[0], tpl).html
-    }
-    return '<p>No preview available.</p>'
-}
-
-const PLACEHOLDER_HINT: Record<string, string[]> = {
-    booking_confirmation: ['{{name}}', '{{date}}', '{{time}}', '{{cancel_link}}'],
-    booking_cancelled:    ['{{name}}', '{{date}}', '{{time}}'],
-    lookbook_delivery:    ['{{name}}'],
-}
-
-function TransactionalTab() {
-    const [templates, setTemplates] = useState<EmailTemplate[]>([])
-    const [loading, setLoading] = useState(true)
-    const [activeId, setActiveId] = useState<string>('booking_confirmation')
-    const [editing, setEditing] = useState(false)
-    const [form, setForm] = useState<Partial<EmailTemplate>>({})
-    const [saving, setSaving] = useState(false)
-    const [saved, setSaved] = useState(false)
-    const [showPreview, setShowPreview] = useState(true)
-
-    useEffect(() => {
-        fetch('/api/studio/email-templates')
-            .then(r => r.json())
-            .then(r => { setTemplates(r.data ?? []); setLoading(false) })
-            .catch(() => setLoading(false))
-    }, [])
-
-    const active = templates.find(t => t.id === activeId)
-
-    const startEdit = useCallback(() => {
-        if (!active) return
-        setForm({ subject: active.subject, heading: active.heading, body: active.body, note: active.note ?? '' })
-        setEditing(true)
-    }, [active])
-
-    const cancelEdit = () => { setEditing(false); setForm({}) }
-
-    const save = async () => {
-        if (!active) return
-        setSaving(true)
-        const res = await fetch(`/api/studio/email-templates/${active.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
-        })
-        const result = await res.json()
-        if (result.data) {
-            setTemplates(prev => prev.map(t => t.id === active.id ? result.data : t))
-        }
-        setSaving(false)
-        setEditing(false)
-        setSaved(true)
-        setTimeout(() => setSaved(false), 2500)
-    }
-
-    // Merge live form values into a preview-able template object
-    const previewTpl = editing && active ? { ...active, ...form } : active
-
-    if (loading) return (
-        <div className="space-y-4">{[1, 2].map(i => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
-    )
-
-    if (templates.length === 0) return (
-        <div className="card-flat text-center py-12">
-            <p className="text-text-secondary text-sm">No templates found. Run the SQL migration in your Supabase dashboard first.</p>
-        </div>
-    )
-
-    return (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Left — selector + editor */}
-            <div className="space-y-4">
-                {/* Template selector */}
-                <div className="flex flex-wrap gap-2">
-                    {templates.map(t => (
-                        <button key={t.id} onClick={() => { setActiveId(t.id); setEditing(false); setForm({}) }}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${activeId === t.id ? 'bg-accent/20 text-primary border-accent/30' : 'bg-surface text-text-secondary border-border hover:text-text-primary'}`}>
-                            {t.name}
-                        </button>
-                    ))}
-                </div>
-
-                {active && (
-                    <div className="card-flat space-y-4">
-                        {/* Header */}
-                        <div className="flex items-start justify-between gap-3">
-                            <div>
-                                <p className="text-text-primary font-semibold text-sm">{active.name}</p>
-                                <p className="text-text-secondary text-xs mt-0.5">{TEMPLATE_META[active.id]?.trigger}</p>
-                            </div>
-                            {!editing && (
-                                <div className="flex items-center gap-2">
-                                    {saved && <span className="text-xs text-emerald-600 font-medium flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Saved</span>}
-                                    <button onClick={startEdit}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-text-secondary hover:text-text-primary transition-colors">
-                                        <Pencil className="w-3.5 h-3.5" /> Edit
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Placeholder hint */}
-                        {PLACEHOLDER_HINT[active.id] && (
-                            <div className="bg-accent/5 border border-accent/20 rounded-xl px-3 py-2">
-                                <p className="text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1.5">Available placeholders</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {PLACEHOLDER_HINT[active.id].map(p => (
-                                        <code key={p} className="bg-surface border border-border px-2 py-0.5 rounded text-xs font-mono text-primary">{p}</code>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {editing ? (
-                            /* Edit form */
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Subject</label>
-                                    <input value={form.subject ?? ''} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                                        className="input-field w-full" />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Heading</label>
-                                    <input value={form.heading ?? ''} onChange={e => setForm(f => ({ ...f, heading: e.target.value }))}
-                                        className="input-field w-full" />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Body</label>
-                                    <textarea value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
-                                        rows={4} className="input-field w-full resize-y" />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-1.5">Footer note</label>
-                                    <input value={form.note ?? ''} onChange={e => setForm(f => ({ ...f, note: e.target.value }))}
-                                        className="input-field w-full" placeholder="Optional note below the email content" />
-                                </div>
-                                <div className="flex gap-3">
-                                    <button onClick={save} disabled={saving}
-                                        className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">
-                                        <Save className="w-4 h-4" /> {saving ? 'Saving…' : 'Save'}
-                                    </button>
-                                    <button onClick={cancelEdit}
-                                        className="px-5 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary border border-border">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            /* Read view */
-                            <div className="space-y-3 text-sm">
-                                {[
-                                    { label: 'Subject',      value: active.subject },
-                                    { label: 'Heading',      value: active.heading },
-                                    { label: 'Body',         value: active.body },
-                                    { label: 'Footer note',  value: active.note || '—' },
-                                ].map(({ label, value }) => (
-                                    <div key={label}>
-                                        <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary block mb-0.5">{label}</span>
-                                        <span className="text-text-primary leading-relaxed">{value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {/* Right — live preview */}
-            <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Live Preview</span>
-                    <button onClick={() => setShowPreview(p => !p)}
-                        className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors">
-                        {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        {showPreview ? 'Hide' : 'Show'}
-                    </button>
-                </div>
-                {showPreview && previewTpl && (
-                    <div className="rounded-2xl overflow-hidden border border-border shadow-card">
-                        <div className="bg-surface border-b border-border px-4 py-2.5 flex items-center gap-2">
-                            <span className="w-3 h-3 rounded-full bg-red-400" />
-                            <span className="w-3 h-3 rounded-full bg-yellow-400" />
-                            <span className="w-3 h-3 rounded-full bg-green-400" />
-                            <span className="ml-3 text-xs text-text-secondary font-mono truncate">
-                                {(form.subject || previewTpl.subject).replace('{{date}}', SAMPLE.date).replace('{{name}}', SAMPLE.name.split(' ')[0])}
-                            </span>
-                        </div>
-                        <iframe
-                            key={activeId + JSON.stringify(form)}
-                            srcDoc={buildPreview(activeId, previewTpl as EmailTemplate)}
-                            title="Email preview"
-                            className="w-full bg-white"
-                            style={{ height: '780px', border: 'none' }}
-                            sandbox="allow-same-origin"
-                        />
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
-
-// ───── Nurture Sequence Tab ─────
-
 const EMPTY_FORM = { subject: '', body: '', delay_days: 0 }
 
 function delayLabel(days: number) {
@@ -302,7 +57,7 @@ function delayLabel(days: number) {
     return `Day ${days}`
 }
 
-function NurtureTab() {
+export default function NurtureSequenceTab() {
     const [emails, setEmails] = useState<NurtureEmail[]>([])
     const [loading, setLoading] = useState(true)
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -313,8 +68,17 @@ function NurtureTab() {
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
     const [previewId, setPreviewId] = useState<string | null>(null)
+    const [sendConfirmId, setSendConfirmId] = useState<string | null>(null)
+    const [sending, setSending] = useState(false)
+    const [sendResult, setSendResult] = useState<{ id: string; sent: number } | null>(null)
+    const [contacts, setContacts] = useState<{ id: string; email: string; name: string | null }[]>([])
+    const [selectedContactIds, setSelectedContactIds] = useState<string[]>([])
+    const [contactSearch, setContactSearch] = useState('')
 
-    useEffect(() => { fetchEmails() }, [])
+    useEffect(() => {
+        fetchEmails()
+        fetch('/api/studio/contacts').then(r => r.json()).then(r => setContacts(r.data ?? [])).catch(() => {})
+    }, [])
 
     const fetchEmails = async () => {
         setLoading(true)
@@ -364,6 +128,40 @@ function NurtureTab() {
         setEmails(prev => prev.filter(e => e.id !== id))
         setDeleteConfirmId(null)
     }
+
+    const closeSendPanel = () => {
+        setSendConfirmId(null)
+        setSelectedContactIds([])
+        setContactSearch('')
+    }
+
+    const sendNow = async (emailId: string) => {
+        setSending(true)
+        try {
+            const body = selectedContactIds.length
+                ? { subscriber_ids: selectedContactIds }
+                : {}
+            const res = await fetch(`/api/studio/nurture-emails/${emailId}/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            })
+            const result = await res.json()
+            setSendResult({ id: emailId, sent: result.sent ?? 0 })
+            setTimeout(() => setSendResult(null), 4000)
+        } finally {
+            setSending(false)
+            closeSendPanel()
+        }
+    }
+
+    const toggleContact = (id: string) =>
+        setSelectedContactIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+
+    const filteredContacts = contacts.filter(c =>
+        c.email.toLowerCase().includes(contactSearch.toLowerCase()) ||
+        (c.name ?? '').toLowerCase().includes(contactSearch.toLowerCase())
+    )
 
     const reorder = async (index: number, direction: 'up' | 'down') => {
         const swapIndex = direction === 'up' ? index - 1 : index + 1
@@ -504,6 +302,10 @@ function NurtureTab() {
                                             className="p-2 rounded-lg hover:bg-surface transition-colors text-text-secondary hover:text-text-primary">
                                             <Pencil className="w-4 h-4" />
                                         </button>
+                                        <button onClick={() => setSendConfirmId(email.id)} title="Send to contacts"
+                                            className={`p-2 rounded-lg transition-colors ${sendResult?.id === email.id ? 'text-emerald-600' : 'hover:bg-surface text-text-secondary hover:text-primary'}`}>
+                                            {sendResult?.id === email.id ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+                                        </button>
                                         <button onClick={() => setDeleteConfirmId(email.id)} title="Delete"
                                             className="p-2 rounded-lg hover:bg-red-50 transition-colors text-text-secondary hover:text-red-500">
                                             <Trash2 className="w-4 h-4" />
@@ -529,6 +331,83 @@ function NurtureTab() {
                                                 sandbox="allow-same-origin"
                                             />
                                         </div>
+                                    </div>
+                                )}
+
+                                {sendConfirmId === email.id && (
+                                    <div className="mt-4 pt-4 border-t border-border space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-sm font-medium text-text-primary">
+                                                {selectedContactIds.length
+                                                    ? `Send to ${selectedContactIds.length} selected contact${selectedContactIds.length !== 1 ? 's' : ''}`
+                                                    : `Send to all contacts (${contacts.length})`}
+                                            </p>
+                                            <button onClick={closeSendPanel} className="text-text-secondary hover:text-text-primary">
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        {contacts.length > 0 && (
+                                            <div className="border border-border rounded-xl overflow-hidden">
+                                                <div className="px-3 py-2 border-b border-border bg-surface flex items-center gap-2">
+                                                    <input
+                                                        value={contactSearch}
+                                                        onChange={e => setContactSearch(e.target.value)}
+                                                        placeholder="Search contacts…"
+                                                        className="flex-1 text-sm bg-transparent outline-none text-text-primary placeholder:text-text-secondary"
+                                                    />
+                                                    {selectedContactIds.length > 0 && (
+                                                        <button onClick={() => setSelectedContactIds([])} className="text-xs text-text-secondary hover:text-text-primary whitespace-nowrap">
+                                                            Clear
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setSelectedContactIds(
+                                                            selectedContactIds.length === filteredContacts.length
+                                                                ? []
+                                                                : filteredContacts.map(c => c.id)
+                                                        )}
+                                                        className="text-xs text-primary hover:underline whitespace-nowrap"
+                                                    >
+                                                        {selectedContactIds.length === filteredContacts.length ? 'Deselect all' : 'Select all'}
+                                                    </button>
+                                                </div>
+                                                <div className="max-h-48 overflow-y-auto divide-y divide-border">
+                                                    {filteredContacts.map(contact => (
+                                                        <label key={contact.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-surface cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedContactIds.includes(contact.id)}
+                                                                onChange={() => toggleContact(contact.id)}
+                                                                className="rounded accent-primary"
+                                                            />
+                                                            <div className="min-w-0">
+                                                                {contact.name && <p className="text-sm font-medium text-text-primary truncate">{contact.name}</p>}
+                                                                <p className="text-xs text-text-secondary truncate">{contact.email}</p>
+                                                            </div>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <p className="text-xs text-text-secondary">Anyone already sent this email will be skipped.</p>
+
+                                        <div className="flex gap-3">
+                                            <button onClick={() => sendNow(email.id)} disabled={sending}
+                                                className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 disabled:opacity-50">
+                                                <Send className="w-3.5 h-3.5" />
+                                                {sending ? 'Sending…' : selectedContactIds.length ? `Send to ${selectedContactIds.length}` : 'Send to all'}
+                                            </button>
+                                            <button onClick={closeSendPanel}
+                                                className="px-4 py-2 border border-border rounded-xl text-sm text-text-secondary hover:text-text-primary">Cancel</button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {sendResult?.id === email.id && sendConfirmId !== email.id && (
+                                    <div className="mt-4 pt-4 border-t border-border flex items-center gap-2 text-sm text-emerald-600 font-medium">
+                                        <Check className="w-4 h-4" /> Sent to {sendResult.sent} contact{sendResult.sent !== 1 ? 's' : ''}
                                     </div>
                                 )}
 
@@ -584,33 +463,5 @@ function NurtureTab() {
                 </button>
             )}
         </div>
-    )
-}
-
-// ───── Page ─────
-
-type Tab = 'transactional' | 'nurture'
-
-export default function EmailsPage() {
-    const [tab, setTab] = useState<Tab>('transactional')
-
-    return (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <div className="mb-8">
-                <h1 className="text-3xl lg:text-4xl font-heading font-semibold text-text-primary mb-2">Emails</h1>
-                <p className="text-text-secondary font-body text-lg">Edit transactional templates and manage your nurture sequence</p>
-            </div>
-
-            <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 w-fit mb-8">
-                {([['transactional', 'Transactional'], ['nurture', 'Nurture Sequence']] as [Tab, string][]).map(([key, label]) => (
-                    <button key={key} onClick={() => setTab(key)}
-                        className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === key ? 'bg-accent/20 text-primary border border-accent/30' : 'text-text-secondary hover:text-text-primary'}`}>
-                        {label}
-                    </button>
-                ))}
-            </div>
-
-            {tab === 'transactional' ? <TransactionalTab /> : <NurtureTab />}
-        </motion.div>
     )
 }

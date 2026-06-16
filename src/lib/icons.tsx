@@ -79,6 +79,7 @@ import {
     ComputerIcon           as _Monitor,
     MoonIcon               as _Moon,
     Sun01Icon              as _Sun,
+    Contact01Icon          as _Contact,
 } from '@hugeicons/core-free-icons'
 
 // ─── Type ────────────────────────────────────────────────────────────────────
@@ -189,3 +190,4 @@ export const Monitor        = icon(_Monitor,        'Monitor')
 export const Moon           = icon(_Moon,           'Moon')
 export const Palette        = icon(_Palette,        'Palette')
 export const Sun            = icon(_Sun,            'Sun')
+export const Contact        = icon(_Contact,        'Contact')

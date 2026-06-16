@@ -18,7 +18,8 @@ import {
     BookMarked,
     CalendarDays,
     ChevronDown,
-    Mail,
+
+    Contact,
 } from '@/lib/icons'
 import { useStudio } from '@/contexts/StudioContext'
 
@@ -31,6 +32,7 @@ const navItems = [
     { label: 'Bookings',  icon: CalendarDays,    href: '/studio/bookings' },
     { label: 'Messages',  icon: MessageSquare,   href: '/studio/messages' },
     { label: 'Invoices',  icon: Receipt,         href: '/studio/invoices' },
+    { label: 'Contacts',  icon: Contact,         href: '/studio/contacts' },
     { label: 'Settings',  icon: Settings,        href: '/studio/settings' },
 ]
 
@@ -40,7 +42,6 @@ const websiteNavItems = [
     { label: 'Journal',       icon: BookOpen,   href: '/studio/website/journal' },
     { label: 'Testimonials',  icon: Star,       href: '/studio/website/testimonials' },
     { label: 'Lookbook',      icon: BookMarked, href: '/studio/website/lookbook' },
-    { label: 'Emails',        icon: Mail,       href: '/studio/website/emails' },
     { label: 'Site Settings', icon: Settings,   href: '/studio/website/settings' },
 ]
 

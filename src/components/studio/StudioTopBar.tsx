@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
     Menu, X,
     LayoutDashboard, Users, FolderKanban, MessageSquare, Receipt,
-    CalendarDays, Settings, Globe, LogOut,
+    CalendarDays, Settings, Globe, LogOut, Contact,
 } from '@/lib/icons'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStudio } from '@/contexts/StudioContext'
@@ -19,6 +19,7 @@ const navItems = [
     { label: 'Bookings',  icon: CalendarDays,    href: '/studio/bookings' },
     { label: 'Messages',  icon: MessageSquare,   href: '/studio/messages' },
     { label: 'Invoices',  icon: Receipt,         href: '/studio/invoices' },
+    { label: 'Contacts',  icon: Contact,         href: '/studio/contacts' },
     { label: 'Website',   icon: Globe,           href: '/studio/website' },
     { label: 'Settings',  icon: Settings,        href: '/studio/settings' },
 ]

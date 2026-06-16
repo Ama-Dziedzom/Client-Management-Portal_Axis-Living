@@ -208,8 +208,15 @@ export const emailTemplates = {
     };
   },
 
-  invoiceDelivery: (name, invoiceNumber, dueDate, projectTitle, lineItems = [], subtotal, taxAmount, total, currency = 'ZMW', notes = '') => {
+  invoiceDelivery: (name, invoiceNumber, dueDate, projectTitle, lineItems = [], subtotal, taxAmount, total, currency = 'ZMW', notes = '', tpl = {}) => {
     const fmt = (n) => `${currency} ${Number(n).toLocaleString('en-ZM', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const vars = { name, invoice_number: invoiceNumber, project: projectTitle, due_date: dueDate };
+
+    const subject = interpolate(tpl.subject || 'Invoice {{invoice_number}} from Axis Living', vars);
+    const heading = interpolate(tpl.heading || 'Your invoice is ready.', vars);
+    const body    = interpolate(tpl.body    || `Hi {{name}}, please find your invoice for <strong>{{project}}</strong> below. Payment is due by {{due_date}}.`, vars);
+    const note    = interpolate(tpl.note    ?? `Questions about this invoice? Reply to this email or reach us at ${CONTACT_EMAIL}.`, vars);
+
     const lineItemRows = lineItems.map(item => `
       <tr>
         <td style="padding:10px 0;border-bottom:1px solid ${COLORS.border};font-size:14px;color:${COLORS.text};">${item.description}</td>
@@ -219,11 +226,11 @@ export const emailTemplates = {
       </tr>`).join('');
 
     return {
-      subject: `Invoice ${invoiceNumber} from Axis Living`,
+      subject,
       html: wrap({
         image: randomImage(),
-        heading: 'Your invoice is ready.',
-        body: `Hi ${name}, please find your invoice for <strong>${projectTitle}</strong> below. Payment is due by ${dueDate}.`,
+        heading,
+        body,
         content: `
           <!-- Invoice meta -->
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;background:${COLORS.bg};border-radius:10px;padding:28px;text-align:left;">
@@ -266,7 +273,59 @@ export const emailTemplates = {
           ${notes ? `<p style="font-size:13px;color:${COLORS.muted};line-height:1.7;font-style:italic;background:${COLORS.bg};padding:20px 24px;border-radius:10px;text-align:left;">${notes}</p>` : ''}
           <p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:${COLORS.primary};">${YOUR_NAME}</p>
         `,
-        note: `Questions about this invoice? Reply to this email or reach us at ${CONTACT_EMAIL}.`,
+        note,
+      }),
+    };
+  },
+
+  invoiceReminder: (name, invoiceNumber, dueDate, projectTitle, total, currency = 'ZMW', portalUrl = '', daysOverdue = 0, tpl = {}) => {
+    const fmt = (n) => `${currency} ${Number(n).toLocaleString('en-ZM', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const isOverdue = daysOverdue > 0;
+    const isDueToday = daysOverdue === 0;
+    const vars = { name, invoice_number: invoiceNumber, project: projectTitle, due_date: dueDate, amount: fmt(total) };
+
+    const defaultSubject = isOverdue
+      ? `Overdue: Invoice {{invoice_number}} — {{amount}}`
+      : isDueToday
+      ? `Payment due today: Invoice {{invoice_number}}`
+      : `Friendly reminder: Invoice {{invoice_number}} due {{due_date}}`;
+
+    const defaultHeading = isOverdue
+      ? 'Your invoice is overdue.'
+      : isDueToday
+      ? 'Payment is due today.'
+      : 'A friendly payment reminder.';
+
+    const overdueNote = isOverdue
+      ? ` Your invoice is now <strong>${daysOverdue} day${daysOverdue === 1 ? '' : 's'} overdue</strong>.`
+      : '';
+
+    const defaultBody = `Hi {{name}}, this is a reminder that invoice {{invoice_number}} for <strong>{{project}}</strong> has a balance of <strong>{{amount}}</strong> due by {{due_date}}.${overdueNote} Please arrange payment at your earliest convenience.`;
+
+    const subject = interpolate(tpl.subject || defaultSubject, vars);
+    const heading = interpolate(tpl.heading || defaultHeading, vars);
+    const body    = interpolate(tpl.body    || defaultBody, vars);
+    const note    = interpolate(tpl.note    ?? `Questions about this invoice? Reply to this email or reach us at ${CONTACT_EMAIL}.`, vars);
+
+    return {
+      subject,
+      html: wrap({
+        image: randomImage(),
+        heading,
+        body,
+        content: `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;background:${COLORS.bg};border-radius:10px;padding:28px;text-align:left;">
+            <tbody>
+              ${detailRow('Invoice Number', invoiceNumber)}
+              ${detailRow('Project', projectTitle)}
+              ${detailRow('Due Date', dueDate)}
+              ${detailRow('Amount Due', fmt(total))}
+            </tbody>
+          </table>
+          ${portalUrl ? btn('View Invoice', portalUrl) : ''}
+          <p style="margin:36px 0 0;font-style:italic;font-family:Georgia,serif;font-size:16px;color:${COLORS.primary};">${YOUR_NAME}</p>
+        `,
+        note,
       }),
     };
   },

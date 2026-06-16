@@ -11,9 +11,10 @@ import {
     MessageSquare, Receipt, FolderKanban, Users, AlertTriangle, ChevronRight
 } from '@/lib/icons'
 import toast from 'react-hot-toast'
+import EmailTemplatesTab from '@/components/studio/EmailTemplatesTab'
 
 // ────────────────── types ──────────────────
-type SettingsTab = 'account' | 'notifications' | 'appearance'
+type SettingsTab = 'account' | 'notifications' | 'appearance' | 'email_templates'
 
 interface ProfileForm {
     name: string
@@ -42,9 +43,10 @@ interface AppearancePrefs {
 
 // ────────────────── tab config ──────────────────
 const tabs: { id: SettingsTab; label: string; icon: typeof User; description: string }[] = [
-    { id: 'account', label: 'Account', icon: User, description: 'Profile & security' },
-    { id: 'notifications', label: 'Notifications', icon: Bell, description: 'Email preferences' },
-    { id: 'appearance', label: 'Appearance', icon: Palette, description: 'Branding & display' },
+    { id: 'account',         label: 'Account',         icon: User,    description: 'Profile & security' },
+    { id: 'notifications',   label: 'Notifications',   icon: Bell,    description: 'Email preferences' },
+    { id: 'appearance',      label: 'Appearance',       icon: Palette, description: 'Branding & display' },
+    { id: 'email_templates', label: 'Email Templates', icon: Mail,    description: 'Transactional templates' },
 ]
 
 // ────────────────── fade variant ──────────────────
@@ -61,8 +63,10 @@ const fadeIn = {
 export default function StudioSettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>('account')
 
+    const isWide = activeTab === 'email_templates'
+
     return (
-        <div className="max-w-4xl">
+        <div className={isWide ? '' : 'max-w-4xl'}>
             <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -78,9 +82,9 @@ export default function StudioSettingsPage() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className={`grid grid-cols-1 gap-8 ${isWide ? '' : 'lg:grid-cols-3'}`}>
                     {/* ───── Sidebar Tabs ───── */}
-                    <div className="lg:col-span-1 space-y-1">
+                    <div className={isWide ? 'flex flex-wrap gap-1' : 'lg:col-span-1 space-y-1'}>
                         {tabs.map((tab) => {
                             const Icon = tab.icon
                             const active = activeTab === tab.id
@@ -88,31 +92,44 @@ export default function StudioSettingsPage() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all group ${
+                                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all group ${
+                                        isWide ? 'flex-row' : 'w-full'
+                                    } ${
                                         active
                                             ? 'bg-primary/8 text-primary shadow-sm'
                                             : 'text-text-secondary hover:bg-accent/5 hover:text-text-primary'
                                     }`}
                                 >
                                     <Icon className={`w-[18px] h-[18px] transition-colors ${active ? 'text-primary' : 'text-text-secondary group-hover:text-text-primary'}`} />
-                                    <div className="flex-1 text-left">
-                                        <span className="block">{tab.label}</span>
-                                        <span className={`block text-[10px] mt-0.5 font-normal ${active ? 'text-primary/60' : 'text-text-secondary/60'}`}>
-                                            {tab.description}
-                                        </span>
-                                    </div>
-                                    <ChevronRight className={`w-3.5 h-3.5 transition-all ${active ? 'opacity-100 text-primary' : 'opacity-0 -translate-x-2 group-hover:opacity-40 group-hover:translate-x-0'}`} />
+                                    {isWide ? (
+                                        <span>{tab.label}</span>
+                                    ) : (
+                                        <>
+                                            <div className="flex-1 text-left">
+                                                <span className="block">{tab.label}</span>
+                                                <span className={`block text-[10px] mt-0.5 font-normal ${active ? 'text-primary/60' : 'text-text-secondary/60'}`}>
+                                                    {tab.description}
+                                                </span>
+                                            </div>
+                                            <ChevronRight className={`w-3.5 h-3.5 transition-all ${active ? 'opacity-100 text-primary' : 'opacity-0 -translate-x-2 group-hover:opacity-40 group-hover:translate-x-0'}`} />
+                                        </>
+                                    )}
                                 </button>
                             )
                         })}
                     </div>
 
                     {/* ───── Tab Content ───── */}
-                    <div className="lg:col-span-2">
+                    <div className={isWide ? '' : 'lg:col-span-2'}>
                         <AnimatePresence mode="wait">
-                            {activeTab === 'account' && <AccountTab key="account" />}
-                            {activeTab === 'notifications' && <NotificationsTab key="notifications" />}
-                            {activeTab === 'appearance' && <AppearanceTab key="appearance" />}
+                            {activeTab === 'account'         && <AccountTab key="account" />}
+                            {activeTab === 'notifications'   && <NotificationsTab key="notifications" />}
+                            {activeTab === 'appearance'      && <AppearanceTab key="appearance" />}
+                            {activeTab === 'email_templates' && (
+                                <motion.div key="email_templates" {...fadeIn}>
+                                    <EmailTemplatesTab />
+                                </motion.div>
+                            )}
                         </AnimatePresence>
                     </div>
                 </div>
