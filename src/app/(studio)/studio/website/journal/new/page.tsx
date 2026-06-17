@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { ArrowLeft, Loader2 } from '@/lib/icons'
+import toast from 'react-hot-toast'
 
 function slugify(text: string) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -44,7 +45,8 @@ export default function NewJournalPostPage() {
             published: form.published,
             published_at: form.published ? new Date().toISOString() : null,
         })
-        if (err) { setError(err.message); setSaving(false); return }
+        if (err) { setError(err.message); setSaving(false); toast.error(err.message); return }
+        toast.success('Post saved')
         router.push('/studio/website/journal')
     }
 

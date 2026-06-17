@@ -6,6 +6,7 @@ import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsiteProject } from '@/types/database'
 import Link from 'next/link'
 import { ImageIcon, Plus, Search, Pencil, Trash2, Eye, EyeOff, Star, ArrowLeft } from '@/lib/icons'
+import toast from 'react-hot-toast'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }
@@ -28,19 +29,23 @@ export default function PortfolioPage() {
     }
 
     async function togglePublished(project: WebsiteProject) {
-        await supabase
+        const { error } = await supabase
             .from('website_projects')
             .update({ published: !project.published })
             .eq('id', project.id)
+        if (error) { toast.error('Failed to update'); return }
         setProjects(prev => prev.map(p => p.id === project.id ? { ...p, published: !p.published } : p))
+        toast.success(project.published ? 'Project unpublished' : 'Project published')
     }
 
     async function deleteProject(id: string) {
         if (!confirm('Delete this project? This cannot be undone.')) return
         setDeleting(id)
-        await supabase.from('website_projects').delete().eq('id', id)
+        const { error } = await supabase.from('website_projects').delete().eq('id', id)
+        if (error) { toast.error('Failed to delete project'); setDeleting(null); return }
         setProjects(prev => prev.filter(p => p.id !== id))
         setDeleting(null)
+        toast.success('Project deleted')
     }
 
     const filtered = projects.filter(p =>

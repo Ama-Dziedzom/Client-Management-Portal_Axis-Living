@@ -65,6 +65,7 @@ export default function StudioInvoicesPage() {
             )
         } catch (err) {
             console.error(err)
+            toast.error('Failed to load invoices')
         } finally {
             setLoading(false)
         }

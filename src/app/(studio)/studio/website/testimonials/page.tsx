@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsiteTestimonial } from '@/types/database'
 import { Star, Plus, Pencil, Trash2, Loader2, ArrowLeft } from '@/lib/icons'
+import toast from 'react-hot-toast'
 import Link from 'next/link'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
@@ -53,12 +54,14 @@ export default function TestimonialsPage() {
         setError('')
         if (editing) {
             const { error: err } = await supabase.from('website_testimonials').update(form).eq('id', editing.id)
-            if (err) { setError(err.message); setSaving(false); return }
+            if (err) { setError(err.message); setSaving(false); toast.error(err.message); return }
             setTestimonials(prev => prev.map(t => t.id === editing.id ? { ...t, ...form } : t))
+            toast.success('Testimonial updated')
         } else {
             const { data, error: err } = await supabase.from('website_testimonials').insert(form).select().single()
-            if (err) { setError(err.message); setSaving(false); return }
+            if (err) { setError(err.message); setSaving(false); toast.error(err.message); return }
             if (data) setTestimonials(prev => [...prev, data])
+            toast.success('Testimonial added')
         }
         setSaving(false)
         closeForm()
@@ -66,8 +69,10 @@ export default function TestimonialsPage() {
 
     async function deleteTestimonial(id: string) {
         if (!confirm('Delete this testimonial?')) return
-        await supabase.from('website_testimonials').delete().eq('id', id)
+        const { error } = await supabase.from('website_testimonials').delete().eq('id', id)
+        if (error) { toast.error('Failed to delete'); return }
         setTestimonials(prev => prev.filter(t => t.id !== id))
+        toast.success('Testimonial deleted')
     }
 
     if (loading) return <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="skeleton h-24 rounded-2xl" />)}</div>

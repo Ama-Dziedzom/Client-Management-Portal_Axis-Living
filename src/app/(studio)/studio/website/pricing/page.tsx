@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsitePricing } from '@/types/database'
 import { Tag, Plus, Pencil, Trash2, X, Loader2, Check, ArrowLeft } from '@/lib/icons'
+import toast from 'react-hot-toast'
 import Link from 'next/link'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
@@ -67,12 +68,14 @@ export default function PricingPage() {
         setError('')
         if (editing) {
             const { error: err } = await supabase.from('website_pricing').update(form).eq('id', editing.id)
-            if (err) { setError(err.message); setSaving(false); return }
+            if (err) { setError(err.message); setSaving(false); toast.error(err.message); return }
             setPackages(prev => prev.map(p => p.id === editing.id ? { ...p, ...form } : p))
+            toast.success('Package updated')
         } else {
             const { data, error: err } = await supabase.from('website_pricing').insert(form).select().single()
-            if (err) { setError(err.message); setSaving(false); return }
+            if (err) { setError(err.message); setSaving(false); toast.error(err.message); return }
             if (data) setPackages(prev => [...prev, data])
+            toast.success('Package added')
         }
         setSaving(false)
         closeForm()
@@ -80,8 +83,10 @@ export default function PricingPage() {
 
     async function deletePackage(id: string) {
         if (!confirm('Delete this package?')) return
-        await supabase.from('website_pricing').delete().eq('id', id)
+        const { error } = await supabase.from('website_pricing').delete().eq('id', id)
+        if (error) { toast.error('Failed to delete'); return }
         setPackages(prev => prev.filter(p => p.id !== id))
+        toast.success('Package deleted')
     }
 
     if (loading) return <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="skeleton h-24 rounded-2xl" />)}</div>

@@ -15,6 +15,7 @@ import {
     ArrowRight
 } from '@/lib/icons'
 import { CustomSelect } from '@/components/ui/CustomSelect'
+import toast from 'react-hot-toast'
 
 const container = {
     hidden: { opacity: 0 },
@@ -56,6 +57,7 @@ export default function StudioProjectsPage() {
             )
         } catch (error) {
             console.error('Error fetching projects:', error)
+            toast.error('Failed to load projects')
         } finally {
             setLoading(false)
         }

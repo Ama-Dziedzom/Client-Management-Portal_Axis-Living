@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Booking } from '@/types/database'
 import { CalendarDays, Clock, Mail, Phone, Search, CreditCard, Tag, ChevronLeft, ChevronRight, X, Calendar, ListTodo } from '@/lib/icons'
 import { CustomSelect } from '@/components/ui/CustomSelect'
+import toast from 'react-hot-toast'
 
 const container = {
     hidden: { opacity: 0 },
@@ -69,12 +70,17 @@ export default function BookingsPage() {
     }
 
     const updateStatus = async (id: string, status: Booking['status']) => {
-        await fetch('/api/studio/bookings', {
+        const res = await fetch('/api/studio/bookings', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, status }),
         })
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b))
+        if (res.ok) {
+            setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b))
+            toast.success(`Status updated to ${status.replace('_', ' ')}`)
+        } else {
+            toast.error('Failed to update status')
+        }
     }
 
     const today = new Date()

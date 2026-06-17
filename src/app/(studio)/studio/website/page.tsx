@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { Globe, ImageIcon, BookOpen, Tag, Star, BookMarked, Settings, ArrowRight } from '@/lib/icons'
+import { Globe, ImageIcon, BookOpen, Tag, Star, BookMarked, Palette, Settings, ArrowRight } from '@/lib/icons'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } }
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }
@@ -16,17 +16,19 @@ export default function WebsiteOverviewPage() {
         pricing: 0,
         testimonials: 0,
         lookbooks: 0,
+        moodbooks: 0,
     })
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function fetchCounts() {
-            const [projects, posts, pricing, testimonials, lookbooks] = await Promise.all([
+            const [projects, posts, pricing, testimonials, lookbooks, moodbooks] = await Promise.all([
                 supabase.from('website_projects').select('id', { count: 'exact', head: true }),
                 supabase.from('website_posts').select('id', { count: 'exact', head: true }),
                 supabase.from('website_pricing').select('id', { count: 'exact', head: true }),
                 supabase.from('website_testimonials').select('id', { count: 'exact', head: true }),
                 supabase.from('website_lookbooks').select('id', { count: 'exact', head: true }),
+                supabase.from('website_moodbooks').select('id', { count: 'exact', head: true }),
             ])
             setCounts({
                 projects: projects.count ?? 0,
@@ -34,6 +36,7 @@ export default function WebsiteOverviewPage() {
                 pricing: pricing.count ?? 0,
                 testimonials: testimonials.count ?? 0,
                 lookbooks: lookbooks.count ?? 0,
+                moodbooks: moodbooks.count ?? 0,
             })
             setLoading(false)
         }
@@ -45,7 +48,8 @@ export default function WebsiteOverviewPage() {
         { label: 'Journal', description: 'Write and publish blog posts', icon: BookOpen, href: '/studio/website/journal', count: counts.posts, color: 'bg-blue-50 text-blue-600' },
         { label: 'Pricing', description: 'Edit service packages', icon: Tag, href: '/studio/website/pricing', count: counts.pricing, color: 'bg-amber-50 text-amber-600' },
         { label: 'Testimonials', description: 'Manage client quotes', icon: Star, href: '/studio/website/testimonials', count: counts.testimonials, color: 'bg-purple-50 text-purple-600' },
-        { label: 'Lookbook', description: 'Upload lookbook files', icon: BookMarked, href: '/studio/website/lookbook', count: counts.lookbooks, color: 'bg-pink-50 text-pink-600' },
+        { label: 'Lookbook', description: 'Subscribers receive it in their inbox', icon: BookMarked, href: '/studio/website/lookbook', count: counts.lookbooks, color: 'bg-pink-50 text-pink-600' },
+        { label: 'Moodbook', description: 'Sent with booking confirmation emails', icon: Palette, href: '/studio/website/moodbook', count: counts.moodbooks, color: 'bg-violet-50 text-violet-600' },
         { label: 'Site Settings', description: 'Contact info, social links', icon: Settings, href: '/studio/website/settings', count: null, color: 'bg-gray-100 text-gray-600' },
     ]
 

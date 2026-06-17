@@ -7,6 +7,7 @@ import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsiteProject } from '@/types/database'
 import Link from 'next/link'
 import { ArrowLeft, Plus, X, Loader2 } from '@/lib/icons'
+import toast from 'react-hot-toast'
 
 function slugify(text: string) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -66,7 +67,8 @@ export default function EditPortfolioProjectPage() {
             images: form.images, featured: form.featured,
             published: form.published, display_order: form.display_order,
         }).eq('id', id)
-        if (err) { setError(err.message); setSaving(false); return }
+        if (err) { setError(err.message); setSaving(false); toast.error(err.message); return }
+        toast.success('Project updated')
         router.push('/studio/website/portfolio')
     }
 

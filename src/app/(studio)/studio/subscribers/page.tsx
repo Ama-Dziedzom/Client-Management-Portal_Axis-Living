@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Users, UserPlus, Trash2, Search, Mail, X, Check, Send } from '@/lib/icons'
+import toast from 'react-hot-toast'
 import NurtureSequenceTab from '@/components/studio/NurtureSequenceTab'
 
 interface Subscriber {
@@ -93,6 +94,9 @@ export default function SubscribersPage() {
                 setAddOpen(false)
                 setAddDone(true)
                 setTimeout(() => setAddDone(false), 2500)
+                toast.success('Subscriber added')
+            } else {
+                toast.error(result.error || 'Failed to add subscriber')
             }
         } finally {
             setAdding(false)
@@ -102,9 +106,14 @@ export default function SubscribersPage() {
     const deleteSubscriber = async (id: string) => {
         setDeleting(true)
         try {
-            await fetch(`/api/studio/contacts/${id}`, { method: 'DELETE' })
-            setSubscribers(prev => prev.filter(s => s.id !== id))
-            setDeleteId(null)
+            const res = await fetch(`/api/studio/contacts/${id}`, { method: 'DELETE' })
+            if (res.ok) {
+                setSubscribers(prev => prev.filter(s => s.id !== id))
+                setDeleteId(null)
+                toast.success('Subscriber removed')
+            } else {
+                toast.error('Failed to remove subscriber')
+            }
         } finally {
             setDeleting(false)
         }
@@ -124,6 +133,9 @@ export default function SubscribersPage() {
                 setSubscribers(prev => prev.map(s => s.id === subscriberId ? { ...s, emails_sent: s.emails_sent + 1 } : s))
                 setSentResult({ subscriberId, subject: email?.subject ?? '' })
                 setTimeout(() => setSentResult(null), 4000)
+                toast.success(`Email sent: "${email?.subject}"`)
+            } else {
+                toast.error('Email could not be sent')
             }
             setSendPickerId(null)
         } finally {

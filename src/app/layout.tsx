@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import './globals.css'
+import { ToasterProvider } from '@/components/ui/ToasterProvider'
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://axisliving.co.zm'),
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en" className="scroll-smooth">
             <body className="bg-background text-foreground antialiased min-h-screen overflow-x-hidden">
                 {children}
+                <ToasterProvider />
             </body>
         </html>
     )

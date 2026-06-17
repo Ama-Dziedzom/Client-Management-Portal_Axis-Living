@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { studioSupabase as supabase } from '@/lib/supabase'
 import { Settings, Loader2, Check, ArrowLeft } from '@/lib/icons'
+import toast from 'react-hot-toast'
 import Link from 'next/link'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
@@ -57,9 +58,11 @@ export default function SiteSettingsPage() {
 
         if (err) {
             setError(err.message)
+            toast.error(err.message)
         } else {
             setSaved(true)
             setTimeout(() => setSaved(false), 3000)
+            toast.success('Settings saved')
         }
         setSaving(false)
     }

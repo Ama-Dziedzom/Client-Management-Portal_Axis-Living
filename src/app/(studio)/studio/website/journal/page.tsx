@@ -6,6 +6,7 @@ import { studioSupabase as supabase } from '@/lib/supabase'
 import { WebsitePost } from '@/types/database'
 import Link from 'next/link'
 import { BookOpen, Plus, Search, Pencil, Trash2, Eye, EyeOff, ArrowLeft } from '@/lib/icons'
+import toast from 'react-hot-toast'
 import { formatDate } from '@/lib/utils'
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
@@ -33,16 +34,20 @@ export default function JournalPage() {
         if (!post.published && !post.published_at) {
             updates.published_at = new Date().toISOString()
         }
-        await supabase.from('website_posts').update(updates).eq('id', post.id)
+        const { error } = await supabase.from('website_posts').update(updates).eq('id', post.id)
+        if (error) { toast.error('Failed to update post'); return }
         setPosts(prev => prev.map(p => p.id === post.id ? { ...p, ...updates } : p))
+        toast.success(post.published ? 'Post unpublished' : 'Post published')
     }
 
     async function deletePost(id: string) {
         if (!confirm('Delete this post? This cannot be undone.')) return
         setDeleting(id)
-        await supabase.from('website_posts').delete().eq('id', id)
+        const { error } = await supabase.from('website_posts').delete().eq('id', id)
+        if (error) { toast.error('Failed to delete post'); setDeleting(null); return }
         setPosts(prev => prev.filter(p => p.id !== id))
         setDeleting(null)
+        toast.success('Post deleted')
     }
 
     const filtered = posts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
